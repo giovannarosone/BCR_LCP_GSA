@@ -34,7 +34,7 @@ make
 
 RUN
 
-./BCR_BWTCollection inputFile outputFile 0
+./BCR_LCP_GSA inputFile outputFile 0
 
 
 References:
