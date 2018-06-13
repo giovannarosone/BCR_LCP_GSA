@@ -4,6 +4,7 @@ Multi-string eBWT/LCP/GSA computation
 
     BCR is part of:
     BEETL: Burrows-Wheeler Extended Tool Library
+    [https://github.com/BEETL]
     Documentation in: doc/BEETL.md
     Copyright (c) 2011-2014 Illumina, Inc.
     BEETL software package is
