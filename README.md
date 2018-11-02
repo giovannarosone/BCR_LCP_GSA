@@ -41,11 +41,12 @@ If your dataset contains sequences having a length greater than 256, you should 
 
 ### Install
 
-First: set the parameters (data structured that must be computed, types, and so on...) in parameters.h 
-
 ```sh
 git clone https://github.com/giovannarosone/BCR\_LCP\_GSA
 cd BCR_LCP_GSA-master
+```
+Open parameters.h file and please, set the parameters (data structured that must be computed, types, and so on...).
+```sh
 make
 ```
 
