@@ -13,7 +13,6 @@ Multi-string eBWT/LCP/GSA(DA/SA) computation
     By Giovanna Rosone
    
    
-Note:
 
 BCR_LCP_GSA can compute at the same time:
 
@@ -39,26 +38,30 @@ Default:
 For instance, the data structures LCP and SA depends on the setting of dataTypeLengthSequences/dataTypelenSeq.
 If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 1, so that dataTypelenSeq is set to uint. 
 
-COMPILE
 
+### Install
 
 First: set the parameters (data structured that must be computed, types, and so on...) in parameters.h 
 
+```sh
+git clone https://github.com/giovannarosone/BCR\_LCP\_GSA
+cd BCR_LCP_GSA-master
+make
+```
 
-Second: make
 
-
-RUN
-
+### Run
+```sh
 ./BCR_LCP_GSA inputFile outputFile 0
+```
 
-
-Example:
-
+### Example
+```sh
 ./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out 0
+```
 
 
-References:
+#### References:
 
     Markus J. Bauer, Anthony J. Cox and Giovanna Rosone
     Lightweight BWT Construction for Very Large String Collections.
@@ -74,7 +77,9 @@ References:
      
     Anthony J. Cox, Fabio Garofalo, Giovanna Rosone, Marinella Sciortino
     Lightweight LCP construction for very large collections of strings. 
-    Journal of Discrete Algorithms (2016) 37: 17-33
+    Journal of Discrete Algorithms (2016) 37: 17-33<sup id="a1">[1](#f1)</sup>
 
 
-
+---
+1. <small id="f1"> Supported by the project Italian MIUR-SIR CMACBioSeq ("_Combinatorial methods for analysis and compression of biological sequences_")
+grant n.~RBSI146R5L.</small> [↩](#a1)
