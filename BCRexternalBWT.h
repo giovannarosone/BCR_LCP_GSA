@@ -34,6 +34,7 @@
 
 #include <map>
 #include "BWTCollection.h"
+#include "Parameters.h" // Defines ulong and uchar.
 #include <fstream>
 #include <iostream>
 
@@ -58,9 +59,9 @@ public:
 		virtual int storeEGSAoutput(const char*);
 		virtual int storeEGSAoutputFromEntireFiles (string input);
 	#endif
-	#if BUILD_SA == 1
+	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
 		void storeEntirePairSA(const char*);
-		void storeEntireSAfromPairSA(const char*);
+		//void storeEntireSAfromPairSA(const char*);
 	#endif
   dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
 	#if BUILD_EXT_MEMORY==0
