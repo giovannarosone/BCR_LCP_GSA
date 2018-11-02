@@ -47,12 +47,12 @@ typedef unsigned long ulong;
 #define dataTypedimAlpha uchar  //size of the alphabet (in biologic case 6 ($,A,C,G,N,T))
 
 
-#define dataTypeLenghtSequences 1		//length of the sequences (in biologic case 100)
+#define dataTypeLengthSequences 1		//length of the sequences (in biologic case 100)
 #define dataTypeNumSeq 0		//number of sequences in the input file. If =0 -> uint
 #define dataTypeNumChar 1		//numer of characters in the input file (length of the BWT) If =0 -> uint
 
 //Set the types
-#if dataTypeLenghtSequences == 1
+#if dataTypeLengthSequences == 1
 #   define dataTypelenSeq uchar
 #else
 #   define dataTypelenSeq uint
