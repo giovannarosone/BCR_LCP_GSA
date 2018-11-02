@@ -106,9 +106,9 @@ namespace SXSI
 			virtual void storeEntireLCP(const char*) = 0;
         #endif
 		virtual void storeEntireBWTFilePartial(const char*) = 0;
-		#if BUILD_SA == 1
+		#if ( (BUILD_DA==1) || (BUILD_SA==1) )
 			virtual void storeEntirePairSA(const char*) = 0;
-			virtual void storeEntireSAfromPairSA(const char*) = 0;
+			//virtual void storeEntireSAfromPairSA(const char*) = 0;
 		#endif
 		
 		#if OUTPUT_FORMAT_EGSA == 1
