@@ -45,7 +45,7 @@ If your dataset contains sequences having a length greater than 256, you should 
 git clone https://github.com/giovannarosone/BCR\_LCP\_GSA
 cd BCR_LCP_GSA-master
 ```
-Open parameters.h file and please, set the parameters (data structured that must be computed, types, and so on...).
+Open parameters.h file and, please, set the parameters (data structured that must be computed, types, and so on...).
 ```sh
 make
 ```
@@ -78,7 +78,7 @@ make
      
     Anthony J. Cox, Fabio Garofalo, Giovanna Rosone, Marinella Sciortino
     Lightweight LCP construction for very large collections of strings. 
-    Journal of Discrete Algorithms (2016) 37: 17-33<sup id="a1">[1](#f1)</sup>
+    Journal of Discrete Algorithms (2016) 37: 17-33 <sup id="a1">[1](#f1)</sup>
 
 
 ---
