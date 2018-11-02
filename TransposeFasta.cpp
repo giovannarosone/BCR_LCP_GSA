@@ -31,6 +31,7 @@
  
  #include "TransposeFasta.h"
 #include "Tools.h"
+#include "Parameters.h"
 #include <assert.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -68,6 +69,11 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	//lengthRead = CYCLENUM;
     
 	std::ifstream infile(input.c_str());
+	
+	if (infile.is_open() == false) {
+		std::cerr << "TransposeFasta::findLengthNseq: could not open file \"" << input.c_str() << "\"!"<< std::endl;	
+		exit (EXIT_FAILURE);
+	}
 	
 	char fileLen[512];
 	sprintf(fileLen, "%s.lenSeqs.aux", fileOutput.c_str());
@@ -151,13 +157,8 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	#if verboseEncode==1
 	   dataTypeNChar sum=0;
        for (dataTypeNSeq m=0; m < lengthSeqVector.size(); m++) {
-           //std::cout << "Length Sequence N. " << (int)m << " is " << (int)lengthSeqVector[m] << std::endl;
-           //std::cout << (int)lengthSeqVector[m] << std::endl;
            sum += lengthSeqVector[m];
-           //if  ((m == 453566) || (m == 453567) || (m == 453568))
-           //    std::cerr << "SeqID= " << (int)(m) << " Len= " << (int)lengthSeqVector[m] << " Sum= " << (int)sum << std::endl;
        }
-       //std::cerr << " Sum= " << (int)sum << std::endl;
 	#endif
 
 
@@ -166,10 +167,11 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
     else
         cerr << "The (new and-or old) reads have the same length." << endl;
 
-	////Added/Modified/Removed  2018-04-16
 	//Store vector in file
 	dataTypeNSeq numchar = fwrite (&lengthSeqVector[0], sizeof(dataTypelenSeq), lengthSeqVector.size(), OutFileLen);
 	
+	std::cerr << "lengthTexts= " << (lengthTexts) << " lengthRead= " << (int)lengthRead << std::endl;
+	std::cerr << "lengthSeqVector.size= " << (lengthSeqVector.size()) << " nSeq= " << nSeq << std::endl;
 	assert (lengthSeqVector.size() == numchar);
 	assert (lengthSeqVector.size() == nSeq);
 	
@@ -227,7 +229,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	for (dataTypedimAlpha z = 0 ; z < SIZE_ALPHA-1; z++)
 		freq[z]=0;
 	freq[SIZE_ALPHA-1]=0;
-	freq[(unsigned int)(TERMINATE_CHAR)]=1;
+	freq[(unsigned int)(TERMINATE_CHAR)]=nSeq;
 
 	//FILE* ifile;
 	//ifile = fopen(input.c_str(), "rb");
@@ -287,10 +289,6 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
     nSeq = 0;
 	dataTypelenSeq sumLenCum = 0;
 
-	//fgets ( buf, BUFFER_SIZELEN, ifile );			//it starts with '>', we can ignore it
-    //while( !feof(ifile) )     {
-		
-		
 	while (getline(infile, bufChar))  {
 		if ((bufChar[bufChar.length()-2] == '\r') || (bufChar[bufChar.length()-2] == '\n'))
             bufChar[bufChar.length()-2] = '\0';
@@ -299,9 +297,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		
 		tmpLen = bufChar.length();          //tmpLen = strlen(buf)-1;
 		
-		//std::cerr << "Nuova lettura: seq:" << bufChar << ". Length " << bufChar.length() << " the last char is "<< (char)bufChar[bufChar.length()-1] << " tmpLen is " << (int)tmpLen << std::endl;
-		
-        if ( (charsBuffered > 0) && ( charsBuffered-1 == BUFFERSIZE))   //it is linked to the number of sequences
+		if ( (charsBuffered > 0) && ( charsBuffered-1 == BUFFERSIZE))   //it is linked to the number of sequences
         {
 			// write buffers to the files, clear buffers
             for(dataTypelenSeq i=0;i<lengthRead;i++ )  {       //For each symbol/column of the read   (for each string)
@@ -313,7 +309,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 				for(dataTypeNChar x=0; x<charsBuffered-1; x++ ) {
 					//For each buffered symbol of the read (a symbol for each string)
 					if (buf_[i][x] != TERMINATE_CHAR_LEN) {
-						freq[(unsigned int)(buf_[i][x])]=1;
+						freq[(unsigned int)(buf_[i][x])]++;   //=1
 						buf_[i][x] = TERMINATE_CHAR_LEN;
 					}
 				}
@@ -348,9 +344,6 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
             sumLenCum = 0;
 		    // increase the number of sequences
 			nSeq++;
-			
-			//if (nSeq % BUFFERSIZE == 0)
-				//cerr << " Title " << bufChar << " Sequence N. " << (int)nSeq  << std::endl;
 			
 			// increase the counter of chars buffered
 			charsBuffered++;
@@ -388,7 +381,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		assert( num_write == charsBuffered );
 		for(dataTypeNChar x=0; x<charsBuffered; x++ ) {
 			if (buf_[i][x] != TERMINATE_CHAR_LEN) {
-				freq[(unsigned int)(buf_[i][x])]=1;
+				freq[(unsigned int)(buf_[i][x])]++;  //=1
 				buf_[i][x] = TERMINATE_CHAR_LEN;
 			}
 			//cerr << "Number of characters reading/writing: " << (int) lengthTexts << "\n";
@@ -412,6 +405,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	outputFiles_.clear();
 	
 	infile.close();
+	
+	
 	
     return true;
 }
