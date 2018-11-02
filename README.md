@@ -32,11 +32,12 @@ The output format can be:
 One should set the parameters in Tools.h
 
 Default:
+- Build eBWT/LCP/DA.
+- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA (BUILD_LCP and BUILD_DA set to 1)  
+- Store distinct files: OUTPUT_FORMAT_EGSA == 0
 
-Build eBWT/LCP/DA with uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA   
-
-OUTPUT_FORMAT_EGSA must be 0
-
+For instance, the data structures LCP and SA depends on the setting of dataTypeLengthSequences/dataTypelenSeq.
+If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 1, so that dataTypelenSeq is set to uint. 
 
 COMPILE
 
