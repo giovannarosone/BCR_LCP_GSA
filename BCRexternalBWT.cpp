@@ -137,7 +137,7 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, int mode)
 			storeEntireLCP(fileOutput);
 		#endif
 
-		#if ((OUTPUT_FORMAT_EGSA==0) && (BUILD_DA==1) && (BUILD_SA==1))
+		#if ((OUTPUT_FORMAT_EGSA==0) && ((BUILD_DA==1) || (BUILD_SA==1)))
 			storeEntirePairSA(fileOutput);
 		
 			//Optional
