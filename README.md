@@ -82,5 +82,6 @@ make
 
 
 ---
-<small> Supported by the project Italian MIUR-SIR CMACBioSeq ("_Combinatorial methods for analysis and compression of biological sequences_")
-grant n.~RBSI146R5L.</small>
+<small> Supported by the project Italian MIUR-SIR [CMACBioSeq][240fb5f5] ("_Combinatorial methods for analysis and compression of biological sequences_") grant n.~RBSI146R5L. P.I. Giovanna Rosone</small>
+
+[240fb5f5]: http://pages.di.unipi.it/rosone/CMACBioSeq.html
