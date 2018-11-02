@@ -89,12 +89,12 @@ typedef unsigned long ulong;
 
 //The pair (da[i], sa[i]) is the gsa[i]
 //if you want to complete the SA array, please set it to 1
-#define BUILD_SA 1
+#define BUILD_SA 0
 //if you want to complete the DA array, please set it to 1
 #define BUILD_DA 1
 
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
-//if BUILD_BCR_ALTERNATE=1 then BCR computes teBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
+//if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
 #define BUILD_BCR_ALTERNATE 0 //0 --> else we compute alternate order the BWT of the sequences
 
 //if BCR_SET=1 then BCR computes the EBWT (the input is a set) (one can have strings of different length, so BCR uses the symbol TERMINATE_CHAR_LEN) 
