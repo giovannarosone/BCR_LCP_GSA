@@ -41,6 +41,7 @@
 #include <stdio.h>
 //#include <stdlib.h>
 
+#include "Parameters.h" // Defines ulong and uchar.
 #include "Tools.h"
 #include <string.h>    
 
@@ -65,7 +66,7 @@ public:
 	bool convertFromCycFile(const string& input, char const * fileOutput);        //it reads the file input for find the length and the number of sequences. Does not build cyc files.
   bool convert1Sequence(char const * filename1) ;
 
-	dataTypelenSeq lengthRead;    //Lenght of each text
+	dataTypelenSeq lengthRead;    //Length of each text
 	dataTypeNChar lengthTexts;   //Total length of all texts without $-symbols
 
 	dataTypeNSeq nSeq;   //number total of texts in filename1
