@@ -30,14 +30,19 @@ The output format can be:
 - four files: .bwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
 
 One should set the parameters in Tools.h
+
 Default:
+
 Build eBWT/LCP/DA with uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA   
+
 OUTPUT_FORMAT_EGSA must be 0
 
 
 COMPILE
 
+
 First: set the parameters (data structured that must be computed, types, and so on...) in parameters.h 
+
 
 Second: make
 
@@ -45,6 +50,11 @@ Second: make
 RUN
 
 ./BCR_LCP_GSA inputFile outputFile 0
+
+
+Example:
+
+./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out 0
 
 
 References:
