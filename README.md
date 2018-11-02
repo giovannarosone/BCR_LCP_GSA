@@ -18,19 +18,21 @@ Note:
 BCR_LCP_GSA can compute at the same time:
 
 - the (extended) Burrows–Wheeler transform (multi-string BWT)
-- the longest common prefix array (optional)
+- the longest common prefix array (optional, set BUILD_LCP to 1)
 - the generalize suffix array (optional):
-    - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i])
-    - suffix array (SA[i] corresponds to the position of the sequence of the suffixes associated to the symbol ebwt[i])
+    - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i]), set BUILD_DA to 1
+    - suffix array (SA[i] corresponds to the position of the sequence of the suffixes associated to the symbol ebwt[i]), set BUILD_SA to 1
     
 of a very large collection of strings having different or same length. 
 
-
-One can set the parameters in Tools.h
-
 The output format can be:
 - EGSA (OUTPUT_FORMAT_EGSA must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
-- three files: .bwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
+- four files: .bwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
+
+One should set the parameters in Tools.h
+Default:
+Build eBWT/LCP/DA with uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA   
+OUTPUT_FORMAT_EGSA must be 0
 
 
 COMPILE
