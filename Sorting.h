@@ -34,6 +34,7 @@
 		
 #include <stdlib.h>
 #include <vector>
+#include "Parameters.h" // Defines ulong and uchar.
 #include "Tools.h"
 
 #if BUILD_LCP == 1
