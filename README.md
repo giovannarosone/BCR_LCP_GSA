@@ -33,7 +33,7 @@ One should set the parameters in Tools.h
 
 Default:
 - Build eBWT/LCP/DA.
-- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA (BUILD_LCP and BUILD_DA set to 1)  
+- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA (BUILD_LCP==1 and BUILD_DA==1)  
 - Store distinct files: OUTPUT_FORMAT_EGSA == 0
 
 For instance, the data structures LCP and SA depends on the setting of dataTypeLengthSequences/dataTypelenSeq.
