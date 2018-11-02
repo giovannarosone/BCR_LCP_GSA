@@ -3674,7 +3674,7 @@ void BCRexternalBWT::storeEntirePairSA( const char* fn ) {
 	static FILE *InFileLen;                  // file of the lengths;
 	InFileLen = fopen(fileLen, "rb");
 	if (InFileLen==NULL) {
-			std::cerr << "storeEntireSAfromPairSA: could not open file \"" << fileLen << "\"!"<< std::endl;
+			std::cerr << "storeEntirePairSA: could not open file \"" << fileLen << "\"!"<< std::endl;
 			exit (EXIT_FAILURE);
 	}
 
