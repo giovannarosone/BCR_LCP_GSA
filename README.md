@@ -1,6 +1,6 @@
 # BCR_LCP_GSA
 
-Multi-string eBWT/LCP/GSA computation
+Multi-string eBWT/LCP/GSA(DA/SA) computation
 
     BCR is part of:
     BEETL: Burrows-Wheeler Extended Tool Library
@@ -16,9 +16,13 @@ Multi-string eBWT/LCP/GSA computation
 Note:
 
 BCR_LCP_GSA can compute at the same time:
+
 - the (extended) Burrows–Wheeler transform (multi-string BWT)
-- the generalize suffix array  (optional)
 - the longest common prefix array (optional)
+- the generalize suffix array (optional):
+    - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i])
+    - suffix array (SA[i] corresponds to the position of the sequence of the suffixes associated to the symbol ebwt[i])
+    
 of a very large collection of strings having different or same length. 
 
 
@@ -31,7 +35,10 @@ The output format can be:
 
 COMPILE
 
-make
+First: set the parameters (data structured that must be computed, types, and so on...) via parameters.h 
+
+Second: make
+
 
 RUN
 
@@ -46,7 +53,7 @@ References:
     
     Markus J. Bauer, Anthony J. Cox, Giovanna Rosone and Marinella Sciortino
     Lightweight LCP Construction for Next-Generation Sequencing Datasets. 
-    Proceedings of WABI 2012, pp 326-337, 2012
+    Proceedings of WABI 2012, pp 326-337
  
     Markus J. Bauer, Anthony J. Cox, Giovanna Rosone 
     Lightweight algorithms for constructing and inverting the BWT of string collections. 
