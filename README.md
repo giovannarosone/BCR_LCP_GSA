@@ -35,7 +35,7 @@ The output format can be:
 
 COMPILE
 
-First: set the parameters (data structured that must be computed, types, and so on...) via parameters.h 
+First: set the parameters (data structured that must be computed, types, and so on...) in parameters.h 
 
 Second: make
 
