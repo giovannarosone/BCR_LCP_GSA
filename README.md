@@ -30,7 +30,7 @@ One can set the parameters in Tools.h
 
 The output format can be:
 - EGSA (OUTPUT_FORMAT_EGSA must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
-- three files: .bwt, .lcp, .pairSA, (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
+- three files: .bwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
 
 
 COMPILE
