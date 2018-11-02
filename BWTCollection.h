@@ -33,7 +33,7 @@
 #define _SXSI_BWTCollection_h_
 
 #include "Parameters.h" // Defines ulong and uchar.
-#include "Tools.h" // Defines ulong and uchar.
+#include "Tools.h" 
 //#include "Sorting.cpp"
 #include "Sorting.h"
 //#include <utility> // Defines std::pair.
