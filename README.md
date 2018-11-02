@@ -78,9 +78,9 @@ make
      
     Anthony J. Cox, Fabio Garofalo, Giovanna Rosone, Marinella Sciortino
     Lightweight LCP construction for very large collections of strings. 
-    Journal of Discrete Algorithms (2016) 37: 17-33 <sup id="a1">[1](#f1)</sup>
+    Journal of Discrete Algorithms (2016) 37: 17-33
 
 
 ---
-1. <small id="f1"> Supported by the project Italian MIUR-SIR CMACBioSeq ("_Combinatorial methods for analysis and compression of biological sequences_")
-grant n.~RBSI146R5L.</small> [↩](#a1)
+<small> Supported by the project Italian MIUR-SIR CMACBioSeq ("_Combinatorial methods for analysis and compression of biological sequences_")
+grant n.~RBSI146R5L.</small>
