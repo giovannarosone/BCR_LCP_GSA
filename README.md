@@ -26,7 +26,7 @@ of a very large collection of strings having different or same length.
 
 The output format can be:
 - EGSA (OUTPUT_FORMAT_EGSA must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
-- four files: .bwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
+- four files: .ebwt, .lcp, .da, posSA (OUTPUT_FORMAT_EGSA must be 0). The end-marker in .bwt file is the symbol '#'
 
 One should set the parameters in Tools.h
 
