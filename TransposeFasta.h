@@ -46,7 +46,7 @@
 #include <string.h>    
 
 
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 1048576
 
 //#define CYCLENUM 100
 
