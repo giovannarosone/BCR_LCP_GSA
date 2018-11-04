@@ -3239,7 +3239,8 @@ int BCRexternalBWT::storeEGSAoutput( const char* fn ) {
 	
 	delete [] filenameIn;
 	delete [] filename;
-	delete [] bufferSA;		
+	delete [] bufferSA;
+	delete [] bufferDA;	
 	delete [] bufferLCP; 
 	fclose(f_ESA);
 	
