@@ -93,10 +93,10 @@ typedef unsigned long ulong;
 //if you want to complete the SA array, please set it to 1
 #define BUILD_SA 0
 //if you want to complete the DA array, please set it to 1
-#define BUILD_DA 1
+#define BUILD_DA 0
 
 //if you want to Store the 'end positions' of the end-markers (one for each sequence), please set it to 1
-#define STORE_ENDMARKER_POS 1
+#define STORE_ENDMARKER_POS 0
 
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
 //if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
@@ -120,7 +120,7 @@ typedef unsigned long ulong;
 //if OUTPUT_FORMAT_EGSA == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
 //if OUTPUT_FORMAT_EGSA == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa
 //if OUTPUT_FORMAT_EGSA == 3, the output format of BCR is at most 4 files at the same time
-#define OUTPUT_FORMAT_EGSA 0
+#define OUTPUT_FORMAT_EGSA 3
 
 //if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
 //if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
