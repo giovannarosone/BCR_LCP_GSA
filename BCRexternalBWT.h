@@ -63,13 +63,28 @@ public:
 		void storeEntirePairSA(const char*);
 		//void storeEntireSAfromPairSA(const char*);
 	#endif
-  dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
-	#if BUILD_EXT_MEMORY==0
+  		
+	#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1)
+		virtual int storeEGSAcomplete( const char* );
+	#endif
+
+	#if OUTPUT_FORMAT_EGSA == 1
+		virtual int storeEGSAoutputFromEntireFiles (string );
+	#endif
+	
+	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
+		void storeEntirePairSA(const char*);
+		//void storeEntireSAfromPairSA(const char*);
+	#endif
+  
+	#if KEEP_eBWT_IN_EXT_MEMORY==0
 		void storeEntireBWTIntMem(const char*);
 		void  storeBWTIntMem(uchar const *, dataTypelenSeq) ;
 		dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *,  dataTypeNChar, dataTypeNChar , uchar *);
 	#endif
-
+	
+	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
+	
 private:
 	#if BUILD_BCR_FROM_EGSA == 1
 		dataTypeNChar readEGSA(char const *);
