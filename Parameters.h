@@ -73,6 +73,7 @@ typedef unsigned long ulong;
 
 //Print of the output (BWT/DA/SA/LCP)
 //Store a txt file containing (BWT/DA/SA/LCP)
+//MUST: (BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) && (OUTPUT_FORMAT_EGSA)==0
 #define printEGSA 0
 
 //Verbose
@@ -80,9 +81,10 @@ typedef unsigned long ulong;
 #define verboseDecode 0
 
 //if you want to delete the partial files, please set it to 1
-#define deletePartialBWT 0 //TO CHECK
-#define deletePartialLCP 0 //TO CHECK
-#define deletePartialGSA 0 //TO CHECK
+#define deletePartialBWT 0 
+#define deletePartialLCP 0 
+#define deletePartialGSA 0 
+#define deleteCycFiles 1 
 
 //if you want to complete the LCP array, please set it to 1
 #define BUILD_LCP 1
@@ -93,6 +95,9 @@ typedef unsigned long ulong;
 //if you want to complete the DA array, please set it to 1
 #define BUILD_DA 1
 
+//if you want to Store the 'end positions' of the end-markers (one for each sequence), please set it to 1
+#define STORE_ENDMARKER_POS 1
+
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
 //if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
 #define BUILD_BCR_ALTERNATE 0 //0 --> else we compute alternate order the BWT of the sequences
@@ -101,28 +106,25 @@ typedef unsigned long ulong;
 //if BCR_SET=0 then BCR computes the BWT (the input is a single sequence)
 #define BCR_SET 1				
 
-////////////////
-
-//if OUTPUT_FORMAT_EGSA == 1, the output format of BCR is as the output of EGSA. BUILD_LCP and BUILD_GSA and BUILD_EXT_MEMORY must be set to 1. Please, set the types as in eGSA
-//if OUTPUT_FORMAT_EGSA == 0, the output format of BCR is at most 4 files 
-#define OUTPUT_FORMAT_EGSA 0 
-
-//if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
-//if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
-#define OUTPUT_linear_SuffixArray 0
-
-////////////////
-
 //if BCR_INPUT_IN_MEMORY==1, BCR loads the input file in a string and compute the BWT of the string (it computes the BWT of the reverse string),  
 //if BCR_INPUT_IN_MEMORY==0, BCR reads from files (cyc files)
 #define BCR_INPUT_IN_MEMORY 0	
 
-//if BUILD_EXT_MEMORY==1, BCR uses files for partials ebwts
-//if BUILD_EXT_MEMORY==0, BCR uses strings for partials ebwts
+//if KEEP_eBWT_IN_EXT_MEMORY==1, BCR uses files for partials ebwts
+//if KEEP_eBWT_IN_EXT_MEMORY==0, BCR uses strings for partials ebwts
 //In both cases, SA, DA, LCP are stored in files.
-#define BUILD_EXT_MEMORY  1 
+#define KEEP_eBWT_IN_EXT_MEMORY  1
 
-////////////////
+
+//if OUTPUT_FORMAT_EGSA == 0, the output format of BCR is at most 4 files - built one after the other
+//if OUTPUT_FORMAT_EGSA == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
+//if OUTPUT_FORMAT_EGSA == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa
+//if OUTPUT_FORMAT_EGSA == 3, the output format of BCR is at most 4 files at the same time
+#define OUTPUT_FORMAT_EGSA 0
+
+//if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
+//if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
+#define OUTPUT_linear_SuffixArray 0
 
 //Computes the EGSA starting to another EGSA
 //See output EGSA of Felipe Louze
