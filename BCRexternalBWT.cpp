@@ -45,7 +45,7 @@
 #include <string.h>    
 
 //#include "Sorting.h"
-#define SIZEBUFFER 1048576
+#define SIZEBUFFER 104857600
 #define DIMBLOCK 1024
 
 //using std::vector;
@@ -79,17 +79,39 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, int mode)
 		std::cout << "Start BCR encode\n";
 		
 		
-		if (OUTPUT_FORMAT_EGSA==1) {
-			if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) && (BUILD_EXT_MEMORY==1))
-				std::cout << "The output format of BCR is as the output of EGSA.\n";
-			else
-				std::cout << "The output format of BCR is as the output of EGSA. BUILD_LCP and BUILD_SA and BUILD_DA and BUILD_EXT_MEMORY must be set to 1 (see Parameters.h).\n";
-			exit (EXIT_FAILURE);
+		if (OUTPUT_FORMAT_EGSA==0) {
+			std::cout << "The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) - built one after the other.\n";
+			
 		}
-		else
-			std::cout << "The output format of BCR consists in at most 4 files: ebwt, lcp, da, posSA.\n";
-		
-		
+
+		if (OUTPUT_FORMAT_EGSA==1) {
+			if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) )
+				std::cout << "The output format of BCR is as the output of EGSA.\n";
+			else {
+				std::cout << "Error! The output format of BCR is as the output of EGSA. BUILD_LCP and BUILD_SA and BUILD_DA must be set to 1 (see Parameters.h).\n";
+				exit (EXIT_FAILURE);
+			}
+		}
+
+		if (OUTPUT_FORMAT_EGSA==2) {
+			if ((BUILD_LCP==1) )
+				std::cout << "The output format of BCR is a unique file .egsa. Order: bwt, lcp, da, sa.\n";
+			else {
+				std::cout << "Error! The output format of BCR is a unique file .egsa (we do not use a struct). BUILD_LCP must be set to 1  (see Parameters.h), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa.\n";
+				exit (EXIT_FAILURE);
+			}
+		}
+
+		if (OUTPUT_FORMAT_EGSA==3) {
+			if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
+				std::cout << "The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time.\n";
+			else {
+				std::cout << "Error! The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time\n";
+				std::cout << " BUILD_LCP or BUILD_DA==1 or BUILD_SA==1 or KEEP_eBWT_IN_EXT_MEMORY must be 1 (see Parameters.h).\n";
+				exit (EXIT_FAILURE);
+			}
+		}
+
 		if (BUILD_LCP==0)
 			std::cout << "Compute the EBWT\n";
 		else
@@ -114,35 +136,43 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, int mode)
 		#endif
 		assert (result != '1');
 
-		#if BUILD_EXT_MEMORY==1
-			#if OUTPUT_FORMAT_EGSA == 0
+		//Separated output built in sequential way
+		#if OUTPUT_FORMAT_EGSA == 0
+			#if KEEP_eBWT_IN_EXT_MEMORY==1
 				//Store the entire BWT from sizeAlpha-files
 				storeEntireBWTFilePartial(fileOutput);
 			#else
-				if ((BUILD_LCP == 1) && (BUILD_DA==1) && (BUILD_SA==1) ){
-					storeEGSAoutput(fileOutput);				
-				}
-			#endif
-		#else
-			#if OUTPUT_FORMAT_EGSA == 0
 				storeEntireBWTIntMem(fileOutput);
-			#else
-				if ((BUILD_LCP == 1) && (BUILD_DA==1) && (BUILD_SA==1) ){
-					storeEGSAoutput(fileOutput);				
-				}
+			#endif
+
+			#if (BUILD_LCP == 1)
+				storeEntireLCP(fileOutput);
+			#endif
+
+			#if ( (BUILD_DA==1) || (BUILD_SA==1) ) 
+				storeEntirePairSA(fileOutput);
+		
+				//Optional
+				#if OUTPUT_linear_SuffixArray ==  1
+					storeEntireSAfromPairSA(fileOutput);
+				#endif
 			#endif
 		#endif
 
-		#if ((OUTPUT_FORMAT_EGSA==0) && (BUILD_LCP == 1))
-			storeEntireLCP(fileOutput);
-		#endif
-
-		#if ((OUTPUT_FORMAT_EGSA==0) && ((BUILD_DA==1) || (BUILD_SA==1)))
-			storeEntirePairSA(fileOutput);
-		
-			//Optional
-			#if OUTPUT_linear_SuffixArray ==  1
-				storeEntireSAfromPairSA(fileOutput);
+		//Unique .gesa file - eGSA tool
+		#if OUTPUT_FORMAT_EGSA == 1  
+			#if ((BUILD_LCP == 1) && (BUILD_DA==1) && (BUILD_SA==1) )
+				storeEGSAcomplete(fileOutput);				
+			#endif
+		//Unique .egsa file 
+		#elif OUTPUT_FORMAT_EGSA == 2
+			//At least the LCP must be computed  
+			#if ( (BUILD_LCP == 1) )
+				storeEGSAcomplete(fileOutput);				
+			#endif
+		#elif OUTPUT_FORMAT_EGSA == 3
+			#if ( (BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (KEEP_eBWT_IN_EXT_MEMORY==1) )
+				storeEGSAcomplete(fileOutput);				
 			#endif
 		#endif
 
@@ -154,22 +184,61 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, int mode)
 			else
 				std::cerr << "In order to print the output, BUILD_LCP and BUILD_SA and BUILD_DA must be set to 1 and OUTPUT_FORMAT_EGSA must be set to 0 (see Parameters.h)\n";
 		#endif
-		/*
-		std::cerr << "Removing the auxiliary input file (cyc files)\n";
-		char *filename;
-		filename = new char[strlen(fileOut)+sizeof(dataTypelenSeq)*8];
 
-		// delete output files
-		for(dataTypelenSeq i=0;i<lengthRead;i++ ) {
-			sprintf (filename, "%s%u.txt", fileOut, i);
-			if (remove(filename)!=0)
-				std::cerr << filename <<" BCRexternalBWT: Error deleting file" << std::endl;
-		}
+
+		#if ( (KEEP_eBWT_IN_EXT_MEMORY == 1) || (BUILD_LCP == 1) || (BUILD_DA == 1) || (BUILD_SA == 1) )
+			//Delete or rename the partial BWT bwt_%d????	
+			const char *ext = ".aux";
+			char *filenameIn = new char[12];
+			char *filename = new char[8];
+
+			for (dataTypedimAlpha g = 0 ; g < sizeAlpha; g++) {
+				#if deletePartialBWT == 1
+					sprintf (filename, "bwt_%d", g);
+					sprintf (filenameIn,"%s%s",filename,ext);
+					if (remove(filenameIn)!=0)
+						std::cerr << "Error deleting aux files" << std::endl;
+				#endif
+
+				#if (deletePartialLCP == 1) && (BUILD_LCP == 1)
+					sprintf (filename, "lcp_%d", g);
+					sprintf (filenameIn,"%s%s",filename,ext);
+					if (remove(filenameIn)!=0)
+						std::cerr << "Error deleting aux files" << std::endl;
+				#endif
+
+				#if deletePartialGSA == 1 && (BUILD_DA == 1)
+					sprintf (filename, "da_%d", g);
+					sprintf (filenameIn,"%s%s",filename,ext);
+					if (remove(filenameIn)!=0)
+						std::cerr << "Error deleting aux files" << std::endl;
+				#endif
+
+				#if deletePartialGSA == 1 && (BUILD_SA == 1) 
+					sprintf (filename, "sa_%d", g);
+					sprintf (filenameIn,"%s%s",filename,ext);
+					if (remove(filenameIn)!=0)
+						std::cerr << "Error deleting aux files" << std::endl;
+				#endif
+			}
+			delete [] filenameIn;
+			delete [] filename;
+		#endif
+		/*
+		#else //renome the aux bwt file
+
+			int lung = strlen(fn) + strlen(filenameIn)+1;
+			char *newfilename = new char[lung];
+			numchar=sprintf (newfilename,"%s%s",fn,filenameIn);
+			//std::cerr  << newfilename << " " << filenameIn << std::endl;
+			if(rename(filenameIn, newfilename))
+					std::cerr  <<"storeEntireLCP: Error renaming file" << std::endl;
 		*/
+
 		time (&end);
         dif = difftime (end,start);
 		
-		/* #if BUILD_EXT_MEMORY == 1
+		/* #if KEEP_eBWT_IN_EXT_MEMORY == 1
 			
 		#endif
 		#if (BUILD_LCP==0)
@@ -239,7 +308,7 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsFilePartial(FILE & InFileBWT, dataT
 	return cont;
 }
 
-#if BUILD_EXT_MEMORY==0
+#if KEEP_eBWT_IN_EXT_MEMORY==0
 dataTypeNChar BCRexternalBWT::rankManySymbolsIntMem(dataTypedimAlpha currentPile, dataTypeNChar *counters, dataTypeNChar alreadyRead, dataTypeNChar toRead, uchar *foundSymbol)
 {
 	dataTypeNChar cont;  //cont is the number of symbols already read!
@@ -261,7 +330,7 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsIntMem(dataTypedimAlpha currentPile
 
 int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char const * fileOut)
 {
-	#if  BUILD_EXT_MEMORY == 1    //BCR uses the internal memory for the BWT partial
+	#if  KEEP_eBWT_IN_EXT_MEMORY == 1    //BCR uses the internal memory for the BWT partial
 		std::cout << "BCR uses the external memory for the BWT partial" << endl;
 	#else
 		std::cout << "BCR uses the internal memory for the BWT partial" << endl;
@@ -273,7 +342,6 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 
 	#if BCR_SET == 0        //Build BCR for 1 sequence
 		std::cout << "BCR of 1 sequence" << endl;
-
 
 		#if BCR_FROMCYC==1
 			std::cerr << "Error: BCR_FROMCYC==1 (cyc files in input) is not implemented! (see BCR_FROMCYC in Parameters.h)" << endl;
@@ -452,7 +520,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	char *filename;
 	filename = new char[strlen(fileOut)+sizeof(dataTypelenSeq)*8];
 
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		createFilePartialBWT();
 		std::cerr << "\nPartial File name for input: " << fileOut <<" \n\n";
 	#else
@@ -489,7 +557,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		//std::cerr << "The filename is ''" << filename <<"'' file." << std::endl;
 		InFileInputText = fopen(filename, "rb");
 		if (InFileInputText==NULL) {
-			std::cerr << filename <<" : Error opening " << std::endl;
+			std::cerr << filename <<"buildBCR : Error opening " << std::endl;
 			exit (EXIT_FAILURE);
 		}
 
@@ -503,7 +571,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		sprintf (filename, "%s%u.txt", fileOut, lengthRead-1);
 		InFileInputText = fopen(filename, "rb");
 		if (InFileInputText==NULL) {
-				std::cerr << filename <<" : Error opening " << std::endl;
+				std::cerr << filename <<"buildBCR : Error opening " << std::endl;
 				exit (EXIT_FAILURE);
 		}
 		num = fread(newSymb,sizeof(uchar),nText,InFileInputText);
@@ -511,9 +579,11 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		//lengthTot += num;   //Increment the number of chars
 		fclose(InFileInputText);
 		
-		if (remove(filename)!=0)
-			std::cerr << ": Error deleting " << filename << " file" << std::endl;
-
+		#if (deleteCycFiles == 1)
+			if (remove(filename)!=0)
+				std::cerr << "buildBCR: Error deleting " << filename << " file" << std::endl;
+		#endif
+		
 	#endif
 
 
@@ -535,8 +605,6 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 
 
 	std::cerr << "\nInserting symbols after the first position." << endl;
-	//cout << "Starting iteration, time now: " << timer.timeNow();
-	//cout << "Starting iteration, usage: " << timer << endl;
 
 	//maxLengthRead-2
 	for (dataTypelenSeq t = lengthRead-2 ; t > 0; t--) {
@@ -551,15 +619,9 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			time (&startWhile);
 		#endif
 
-		//if (t % 1000000 == 0) {
-		//	std::cerr << "\n"<< "j= "<< (long) lengthRead - t - 1 <<" - symbols in position " << (long) t << "\n";
-			//cout << "Starting iteration " << (long) lengthRead - t - 1  << ", time now: " << timer.timeNow();
-			//cout << "Starting iteration " << (long) lengthRead - t - 1 << ", usage: " << timer << endl;
-		//}
-
-			//To insert the symbol from position m-3 to position 1
-			//The last inserted symbol is in position i+1 (or it is newSymb[j]),
-			//the next symbol (to insert) is in position i
+		//To insert the symbol from position m-3 to position 1
+		//The last inserted symbol is in position i+1 (or it is newSymb[j]),
+		//the next symbol (to insert) is in position i
 
 		#if BCR_SET == 0        //Build BCR for 1 sequence
 			newSymb[0]='\0';
@@ -588,8 +650,10 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			//lengthTot += num;   //Increment the number of chars
 			fclose(InFileInputText);
 
-			if (remove(filename)!=0)
-				std::cerr << "Error deleting " << filename << " file" << std::endl;
+			#if (deleteCycFiles == 1)
+				if (remove(filename)!=0)
+					std::cerr << "Error deleting " << filename << " file" << std::endl;
+			#endif
 
 		#endif
 
@@ -643,17 +707,11 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		assert( num == nText); // we should always read the same number of characters
 		fclose(InFileInputText);
 		
-		if (remove(filename)!=0)
-			std::cerr << "buildBCR: Error deleting " << filename << " file" << std::endl;
-		/*
-		std::cerr << filename  << std::endl;
-		std::cerr << "read number is " << num << "\n";
-		for (dataTypeNSeq j = 0 ; j < nText; j++)
-			std::cerr << newSymb[j];
-		std::cerr << ".\n";
-		*/
-		//lengthTot += num;   //Increment the number of chars
-
+		#if (deleteCycFiles == 1)
+			if (remove(filename)!=0)
+				std::cerr << "buildBCR: Error deleting " << filename << " file" << std::endl;
+		#endif
+		
 	#endif
 
 	InsertNsymbols(newSymb, 1);
@@ -676,13 +734,13 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#else
 			newSymb[j] = TERMINATE_CHAR;
 		#endif
-
-
-
 	}
       //std::cerr << "\n";
 
 	InsertNsymbols(newSymb, 0);
+	
+	
+	
 
 	#if verboseEncode==1 || printEGSA==1
 		cerr << "\nAll new characters have been inserted, usage: " << timer << endl;
@@ -700,6 +758,62 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#endif
 	#endif
 
+	
+	/*
+		if it is only useful for decoding
+	*/
+
+	#if STORE_ENDMARKER_POS == 1
+		 //We are storing the last simbols of sequences: $
+			std::cerr << "Stores the 'end positions' of the $!"<< std::endl;
+			char *fileEndPos = new char[strlen(fileOutput)+8];
+			sprintf (fileEndPos,"%s%s",fileOutput,".EOFpos");
+			static FILE *OutFileEndPos;                  // output file of the end positions;
+			OutFileEndPos = fopen(fileEndPos, "wb");
+			if (OutFileEndPos==NULL) {
+					std::cerr << "Error opening \"" << fileEndPos << "\" file"<< std::endl;
+					exit (EXIT_FAILURE);
+			}
+
+			
+			//Each symbol newSymb[seqN[i]] has been inserted in position posN[i] into the pile pileN[i]
+			//We have to store the absolute positions in the entire BWT
+			//So we need to use the tableOcc.
+			//The symbol $ of the sequence i is in the position endPos[SeqN[i]]
+			for (dataTypeNSeq i = 0; i < nText; i++) {
+				for (dataTypedimAlpha r = 0; r < vectTriple[i].pileN; r++) {
+					for (dataTypedimAlpha t = 0; t < sizeAlpha; t++) {
+						vectTriple[i].posN += tableOcc[r][t];
+					}
+				}
+			}
+		
+			dataTypeNChar numchar = fwrite (&nText, sizeof(dataTypeNChar), 1 , OutFileEndPos);
+			assert( numchar == 1); // we should always read the same number of characters
+
+			#if (verboseEncode == 1) 
+				std::cerr << nText << " positions of the EOF into BWT: " << std::endl;
+			#endif
+			for (dataTypeNSeq i = 0; i < nText; i++) {
+				#if (verboseEncode == 1) 				
+					std::cerr << "#seq: " << vectTriple[i].seqN << " pos in ebwt: " << vectTriple[i].posN << " suffix starting with " << (unsigned int)vectTriple[i].pileN << std::endl;
+				#endif
+				numchar = fwrite (&vectTriple[i].seqN, sizeof(dataTypeNSeq), 1 , OutFileEndPos);
+				assert( numchar == 1); // we should always read the same number of characters
+				numchar = fwrite (&vectTriple[i].posN, sizeof(dataTypeNChar), 1 , OutFileEndPos); //here vectTriple[i].posN is the relative position of $ in the partial BWT
+				assert( numchar == 1); // we should always read the same number of characters
+				numchar = fwrite (&vectTriple[i].pileN, sizeof(dataTypedimAlpha), 1 , OutFileEndPos);
+				assert( numchar == 1); // we should always read the same number of characters
+			}
+			
+			#if (verboseEncode == 1) 
+				std::cerr << std::endl;
+			#endif
+			
+			fclose(OutFileEndPos);
+					
+	#endif
+	
 
 //	vectTriple.~vector<sortElement>();
 	/*
@@ -756,7 +870,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	const char *ext = ".aux";
 
 
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		sprintf (filename, "bwt_%d",0);
 		sprintf (filenameOut,"%s%s",filename,ext);
 		FILE *OutFileBWT = openWriteFilePartialBWT_0();
@@ -849,7 +963,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	//assert( num == nText); // we should always read the same number of characters
 	//We don't store TERMINATE_CHAR_LEN symbol (the strings can have different length)
 	//dataTypeNChar num = fwrite (newSymb, sizeof(uchar), nExamedTexts , OutFileBWT);
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		dataTypeNChar num = writeFilePartial(newSymb, OutFileBWT);
 		assert( num == nExamedTexts); // we should always read the same number of characters
 		fclose(OutFileBWT);
@@ -969,11 +1083,6 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		}
 
 	#endif	
-		
-		
-		
-
-
 
 	delete [] filenameOut;
 	delete [] filename;
@@ -985,13 +1094,11 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			static FILE *InFileLCP;                  // output and input file LCP;
 			char *filenameInLCP = new char[12];
 			char *filenameLCP = new char[8];
-			//const char *ext = ".aux";
 			dataTypelenSeq *bufferLCP = new dataTypelenSeq[SIZEBUFFER];
 			dataTypedimAlpha mmm=0;
 			while (mmm < sizeAlpha) {
 				numchar=sprintf (filenameLCP, "lcp_%d", mmm);
 				numchar=sprintf (filenameInLCP,"%s%s",filenameLCP,ext);
-				//printf("===currentPile= %d\n",mmm);
 				InFileLCP = fopen(filenameInLCP, "rb");
 				for (dataTypeNChar g = 0 ; g < SIZEBUFFER; g++)
 					bufferLCP[g] = 0;
@@ -1019,7 +1126,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 
 void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSymb)
 {
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		static FILE *InFileBWT;                  // output and input file BWT;
 	#endif
 	char *filenameIn = new char[12];
@@ -1062,7 +1169,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 
 			dataTypedimAlpha currentPile = vectTriple[j].pileN;
 
-			#if BUILD_EXT_MEMORY==1
+			#if KEEP_eBWT_IN_EXT_MEMORY==1
 				InFileBWT = openFilePartialIn(currentPile );
 			#endif
 
@@ -1073,25 +1180,18 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			dataTypeNChar cont = 0;   //number of the read symbols
 			uchar foundSymbol;
 			dataTypeNChar numberRead=0;
-			#if BUILD_EXT_MEMORY==0
+			#if KEEP_eBWT_IN_EXT_MEMORY==0
 				dataTypeNChar alreadyRead=0;
 			#endif	
 			while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
-				
-				//2018
-			   //#if (BCR_SET==1)
-			//	 if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
-			  // #endif
-					//if (verboseEncode == 1)
-					//	std::cerr << "j-1: Q["<<k<<"]=" << (unsigned int)vectTriple[k].pileN << " P["<<k<<"]=" << (dataTypeNChar)vectTriple[k].posN << " N["<<k<<"]=" << (dataTypeNSeq)vectTriple[k].seqN << "\t";
-
+			
 					//std::cerr << "--k= " << k << " pileN[k]= " << pileN[k] << " posN[k]= " << posN[k] <<  " seqN[k]= " << seqN[k] << std::endl;
 					//For any character (of differents sequences) in the same pile
 					foundSymbol = '\0';
 					//cont is the number of symbols already read!
 					toRead = vectTriple[k].posN - cont;
 
-					#if BUILD_EXT_MEMORY==1
+					#if KEEP_eBWT_IN_EXT_MEMORY==1
 						numberRead = rankManySymbolsFilePartial(*InFileBWT, counters, toRead, &foundSymbol);
 					#else
 						
@@ -1107,11 +1207,6 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 						#endif
 					#endif
 
-					//2018
-					//if ((foundSymbol == TERMINATE_CHAR) || (foundSymbol == '\0')) {
-					//	std::cerr << "--> dopo rank New posN[k]=" << (unsigned int)vectTriple[k].posN << " New pileN[k]=" << (unsigned int)vectTriple[k].pileN << " posSymb= " << posSymb << " foundSymbol= " << (unsigned int)foundSymbol << std::endl;
-					//}
-
 					assert (toRead == numberRead);
 					cont += numberRead;
 					//I have to update the value in vectTriple[k].posN, it must contain the position of the new symbol
@@ -1119,72 +1214,31 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 					#if BUILD_BCR_ALTERNATE == 0  //We compute straightforward order the BWT of the sequences
 
 						vectTriple[k].posN = counters[alpha[(unsigned int)foundSymbol]];
-						//std::cerr << "--counters[alpha[(unsigned int)foundSymbol]=" << (unsigned int)counters[alpha[(unsigned int)foundSymbol]] <<std::endl;
-						//std::cerr << "--New posN[k]=" << (unsigned int)posN[k] <<std::endl;
-						/*
-						if (verboseEncode == 1)
-							std::cerr << "\nInit New P["<< k <<"]= " << vectTriple[k].posN <<std::endl;
-						*/
+			
 						for (dataTypedimAlpha g = 0 ; g < currentPile; g++) {  //I have to count in each pile g= 0... (currentPile-1)-pile
 							vectTriple[k].posN = vectTriple[k].posN + tableOcc[g][alpha[(unsigned int)foundSymbol]];
-
-							//std::cerr << "--New posN[k]=" << (unsigned int)posN[k] << " tableOcc[g][alpha[(unsigned int)symbol]] " << tableOcc[g][alpha[(unsigned int)symbol]] <<std::endl;
-							/*
-							if (verboseEncode == 1) {
-								std::cerr << "g= " << (unsigned int)g << " symbol= " << (unsigned int)foundSymbol << " alpha[symbol]= "<< (unsigned int)alpha[(unsigned int)foundSymbol] <<std::endl;
-								std::cerr << "Add New posN[k]=" << vectTriple[k].posN << " tableOcc[g][alpha[(unsigned int)symbol]] " << tableOcc[g][alpha[(unsigned int)foundSymbol]] <<std::endl;
-							}
-							*/
 						}
 					#else //We compute alternate order the BWT of the sequences
 						if (tableOcc[currentPile][alpha[(unsigned int)foundSymbol]] > counters[alpha[(unsigned int)foundSymbol]])
 							vectTriple[k].posN = tableOcc[currentPile][alpha[(unsigned int)foundSymbol]] - counters[alpha[(unsigned int)foundSymbol]]+1;
 						else
 							vectTriple[k].posN = 1;
-	/*
-						if (verboseEncode == 1)
-							std::cerr << "\nInit New P["<< k <<"]= " << vectTriple[k].posN <<std::endl;
-	*/
+
 						for (dataTypedimAlpha g = currentPile+1 ; g <sizeAlpha ; g++) {
 								//I have to count in each pile g= (currentPile+1)...sizeAlpha-pile
 							vectTriple[k].posN = vectTriple[k].posN + tableOcc[g][alpha[(unsigned int)foundSymbol]];
-							//std::cerr << "--New posN[k]=" << (unsigned int)vectTriple[k].posN << " tableOcc[g][alpha[(unsigned int)symbol]] " << tableOcc[g][alpha[(unsigned int)symbol]] <<std::endl;
-							/*
-							if (verboseEncode == 1) {
-								std::cerr << "g= " << (unsigned int)g << " symbol= " << (unsigned int)foundSymbol << " alpha[symbol]= "<< (unsigned int)alpha[(unsigned int)foundSymbol] <<std::endl;
-								std::cerr << "Add New posN[k]=" << vectTriple[k].posN << " tableOcc[g][alpha[(unsigned int)symbol]] " << tableOcc[g][alpha[(unsigned int)foundSymbol]] <<std::endl;
-							}
-	*/
 						}
 
 					#endif
 
 					//I have to insert the new symbol in the symbol-pile
 
-					//int tmpOLDpile=vectTriple[k].pileN;
-
 					vectTriple[k].pileN=alpha[(unsigned int)foundSymbol];
 
-					//2018
-					/*
-						if (vectTriple[k].pileN == (unsigned int)TERMINATE_CHAR) {
-							std::cerr << "-->New posN[k]=" << (unsigned int)vectTriple[k].posN << " New pileN[k]=" << (unsigned int)vectTriple[k].pileN << " posSymb= " << posSymb << " tmpOLDpile= " << tmpOLDpile << std::endl;
-							std::cerr << "*** " << " foundSymbol= " << (unsigned int)foundSymbol << " alpha[symbol]= "<< (unsigned int)alpha[(unsigned int)foundSymbol] <<std::endl;
-						}
-					*/ 
-					
-					//if (verboseEncode == 1)
-					//	std::cerr << "j  : Q[q]=" << (unsigned int)vectTriple[k].pileN << " P[q]=" << (dataTypeNChar)vectTriple[k].posN <<  " N[q]=" << (dataTypeNSeq)vectTriple[k].seqN << std::endl;
-			   
-			   //2018
-			   //#if (BCR_SET==1)
-				//}  //end if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)
-			   //#endif
-			k++;
+				k++;
 			}
 
-			#if BUILD_EXT_MEMORY==1
-			//fclose(InFileBWT);
+			#if KEEP_eBWT_IN_EXT_MEMORY==1			
 				closeFilePartial(InFileBWT);
 			#endif
 
@@ -1204,13 +1258,6 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				//if ((vectInsTexts[j]==1) && (newSymb[j] != TERMINATE_CHAR_LEN))  //The new symbol has been inserted in some y-pile with y>0
 				rankInserted +=  vectInsTexts[j];
 				if ((vectInsTexts[j]==0) && (newSymb[j] != TERMINATE_CHAR_LEN)) {   //The new symbol have to be inserted in 0-pile
-					//std::cerr << "Insert new symbols!" << std::endl;
-					//std::cerr << "+++j= " << j << " vectInsTexts[j]= " << vectInsTexts[j] << " newSymb[j]= " << newSymb[j]  << " rankInserted= " << rankInserted << std::endl;
-					//2018
-					//dataTypeNSeq rankInserted=0;
-					//for (dataTypeNSeq x = 0 ; x < j; x++)
-					//	rankInserted +=  vectInsTexts[x];
-					
 					sortElement tripla;
 					tripla.posN = rankInserted+1;  // position of the suffix (1-based)
 					tripla.seqN = j;	  // number of the sequence
@@ -1303,7 +1350,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	#endif
 	
 	#if BUILD_LCP == 0
-		#if BUILD_EXT_MEMORY == 1
+		#if KEEP_eBWT_IN_EXT_MEMORY == 1
 			storeBWTFilePartial(newSymb, posSymb);
 		#else
 			storeBWTIntMem(newSymb, posSymb);
@@ -1354,65 +1401,8 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				std::cerr << vectTriple[g].lcpSucN  << " ";
 			}
 		#endif
-
-
 	#endif
 	
-	//std::cerr << "-----\n";
-
-
-	/*
-		if it is only useful for decoding
-	*/
-
-	////std::cerr << "End storing BWT" << std::endl;
-	//if (posSymb == lengthRead) { //We are storing the last simbols of sequences: $
-	//	std::cerr << "Stores the 'end positions' of the $!"<< std::endl;
-	//	char *fileEndPos="outFileEndPos.bwt";
-	//	static FILE *OutFileEndPos;                  // output file of the end positions;
-	//	OutFileEndPos = fopen(fileEndPos, "wb");
-	//	if (OutFileEndPos==NULL) {
-	//			std::cerr << "Error opening \"" << fileEndPos << "\" file"<< std::endl;
-	//			exit (EXIT_FAILURE);
-	//	}
-
-	//	/*
-	//	//Each symbol newSymb[seqN[i]] has been inserted in position posN[i] into the pile pileN[i]
-	//	//We have to store the absolute positions in the entire BWT
-	//	//So we need to use the tableOcc.
-	//	//The symbol $ of the sequence i is in the position endPos[SeqN[i]]
-	//	for (dataTypeNSeq i = 0; i < nText; i++) {
-	//		for (dataTypedimAlpha r = 0; r < vectTriple[i].pileN; r++) {
-	//			for (dataTypedimAlpha t = 0; t < sizeAlpha; t++) {
-	//				vectTriple[i].posN += tableOcc[r][t];
-	//			}
-	//		}
-	//	}
-	//
-	//	std::cerr << "Positions of the EOF into BWT" << std::endl;
-	//	for (dataTypeNSeq i = 0; i < nText; i++) {
-	//		std::cerr << posN[i] << " ";
-	//	}
-	//	std::cerr << std::endl;
-	//	*/
-	//
-	//	numchar = fwrite (&nText, sizeof(dataTypeNChar), 1 , OutFileEndPos);
-	//	assert( numchar == 1); // we should always read the same number of characters
-
-	//	for (dataTypeNSeq i = 0; i < nText; i++) {
-	//		if (verboseEncode == 1)
-	//			std::cerr << "Triple: " << vectTriple[i].seqN << " " << vectTriple[i].posN << " " << (unsigned int)vectTriple[i].pileN << std::endl;
-	//		numchar = fwrite (&vectTriple[i].seqN, sizeof(dataTypeNSeq), 1 , OutFileEndPos);
-	//		assert( numchar == 1); // we should always read the same number of characters
-	//		numchar = fwrite (&vectTriple[i].posN, sizeof(dataTypeNChar), 1 , OutFileEndPos); //here vectTriple[i].posN is the relative position of $ in the partial BWT
-	//		assert( numchar == 1); // we should always read the same number of characters
-	//		numchar = fwrite (&vectTriple[i].pileN, sizeof(dataTypedimAlpha), 1 , OutFileEndPos);
-	//		assert( numchar == 1); // we should always read the same number of characters
-	//	}
-
-	//	fclose(OutFileEndPos);
-	//	std::cerr << "The'end positions' stored!"<< std::endl;
-	//}
 }
 
 void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq posSymb) {
@@ -1421,15 +1411,13 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	//Now I have to update the BWT in each file.
 	const char *ext = ".aux";
 
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		static FILE *OutFileBWT, *InFileBWT;                  // output and input file BWT;
 		char *filenameOut = new char[16];
 		char *filenameIn = new char[12];
 		char *filename = new char[8];
 		dataTypeNChar numcharWrite=0;
 	#endif
-
-
 
 	#if  (BUILD_DA==1) 
 		static FILE *OutFileDA, *InFileDA;                  // output and input file DA;
@@ -1466,7 +1454,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 		currentPile = vectTriple[j].pileN;
 
-		#if BUILD_EXT_MEMORY==1
+		#if KEEP_eBWT_IN_EXT_MEMORY==1
 			numchar=sprintf (filename, "bwt_%d", currentPile);
 
 			/*
@@ -1538,7 +1526,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				while (toRead > 0) {            //((numchar!=0) && (toRead > 0)) {
 					if (toRead < SIZEBUFFER) { //The last reading for this sequence
 						//numchar = fread(buffer,sizeof(uchar),toRead,InFileBWT);
-						#if BUILD_EXT_MEMORY==1
+						#if KEEP_eBWT_IN_EXT_MEMORY==1
 							numchar =  readOnFilePartial(buffer, toRead, InFileBWT) ;
 							assert(numchar == toRead); // we should always read/write the same number of characters
 							numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
@@ -1561,7 +1549,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 						#endif
 					}
 					else {
-						#if BUILD_EXT_MEMORY==1
+						#if KEEP_eBWT_IN_EXT_MEMORY==1
 							numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
 							//numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
 							assert(numchar == SIZEBUFFER); // we should always read/write the same number of characters
@@ -1596,7 +1584,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				//And I have to update the number of occurrences of each symbol
 				if (toRead==0) {
 					//numchar = fwrite (&newSymb[vectTriple[k].seqN], sizeof(uchar), 1, OutFileBWT);
-					#if BUILD_EXT_MEMORY==1
+					#if KEEP_eBWT_IN_EXT_MEMORY==1
 						numchar =  writeSymbolOnFilePartial(newSymb[vectTriple[k].seqN], 1, OutFileBWT) ;
 						assert(numchar == 1); // we should always read/write the same number of characters
 					#endif
@@ -1628,7 +1616,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		//But before, I have to copy the remainder symbols from the old BWT to new BWT
 		while (numchar!=0) {
 
-			#if BUILD_EXT_MEMORY==1
+			#if KEEP_eBWT_IN_EXT_MEMORY==1
 				numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
 				//numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
 				if (numchar > 0) {
@@ -1650,7 +1638,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 			#endif
 		}
 
-		#if BUILD_EXT_MEMORY==1
+		#if KEEP_eBWT_IN_EXT_MEMORY==1
 			/* fclose(InFileBWT);
 			fclose(OutFileBWT); */
 			closeFilePartial(InFileBWT);
@@ -1672,7 +1660,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	//static FILE *tmpFile;
 	//tmpFile = fopen("sizeFileBwt.txt", "a");
 
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		//Renaming new to old (bwt files)
 		for (dataTypedimAlpha g = 0 ; g < sizeAlpha; g++) {
 			/* numchar=sprintf (filename, "bwt_%d", g);
@@ -1724,16 +1712,16 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 						}
 					#endif
 					#if (BUILD_SA==1) 
-						if (verboseEncode == 1) {
+						/* if (verboseEncode == 1) {
 							struct stat results;
 							if (stat(filenameInSA, &results) == 0)
 								// The size of the file in bytes is in results.st_size
 								//fprintf(tmpFile,"%s\t%u\n", filenameInSA, results.st_size);
-								std::cerr << filenameInSA <<"\t" << results.st_size << std::endl;
+								std::cerr << filenameInSA <<"-\t" << results.st_size << std::endl;
 							else
 								//fprintf(tmpFile,"An error occurred %s\n", filenameInSA);
 								std::cerr << "An error occurred" << std::endl;
-						}
+						} */
 						numchar=sprintf (filenameSA, "sa_%d", g);
 						numchar=sprintf (filenameInSA,"%s%s",filenameSA,ext);
 						numchar=sprintf (filenameOutSA,"new_%s%s",filenameSA,ext);
@@ -1764,7 +1752,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				}
 		#endif
 
-		#if BUILD_EXT_MEMORY==1
+		#if KEEP_eBWT_IN_EXT_MEMORY==1
 			delete [] filenameIn;
 			delete [] filename;
 			delete [] filenameOut;
@@ -1794,7 +1782,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	#endif
 }
 
-#if BUILD_EXT_MEMORY == 0
+#if KEEP_eBWT_IN_EXT_MEMORY == 0
 void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSymb) {
 	//I have found the position where I have to insert the chars in the position t of the each text
 	//Now I have to update the partial BWT
@@ -2116,7 +2104,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	//Now I have to update the BWT in each file.
 
 	
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		static FILE *OutFileBWT, *InFileBWT;                  // output and input file BWT;
 		char *filename = new char[8];
 		char *filenameOut = new char[16];
@@ -2179,7 +2167,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 		//std::cerr << "---Pile " << (unsigned int)currentPile << std::endl;
         assert(currentPile <= sizeAlpha);
 		
-		#if BUILD_EXT_MEMORY==1
+		#if KEEP_eBWT_IN_EXT_MEMORY==1
 			numchar=sprintf (filename, "bwt_%d", currentPile);
 			numchar=sprintf (filenameIn,"%s%s",filename,ext);
 			InFileBWT = fopen(filenameIn, "rb");
@@ -2262,9 +2250,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 		dataTypeNChar cont = 0;
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 			//std::cerr << "Start k= "<< k <<": Symb="<< newSymb[vectTriple[k].seqN] << ", Seq=" << vectTriple[k].seqN << ", Pos=" << vectTriple[k].posN << ", cont="<< cont << "\n";
-		  #if (BCR_SET==1)
-            if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
-		  #endif
+		  //#if (BCR_SET==1)
+          //  if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
+		  //#endif
                 //if (verboseEncode==1)
 				     //std::cerr << "++++++++++++++k= " << k << " Q[k]= " << (unsigned int)vectTriple[k].pileN << " P[k]= " << vectTriple[k].posN << " cont = "<< cont << std::endl;
 				//So I have to read the k-BWT and I have to count the number of the symbols up to the position posN.
@@ -2277,7 +2265,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 				//std::cerr << "Before of (toRead > 0) - Start: symb="<< newSymb[vectTriple[k].seqN] <<", vectTriple["<< k << "].posN=" << vectTriple[k].posN << ", cont="<< cont <<", toRead= " << toRead << "\n";
 
 			/*
-				#if BUILD_EXT_MEMORY == 0
+				#if KEEP_eBWT_IN_EXT_MEMORY == 0
 					dataTypeNChar toReadBWT=toRead, contBWT = cont;
 					while (toReadBWT > 0) {
 						vectBWTcurrentPile.push_back ( vectVectBWT[currentPile][eleCurrentPile] );
@@ -2292,7 +2280,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 				while (toRead > 0) {            //((numchar!=0) && (toRead > 0)) {
 					if (toRead < SIZEBUFFER) { //The last reading for this sequence
 					
-						#if BUILD_EXT_MEMORY == 1
+						#if KEEP_eBWT_IN_EXT_MEMORY == 1
 								numchar = fread(buffer,sizeof(uchar),toRead,InFileBWT);
 								//if (verboseEncode == 1)
 									//std::cerr << "BWT: number read " << numchar << " to Read " << toRead << "\n";
@@ -2338,7 +2326,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 						#endif
 					}
 					else {
-						#if BUILD_EXT_MEMORY == 1
+						#if KEEP_eBWT_IN_EXT_MEMORY == 1
 							numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
 							//if (verboseEncode == 1)
 							//std::cerr << "number read " << numchar << "\n";
@@ -2427,9 +2415,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 				//And I have to insert the valueLCP store in lcpCurN + 1 in the previous iteration
 				if (toRead==0) {
 					//std::cerr << "\n---Now I can insert the new symbol and lcp, indeed toRead= " << toRead << std::endl;
-					//std::cerr << "---STO inserendo newSymb[vectTriple[k].seqN]= " << newSymb[vectTriple[k].seqN] << " ";
+					//std::cerr << "---sto inserendo newSymb[vectTriple[k].seqN]= " << newSymb[vectTriple[k].seqN] << " ";
 					//std::cerr << "---per la sequenza  " << vectTriple[k].seqN << " in the segment " << currentPile << "\n";
-					#if BUILD_EXT_MEMORY == 1
+					#if KEEP_eBWT_IN_EXT_MEMORY == 1
 						numchar = fwrite (&newSymb[vectTriple[k].seqN], sizeof(uchar), 1, OutFileBWT);
 						assert(numchar == 1); // we should always read/write the same number of characters
 					#else
@@ -2616,7 +2604,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 							uchar sucSymbol='\0';
 							//it there exists another symbol in the segment file then I have to update it.
 							
-							#if BUILD_EXT_MEMORY == 1
+							#if KEEP_eBWT_IN_EXT_MEMORY == 1
 								numchar = fread(&sucSymbol,sizeof(uchar),1,InFileBWT);
 
 							#else
@@ -2633,7 +2621,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 							if (numchar == 1) {  //There exists at least a symbol in the current segment
 								//std::cerr << "I read the symbol sucSymbol is " << (unsigned int)alpha[(unsigned int)sucSymbol] << "\n";
 
-								#if BUILD_EXT_MEMORY == 1
+								#if KEEP_eBWT_IN_EXT_MEMORY == 1
 									numcharWrite = fwrite (&sucSymbol, sizeof(uchar), numchar, OutFileBWT);
 									//if (verboseEncode == 1)
 									//	std::cerr << "In BWT: number read " << numchar << " ==1 \n";
@@ -2793,9 +2781,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					std::cerr << std::endl;
 				}
 
-		   #if (BCR_SET==1)
-			}  //close if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)
-		   #endif
+		   //#if (BCR_SET==1)
+			//}  //close if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)
+		   // #endif
             //}
 
 
@@ -2828,7 +2816,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			numcharWrite = fwrite (bufferLCP, sizeof(dataTypelenSeq), numchar , OutFileLCP);
 			assert(numchar == numcharWrite); // we should always read/write the same number of characters
 			
-			#if BUILD_EXT_MEMORY == 1				
+			#if KEEP_eBWT_IN_EXT_MEMORY == 1				
 				//For BWT
 				numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
 				numcharWrite = fwrite (buffer, sizeof(uchar), numchar , OutFileBWT);
@@ -2901,7 +2889,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
            }
         }
 
-		#if BUILD_EXT_MEMORY == 1
+		#if KEEP_eBWT_IN_EXT_MEMORY == 1
 			fclose(InFileBWT);
 			fclose(OutFileBWT);
 			
@@ -2984,7 +2972,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 
 	delete [] buffer;
 	delete [] filenameIn;
-	#if BUILD_EXT_MEMORY == 1
+	#if KEEP_eBWT_IN_EXT_MEMORY == 1
 		delete [] filename;
 		delete [] filenameOut;
 	#endif
@@ -3008,82 +2996,134 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 }
 #endif
 
-#if OUTPUT_FORMAT_EGSA == 1
 
-int BCRexternalBWT::storeEGSAoutput( const char* fn ) {
-	
-	#if BUILD_EXT_MEMORY == 1
-		static FILE  *InFileBWT;                  // input file BWT;
-		uchar *bufferBWT = new uchar[SIZEBUFFER];
-		dataTypeNChar numcharBWT;
-	#endif
-	
-	static FILE  *InFileLCP;                  // input file LCP;
-	static FILE  *InFilePairSA;               //  input file SA;
-	static FILE  *InFileDA;                   //  input file DA;
+
+#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1)
+int BCRexternalBWT::storeEGSAcomplete( const char* fn ) {
 	
 	char *filenameIn = new char[1024];
 	char *filename = new char[1024];
 	const char *ext = ".aux";
-	
-	//Open EGSA file
-	
-		//dataTypeNSeq numTotalTexts;
-		//#if BUILD_BCR_FROM_EGSA == 1
-		//	numTotalTexts = nText+nAddedTextEGSA;
-		//#else
-		//	numTotalTexts = nText;
-		//#endif
-	
-	FILE *f_ESA;			// pointer to the ESA input file
-	char c_aux[1024];
-//	sprintf(c_aux, "%s.%d.gesa", fn, numTotalTexts);  //
-	sprintf(c_aux, "%s.%d.gesa", fn, 0);
-	f_ESA = fopen(c_aux, "wb");//rb
-	if (f_ESA == NULL) {
-		std::cerr << "EGSA: Error opening: " << c_aux << std::endl;
-		exit (EXIT_FAILURE);
-	}	
-	t_GSA GSA;
-	
-	std::cerr << "EGSA: sizeof(type of t_GSA): " << sizeof(t_GSA) << "\n";
-	std::cerr << "file EGSA: " << lengthTot_plus_eof * sizeof(t_GSA) << "\n";
+	dataTypeNChar numcharRead=0;
 
-	dataTypeNChar numcharPairSA, numcharLCP, numcharDA, numEle=0;
 	//dataTypeNChar numcharWrite=0;
 	
+	#if KEEP_eBWT_IN_EXT_MEMORY == 1
+		static FILE  *InFileBWT;                  // input file BWT;
+		uchar *bufferBWT = new uchar[SIZEBUFFER];
+	#endif
 	
-	dataTypelenSeq *bufferLCP = new dataTypelenSeq[SIZEBUFFER];
-	dataTypelenSeq *bufferSA = new dataTypelenSeq[SIZEBUFFER];
-	dataTypeNSeq *bufferDA = new dataTypeNSeq[SIZEBUFFER];
+	#if (OUTPUT_FORMAT_EGSA == 1) || (OUTPUT_FORMAT_EGSA == 2)
+		dataTypeNChar numberBWTwritten = 0;
+	#endif
 
+	#if BUILD_LCP == 1
+		static FILE  *InFileLCP;                  // input file LCP;
+		dataTypelenSeq *bufferLCP = new dataTypelenSeq[SIZEBUFFER];
+	#endif
+	
+	#if BUILD_SA == 1
+		static FILE  *InFilePairSA;               //  input file SA;
+		dataTypelenSeq *bufferSA = new dataTypelenSeq[SIZEBUFFER];
+	#endif
+	
+	#if BUILD_DA == 1
+		static FILE  *InFileDA;                   //  input file DA;
+		dataTypeNSeq *bufferDA = new dataTypeNSeq[SIZEBUFFER];
+	#endif
 
-	std::cerr << "Build the entire BWT/LCP/DA/SA file (eGSA format).\n";
+	std::cerr << "Build the entire BWT/LCP/DA/SA file.\n";	
 
-	#if (printEGSA == 1)
-		dataTypeNChar *freqOut = new dataTypeNChar [SIZE_ALPHA];
-		for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
-     	   freqOut[i] = 0;
-		freqOut[SIZE_ALPHA-1] = 0;
+	
+	#if OUTPUT_FORMAT_EGSA == 1
+	
+		std::cerr << "Build the entire gesa file (eGSA tool).\n";	
+	
+		dataTypeNChar numEle=0;
 
-		cout << "bwt\t" << "gsa(pos,id)\t" << "lcp\t" << endl; 
+		FILE *f_ESA;			// pointer to the ESA input file
+		char c_aux[1024];
+	//	sprintf(c_aux, "%s.%d.gesa", fn, numTotalTexts);  //
+		sprintf(c_aux, "%s.%d.gesa", fn, 0);
+		f_ESA = fopen(c_aux, "wb");//rb
+		if (f_ESA == NULL) {
+			std::cerr << "EGSA: Error opening: " << c_aux << std::endl;
+			exit (EXIT_FAILURE);
+		}	
+		t_GSA GSA;
+		
+		std::cerr << "EGSA: sizeof(type of t_GSA): " << sizeof(t_GSA) << "\n";
+		std::cerr << "file EGSA: " << lengthTot_plus_eof * sizeof(t_GSA) << "\n";
+
+	#endif
+	
+	#if OUTPUT_FORMAT_EGSA == 2
+	
+		std::cerr << "Build the entire egsa file (unique file for BWT/LCP/DA/SA).\n";	
+		
+		FILE *OutFileEGSA;			// pointer to the EGSA input file
+		char *fnEGSA = new char[strlen(fn)+8];
+		sprintf (fnEGSA,"%s%s",fn,".egsa");
+		OutFileEGSA = fopen(fnEGSA, "wb");//rb
+		if (OutFileEGSA == NULL) {
+			std::cerr << "Unique EGSA file: Error opening: " << fnEGSA << std::endl;
+			exit (EXIT_FAILURE);
+		}		
+
+	#endif
+
+	#if OUTPUT_FORMAT_EGSA == 3
+		std::cerr << "Build the entire four files for BWT/LCP/DA/SA.\n";	
+		
+		char *fnBWT = new char[strlen(fn)+8];
+		static FILE *OutFileBWT; 
+		sprintf (fnBWT,"%s%s",fn,".ebwt");
+		OutFileBWT = fopen(fnBWT, "wb");
+		if (OutFileBWT==NULL) {
+			std::cerr << "storeEGSAcomplete: Error opening " << std::endl;
+			exit (EXIT_FAILURE);
+		}
+	
+		#if BUILD_LCP == 1
+			char *fnLCP = new char[strlen(fn)+8];
+			static FILE *OutFileLCP; 
+			sprintf (fnLCP,"%s%s",fn,".lcp");
+			OutFileLCP = fopen(fnLCP, "wb");
+			if (OutFileLCP==NULL) {
+				std::cerr << "storeEGSAcomplete: Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
+		#if BUILD_SA == 1
+			char *fnSA = new char[strlen(fn)+8];
+			static FILE *OutFileSA; 
+			sprintf (fnSA,"%s%s",fn,".posSA");
+			OutFileSA = fopen(fnSA, "wb");
+			if (OutFileSA==NULL) {
+				std::cerr << "storeEGSAcomplete: Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
+		#if BUILD_DA == 1
+			char *fnDA = new char[strlen(fn)+8];
+			static FILE *OutFileDA; 
+			sprintf (fnDA,"%s%s",fn,".da");
+			OutFileDA = fopen(fnDA, "wb");
+			if (OutFileDA==NULL) {
+				std::cerr << "storeEGSAcomplete: Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
 	#endif
 		
-	
-	dataTypeNChar numberBWTwritten = 0;
-	
 	for (dataTypedimAlpha g = 0 ; g < sizeAlpha; g++) {
-		#if (printEGSA == 1)
-			cout << endl; 
-		#endif
-	
 		//BWT
-		#if BUILD_EXT_MEMORY == 1
-			numcharBWT=sprintf (filename, "bwt_%d", g);
-			numcharBWT=sprintf (filenameIn,"%s%s",filename,ext);
+		#if KEEP_eBWT_IN_EXT_MEMORY == 1
+			sprintf (filename, "bwt_%d", g);
+			sprintf (filenameIn,"%s%s",filename,ext);
 			InFileBWT = fopen(filenameIn, "rb");
 			if (InFileBWT==NULL) {
-				std::cerr << "BWT file " << (unsigned int)g <<": Error opening " << std::endl;
+				std::cerr << "storeEGSAcomplete: BWT file " << (unsigned int)g <<": Error opening " << std::endl;
 				exit (EXIT_FAILURE);
 			}
 		#else
@@ -3091,163 +3131,236 @@ int BCRexternalBWT::storeEGSAoutput( const char* fn ) {
 		#endif
 		
 		//LCP
-		numcharLCP=sprintf (filename, "lcp_%d", g);
-		numcharLCP=sprintf (filenameIn,"%s%s",filename,ext);
-		InFileLCP = fopen(filenameIn, "rb");
-		if (InFileLCP==NULL) {
-			std::cerr << "storeEGSAoutput: LCP file " << (unsigned int)g <<": Error opening " << std::endl;
-			exit (EXIT_FAILURE);
-		}
+		#if BUILD_LCP == 1
+			sprintf (filename, "lcp_%d", g);
+			sprintf (filenameIn,"%s%s",filename,ext);
+			InFileLCP = fopen(filenameIn, "rb");
+			if (InFileLCP==NULL) {
+				std::cerr << "storeEGSAcomplete: LCP file " << (unsigned int)g <<": Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
 		
 		//DA
-		numcharDA=sprintf (filename, "da_%d", g);
-		numcharDA=sprintf (filenameIn,"%s%s",filename,ext);
-		InFileDA = fopen(filenameIn, "rb");
-		if (InFileDA==NULL) {
-			std::cerr << "storeEGSAoutput: DA file " << (unsigned int)g <<": Error opening " << std::endl;
-			exit (EXIT_FAILURE);
-		}
+		#if BUILD_DA == 1
+			sprintf (filename, "da_%d", g);
+			sprintf (filenameIn,"%s%s",filename,ext);
+			InFileDA = fopen(filenameIn, "rb");
+			if (InFileDA==NULL) {
+				std::cerr << "storeEGSAcomplete: DA file " << (unsigned int)g <<": Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
 		
 		//SA
-		numcharPairSA=sprintf (filename, "sa_%d", g);
-		numcharPairSA=sprintf (filenameIn,"%s%s",filename,ext);
-		InFilePairSA = fopen(filenameIn, "rb");
-		if (InFilePairSA==NULL) {
-			std::cerr << "storeEGSAoutput: SA file " << (unsigned int)g <<": Error opening " << std::endl;
-			exit (EXIT_FAILURE);
-		}
-		
-		#if BUILD_EXT_MEMORY == 1
-			while ((!feof(InFileBWT))  && (!feof(InFileDA)) && (!feof(InFilePairSA)) && (!feof(InFileLCP)) )  {
-		#else
-			while ((!feof(InFilePairSA)) && (!feof(InFileDA)) && (!feof(InFileLCP)) )  {
+		#if BUILD_SA == 1
+			sprintf (filename, "sa_%d", g);
+			sprintf (filenameIn,"%s%s",filename,ext);
+			InFilePairSA = fopen(filenameIn, "rb");
+			if (InFilePairSA==NULL) {
+				std::cerr << "storeEGSAcomplete: SA file " << (unsigned int)g <<": Error opening " << std::endl;
+				exit (EXIT_FAILURE);
+			}
 		#endif
-				#if BUILD_EXT_MEMORY == 1
-					numcharBWT = fread(bufferBWT,sizeof(uchar),SIZEBUFFER,InFileBWT);
+	
+		while ( 
+			#if BUILD_LCP == 1  
+				(!feof(InFileLCP)) 	
+				#if BUILD_DA == 1
+					&& (!feof(InFileDA))
+				#endif
+				#if BUILD_SA == 1
+					&& (!feof(InFilePairSA))
+				#endif
+				#if KEEP_eBWT_IN_EXT_MEMORY == 1
+					&& (!feof(InFileBWT))
+				#endif
+			#endif
+
+			#if BUILD_LCP == 0 && BUILD_DA == 1
+				(!feof(InFileDA))
+				#if BUILD_SA == 1
+					&& (!feof(InFilePairSA))
+				#endif
+				#if KEEP_eBWT_IN_EXT_MEMORY == 1
+					&& (!feof(InFileBWT))
+				#endif
+			#endif
+
+			#if BUILD_LCP == 0 && BUILD_DA == 0 && BUILD_SA == 1
+				(!feof(InFilePairSA))
+				#if KEEP_eBWT_IN_EXT_MEMORY == 1
+					&& (!feof(InFileBWT))
+				#endif
+			#endif
+			#if BUILD_LCP == 0 && BUILD_DA == 0 && BUILD_SA == 0 && KEEP_eBWT_IN_EXT_MEMORY == 1
+				(!feof(InFileBWT))
+			#endif
+		)  {
+		
+				#if KEEP_eBWT_IN_EXT_MEMORY == 1
+					numcharRead = fread(bufferBWT,sizeof(uchar),SIZEBUFFER,InFileBWT);
+				#endif
+								
+				#if BUILD_DA == 1
+					numcharRead = fread(bufferDA,sizeof(dataTypeNSeq),SIZEBUFFER,InFileDA);
 				#endif
 				
-				numcharDA = fread(bufferDA,sizeof(dataTypeNSeq),SIZEBUFFER,InFileDA);
-				numcharPairSA = fread(bufferSA,sizeof(dataTypelenSeq),SIZEBUFFER,InFilePairSA);
-				
-				numcharLCP = fread(bufferLCP,sizeof(dataTypelenSeq),SIZEBUFFER,InFileLCP);
-				
-				#if BUILD_EXT_MEMORY == 1
-					if ((numcharLCP != numcharPairSA) || (numcharLCP != numcharDA) || (numcharLCP != numcharBWT))
-				#else
-					if ((numcharLCP != numcharPairSA) || (numcharLCP != numcharDA))
+				#if BUILD_SA == 1
+					numcharRead = fread(bufferSA,sizeof(dataTypelenSeq),SIZEBUFFER,InFilePairSA);
 				#endif
-					std::cerr << "Error: number  in BWT in Pair SA  and in LCP\n";
-				else {
-					//std::cerr << "bwt\tlcp\tpos\tnumSeq\tSA\tQS\n";
-					for (dataTypeNChar i=0; i < numcharLCP; i++) {
-						numEle++;
+			
+				#if BUILD_LCP == 1  
+					numcharRead = fread(bufferLCP,sizeof(dataTypelenSeq),SIZEBUFFER,InFileLCP);
+				#endif
 
-						GSA.suff = bufferSA[i];
-						GSA.text = bufferDA[i];
-						
-						GSA.lcp = bufferLCP[i];
+					#if (OUTPUT_FORMAT_EGSA == 1) || (OUTPUT_FORMAT_EGSA == 2)
+						for (dataTypeNChar i=0; i < numcharRead; i++) {
 
-						#if BUILD_EXT_MEMORY == 1
-							if (bufferBWT[i] == '#')
-								GSA.bwt='\0';
-							else
-								GSA.bwt=bufferBWT[i];
+							#if (OUTPUT_FORMAT_EGSA == 1)
+								numEle++;
+								GSA.suff = bufferSA[i];
+								GSA.text = bufferDA[i];							
+								GSA.lcp = bufferLCP[i];
+								#if KEEP_eBWT_IN_EXT_MEMORY == 1
+									if (bufferBWT[i] == '#')
+										GSA.bwt='\0';
+									else
+										GSA.bwt=bufferBWT[i];
+								#else
+									if (vectVectBWT[g][eleCurrentPile] == '#')
+										GSA.bwt='\0';
+									else
+										GSA.bwt=vectVectBWT[g][eleCurrentPile];
+								#endif
+							
+								fwrite(&GSA.text, sizeof(dataTypeNSeq), 1, f_ESA);	
+								fwrite(&GSA.suff, sizeof(dataTypelenSeq), 1, f_ESA);	
+								fwrite(&GSA.lcp, sizeof(dataTypelenSeq), 1, f_ESA);	
+								fwrite(&GSA.bwt, sizeof(uchar), 1, f_ESA);	
+							#endif
+
+							#if OUTPUT_FORMAT_EGSA == 2
+								#if KEEP_eBWT_IN_EXT_MEMORY == 1
+									fwrite (&bufferBWT[i], sizeof(uchar), 1 , OutFileEGSA);
+								#else
+									fwrite (&vectVectBWT[g][eleCurrentPile], sizeof(uchar), 1 , OutFileEGSA);								
+								#endif
+									
+								#if BUILD_LCP == 1
+									fwrite (&bufferLCP[i], sizeof(dataTypelenSeq), 1 , OutFileEGSA);
+								#endif
+								
+								#if BUILD_DA == 1
+									fwrite (&bufferDA[i], sizeof(dataTypeNSeq), 1 , OutFileEGSA);
+								#endif	
+
+								#if BUILD_SA == 1
+									fwrite (&bufferSA[i], sizeof(dataTypelenSeq), 1 , OutFileEGSA);
+								#endif			
+							#endif
+
+							numberBWTwritten++;
+						}
+					#endif
+					#if OUTPUT_FORMAT_EGSA == 3
+						#if KEEP_eBWT_IN_EXT_MEMORY == 1
+							fwrite (bufferBWT, sizeof(uchar), numcharRead , OutFileBWT);
 						#else
-							if (vectVectBWT[g][eleCurrentPile] == '#')
-								GSA.bwt='\0';
-							else
-								GSA.bwt=vectVectBWT[g][eleCurrentPile];							
+							for (dataTypeNChar i=0; i < numcharRead; i++) {
+								fwrite (&vectVectBWT[g][eleCurrentPile], sizeof(uchar), 1 , OutFileBWT);								
+							}
 						#endif
+						#if BUILD_LCP == 1
+							fwrite (bufferLCP, sizeof(dataTypelenSeq), numcharRead , OutFileLCP);
+							//assert(numcharLCP == numcharWrite); 
+						#endif
+						#if BUILD_SA == 1
+							fwrite (bufferSA, sizeof(dataTypelenSeq), numcharRead , OutFileSA);
+							//assert(numcharLCP == numcharWrite); 
+						#endif
+						#if BUILD_DA == 1
+							fwrite (bufferDA, sizeof(dataTypeNSeq), numcharRead , OutFileDA);
+							//assert(numcharLCP == numcharWrite); 
+						#endif
+				
+					#endif
+							
+					#if KEEP_eBWT_IN_EXT_MEMORY == 0
+						eleCurrentPile++;
+					#endif
 					
-						fwrite(&GSA.text, sizeof(dataTypeNSeq), 1, f_ESA);	
-						fwrite(&GSA.suff, sizeof(dataTypelenSeq), 1, f_ESA);	
-						fwrite(&GSA.lcp, sizeof(dataTypelenSeq), 1, f_ESA);	
-						fwrite(&GSA.bwt, sizeof(uchar), 1, f_ESA);	
-						numberBWTwritten++;
-						
-						#if (printEGSA == 1)
-							cout << (char)GSA.bwt<< "\t" << (int)GSA.suff << "\t" << (int)GSA.text << "\t" << (int)GSA.lcp << "\t" << std::endl;
-							#if BUILD_EXT_MEMORY == 1
-								freqOut[(unsigned int)(bufferBWT[i])]++;
-							#else
-								freqOut[(unsigned int)(vectVectBWT[g][eleCurrentPile])]++;
-							#endif 
-						#endif
-						
-						#if BUILD_EXT_MEMORY == 0
-							eleCurrentPile++;
-						#endif
-					}
-				}
+				
 		}  //end-while
 		
-		fclose(InFileDA);		
-		fclose(InFilePairSA);
-		fclose(InFileLCP);
+		#if BUILD_LCP == 1
+			fclose(InFileLCP);
+		#endif
 
-		#if BUILD_EXT_MEMORY == 1
+		#if BUILD_SA == 1
+			fclose(InFilePairSA);
+		#endif
+		#if BUILD_DA == 1
+			fclose(InFileDA);		
+		#endif
+		
+		#if KEEP_eBWT_IN_EXT_MEMORY == 1
 			fclose(InFileBWT);			
 		#endif
 			
 						
 	} // end-for
-	std::cerr  <<"Number records in EGSA file: " << numberBWTwritten << std::endl;
-	assert ( numberBWTwritten== lengthTot_plus_eof);
 	
-	#if BUILD_EXT_MEMORY == 1
-		#if (printEGSA == 1)
-			int check=0;
-			std::cerr << "Distribution in BWT\n";		
-			
-			for (dataTypedimAlpha g = 0 ; g < SIZE_ALPHA-1; g++) {
-				if (freqOut[g] > 0){				
-					InFileBWT = openFilePartialIn(alpha[(unsigned int)g]);
-					fseek(InFileBWT,0,SEEK_END);
-					dataTypeNChar lengthBWTPartial=ftell(InFileBWT);
-					if (freqOut[g] == lengthBWTPartial)
-						std::cerr << (unsigned int)g << " " << g << " freq: " << freqOut[g] << "\n";
-					else {
-						std::cerr << (unsigned int)g << " " << g << " freq: " << freqOut[g] << " freq in BWT: " << lengthBWTPartial << "***********************\n";
-						check = 1;
-					}
-					closeFilePartial(InFileBWT);
-				}
-			}
-			if (freqOut[(SIZE_ALPHA-1)] > 0){
-				InFileBWT = openFilePartialIn(alpha[(unsigned int)(SIZE_ALPHA-1)]);
-				fseek(InFileBWT,0,SEEK_END);
-				dataTypeNChar lengthBWTPartial=ftell(InFileBWT);
-				if (freqOut[(SIZE_ALPHA-1)] == lengthBWTPartial)
-					std::cerr << (unsigned int)(SIZE_ALPHA-1) << " " << SIZE_ALPHA-1 << " freq: " << freqOut[(SIZE_ALPHA-1)] << "\n";
-				else {
-					std::cerr << (unsigned int)(SIZE_ALPHA-1) << " " << SIZE_ALPHA-1 << " freq: " << freqOut[(SIZE_ALPHA-1)] << " freq in BWT: " << lengthBWTPartial << "***********************\n";
-					check = 1;
-				}
-				closeFilePartial(InFileBWT);
-			}
-
-			if (check == 1)
-				std::cerr << "WARNING! Some length partial BWT != the number of occurrences! " << std::endl;
-
-			delete [] freqOut;
-		#endif
+	#if (OUTPUT_FORMAT_EGSA == 1) || (OUTPUT_FORMAT_EGSA == 2)
+		std::cerr  <<"Number records in EGSA file: " << numberBWTwritten << std::endl;
+		assert ( numberBWTwritten== lengthTot_plus_eof);
 	#endif
 	
-	#if BUILD_EXT_MEMORY == 1
+		
+	#if KEEP_eBWT_IN_EXT_MEMORY == 1
 		delete [] bufferBWT;
 	#endif
 	
 	delete [] filenameIn;
 	delete [] filename;
-	delete [] bufferSA;
-	delete [] bufferDA;	
-	delete [] bufferLCP; 
-	fclose(f_ESA);
+
+	#if  (BUILD_LCP==1)
+		delete [] bufferLCP; 
+	#endif	
+	#if  (BUILD_DA==1)
+		delete [] bufferDA;		
+	#endif
+	#if  (BUILD_SA==1)
+		delete [] bufferSA;		
+	#endif
+
+	
+	#if OUTPUT_FORMAT_EGSA == 1
+		fclose(f_ESA);
+	#endif
+
+	#if OUTPUT_FORMAT_EGSA == 2		
+		fclose(OutFileEGSA);
+	#endif
+
+	#if OUTPUT_FORMAT_EGSA == 3
+		#if  (BUILD_LCP==1)
+			fclose(OutFileLCP);
+		#endif	
+		#if  (BUILD_DA==1)
+			fclose(OutFileDA);
+		#endif
+		#if  (BUILD_SA==1)
+			fclose(OutFileSA);
+		#endif
+	#endif
 	
 	return 0;
 }
+#endif
 
 
+#if OUTPUT_FORMAT_EGSA == 1
 int BCRexternalBWT::storeEGSAoutputFromEntireFiles (string input) {
 
 	string fnBWT, fnPairSA, fnLCP, fnEGSA, fnDA;
@@ -3426,22 +3539,7 @@ void BCRexternalBWT::storeEntireBWTFilePartial( const char* fn ) {
 		fclose(InFileBWT);
 
 
-		//Delete or rename the partial BWT bwt_%d????
-		#if deletePartialBWT == 1
-			if (remove(filenameIn)!=0)
-				std::cerr << "storeEntireBWTFilePartial: Error deleting file" << std::endl;
-
-			/*
-		#else //rename the aux bwt file
-			int lung = strlen(fn) + strlen(filenameIn)+1;
-			char *newfilename = new char[lung];
-			numchar=sprintf (newfilename,"%s%s",fn,filenameIn);
-			//std::cerr  << newfilename << " " << filenameIn << std::endl;
-			if(rename(filenameIn, newfilename))
-					std::cerr  <<"storeEntireBWTFilePartial: Error renaming file" << std::endl;
-			delete[] newfilename;
-		*/
-		#endif
+		
 	}
 	fclose(OutFileBWT);
 
@@ -3561,23 +3659,6 @@ void BCRexternalBWT::storeEntireLCP( const char* fn ) {
 
 		fclose(InFileLCP);
 
-
-		//Delete or renome the partial LCP lcp_%d????
-		#if (deletePartialLCP == 1)
-
-			if (remove(filenameIn)!=0)
-				std::cerr << "storeEntireLCP: Error deleting file" << std::endl;
-		/*
-		#else //renome the aux bwt file
-
-			int lung = strlen(fn) + strlen(filenameIn)+1;
-			char *newfilename = new char[lung];
-			numchar=sprintf (newfilename,"%s%s",fn,filenameIn);
-			//std::cerr  << newfilename << " " << filenameIn << std::endl;
-			if(rename(filenameIn, newfilename))
-					std::cerr  <<"storeEntireLCP: Error renaming file" << std::endl;
-		*/
-		#endif
 	}
 	fclose(OutFileLCP);
 
@@ -3709,10 +3790,7 @@ void BCRexternalBWT::storeEntirePairSA( const char* fn ) {
 			}
 
 			fclose(InFileDA);
-			#if deletePartialGSA == 1
-				if (remove(filenameIn)!=0)
-					std::cerr << "storeEntirePairSA: Error deleting file" << std::endl;
-			#endif
+			
 		#endif
 	
 		#if  (BUILD_SA==1)
@@ -3738,10 +3816,7 @@ void BCRexternalBWT::storeEntirePairSA( const char* fn ) {
 			}
 
 			fclose(InFileSA);
-			#if deletePartialGSA == 1
-				if (remove(filenameIn)!=0)
-					std::cerr << "storeEntirePairSA: Error deleting file" << std::endl;
-			#endif
+		
 		#endif
 		
 	}
@@ -3803,13 +3878,12 @@ void BCRexternalBWT::storeEntirePairSA( const char* fn ) {
 	#endif
 	#if  (BUILD_SA==1)
 		delete[] fnSA;
-		
 	#endif
 
 }
 #endif
 
-#if BUILD_EXT_MEMORY==0
+#if KEEP_eBWT_IN_EXT_MEMORY==0
 void BCRexternalBWT::storeEntireBWTIntMem( const char* fn ) {
 	static FILE *OutFileBWT;                  // output and input file BWT;
 	dataTypeNChar numcharWrite;
@@ -3821,9 +3895,9 @@ void BCRexternalBWT::storeEntireBWTIntMem( const char* fn ) {
 
 	int lung = strlen(fn);
 	char *fnBWT = new char[lung+7];
-	numchar=sprintf (fnBWT,"%s%s",fn,".ebwt");		
+	sprintf (fnBWT,"%s%s",fn,".ebwt");		
 	
-	OutFileBWT = fopen(fn, "wb");
+	OutFileBWT = fopen(fnBWT, "wb");
 	if (OutFileBWT==NULL) {
 		std::cerr << "(storeEntireBWTIntMem) Entire BWT file: Error opening " << std::endl;
 		exit (EXIT_FAILURE);
@@ -4023,7 +4097,7 @@ void BCRexternalBWT::printSegments()
 
 	std::cerr  << "\nPartial BWT segments:\n";
 
-	#if BUILD_EXT_MEMORY==1
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
 		static FILE *InFileBWT;
 		char *filenameIn = new char[12];
 		char *filename = new char[8];
