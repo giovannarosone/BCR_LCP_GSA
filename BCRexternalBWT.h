@@ -55,15 +55,7 @@ public:
 		void storeEntireLCP(const char*);
     #endif
 	void storeEntireBWTFilePartial(const char*);
-	#if OUTPUT_FORMAT_EGSA == 1
-		virtual int storeEGSAoutput(const char*);
-		virtual int storeEGSAoutputFromEntireFiles (string input);
-	#endif
-	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
-		void storeEntirePairSA(const char*);
-		//void storeEntireSAfromPairSA(const char*);
-	#endif
-  		
+	
 	#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1)
 		virtual int storeEGSAcomplete( const char* );
 	#endif
@@ -71,12 +63,11 @@ public:
 	#if OUTPUT_FORMAT_EGSA == 1
 		virtual int storeEGSAoutputFromEntireFiles (string );
 	#endif
-	
 	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
 		void storeEntirePairSA(const char*);
 		//void storeEntireSAfromPairSA(const char*);
 	#endif
-  
+	
 	#if KEEP_eBWT_IN_EXT_MEMORY==0
 		void storeEntireBWTIntMem(const char*);
 		void  storeBWTIntMem(uchar const *, dataTypelenSeq) ;
