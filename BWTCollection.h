@@ -112,7 +112,6 @@ namespace SXSI
 		#endif
 	    
 		#if OUTPUT_FORMAT_EGSA == 1
-			virtual int storeEGSAoutput(const char*) = 0;
 			virtual int storeEGSAoutputFromEntireFiles (string input)= 0;
 		#endif
 		
