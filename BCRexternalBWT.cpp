@@ -45,7 +45,7 @@
 #include <string.h>    
 
 //#include "Sorting.h"
-#define SIZEBUFFER 104857600
+#define SIZEBUFFER 1048576
 #define DIMBLOCK 1024
 
 //using std::vector;
