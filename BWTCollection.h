@@ -71,16 +71,12 @@ namespace SXSI
 		dataTypedimAlpha sizeAlpha;  //number of the different symbols in the input texts
 		dataTypedimAlpha *alphaInverse;  //Corresponding between alpha[i] and the symbol as char
 
-		#if USE_QS==1
-			uchar *newSymbQS;
-		#endif
-
 		#if BUILD_BCR_FROM_EGSA == 1
 			dataTypeNSeq nAddedTextEGSA;
 			//char c_aux[512] = "7seqsVar.fasta.7.gesa";
 		#endif
 
-		#if BUILD_EXT_MEMORY==0
+		#if KEEP_eBWT_IN_EXT_MEMORY==0
 			std::vector< std::vector<char> > vectVectBWT;
 		#endif
 
@@ -111,13 +107,18 @@ namespace SXSI
 			//virtual void storeEntireSAfromPairSA(const char*) = 0;
 		#endif
 		
+   		#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (KEEP_eBWT_IN_EXT_MEMORY==1) )
+			virtual int storeEGSAcomplete( const char* )=0;
+		#endif
+	    
 		#if OUTPUT_FORMAT_EGSA == 1
 			virtual int storeEGSAoutput(const char*) = 0;
 			virtual int storeEGSAoutputFromEntireFiles (string input)= 0;
 		#endif
 		
 		virtual dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *)=0;
-		#if BUILD_EXT_MEMORY==0
+	    
+		#if KEEP_eBWT_IN_EXT_MEMORY==0
 			virtual void  storeBWTIntMem(uchar const *, dataTypelenSeq) =0;
 			virtual void storeEntireBWTIntMem(const char*) = 0;
 			virtual dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *, dataTypeNChar, dataTypeNChar , uchar *) =0;
