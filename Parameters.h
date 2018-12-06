@@ -142,7 +142,7 @@ typedef unsigned long ulong;
 //In both cases, SA, DA, LCP are stored in files.
 #define KEEP_eBWT_IN_EXT_MEMORY  1
 
-//if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other (use it if you want to build only the eBWT)
+//if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other
 //if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
 //if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: ebwt, lcp, da, sa
 //if OUTPUT_FORMAT == 3, the output format of BCR is at most 4 files at the same time
