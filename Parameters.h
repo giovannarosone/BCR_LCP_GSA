@@ -40,35 +40,62 @@
 #include <iostream>
 #include <fstream>
 
+#define SIZEBUFFER 10485760     //Size of the buffer for partial ebwt/LCP/DA/SA
+
 typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
 #define dataTypedimAlpha uchar  //size of the alphabet (in biologic case 6 ($,A,C,G,N,T))
 
+/* USE: 0 - below 255 (unsigned char)
+ *		1 - between 256 and 65.536 (unsigned short)
+ *		2 - between 65.536 and 4.294.967.296 (unsigned int)
+ *		3 - otherwise (unsigned long)
+ */
 
-#define dataTypeLengthSequences 1		//length of the sequences (in biologic case 100)
-#define dataTypeNumSeq 0		//number of sequences in the input file. If =0 -> uint
-#define dataTypeNumChar 1		//numer of characters in the input file (length of the BWT) If =0 -> uint
+// Type size for Sequences Length (in biologic case 100)
+#define dataTypeLengthSequences 0		
+
+// Type size for Number of Sequences in the input file
+#define dataTypeNumSeq 2		
+
+// Type size for Number of Character in the input file (length of the BWT)
+#define dataTypeNumChar 3		
+
 
 //Set the types
-#if dataTypeLengthSequences == 1
-#   define dataTypelenSeq uchar
-#else
-#   define dataTypelenSeq uint
+#if dataTypeLengthSequences == 0
+	#define dataTypelenSeq uchar
+#elif dataTypeLengthSequences == 1
+	#define dataTypelenSeq ushort
+#elif dataTypeLengthSequences == 2
+	#define dataTypelenSeq uint
+#elif dataTypeLengthSequences == 3
+	#define dataTypelenSeq ulong	
 #endif
 
-#if dataTypeNumSeq == 1
-#   define dataTypeNSeq ulong
-#else
-#   define dataTypeNSeq uint
+#if dataTypeNumSeq == 0
+	#define dataTypeNSeq uchar
+#elif dataTypeNumSeq == 1
+	#define dataTypeNSeq ushort
+#elif dataTypeNumSeq == 2
+	#define dataTypeNSeq uint
+#elif dataTypeNumSeq == 3
+	#define dataTypeNSeq ulong	
 #endif
 
-#if dataTypeNumChar == 1
-#   define dataTypeNChar ulong
-#else
-#   define dataTypeNChar uint
+
+#if dataTypeNumChar == 0
+	#define dataTypeNChar uchar
+#elif dataTypeNumChar == 1
+	#define dataTypeNChar ushort
+#elif dataTypeNumChar == 2
+	#define dataTypeNChar uint
+#elif dataTypeNumChar == 3
+	#define dataTypeNChar ulong	
 #endif
+
 ////////////
 
 //Print of the output (BWT/DA/SA/LCP)
@@ -81,9 +108,9 @@ typedef unsigned long ulong;
 #define verboseDecode 0
 
 //if you want to delete the partial files, please set it to 1
-#define deletePartialBWT 0 
-#define deletePartialLCP 0 
-#define deletePartialGSA 0 
+#define deletePartialBWT 1 
+#define deletePartialLCP 1 
+#define deletePartialGSA 1 
 #define deleteCycFiles 1 
 
 //if you want to complete the LCP array, please set it to 1
@@ -115,12 +142,14 @@ typedef unsigned long ulong;
 //In both cases, SA, DA, LCP are stored in files.
 #define KEEP_eBWT_IN_EXT_MEMORY  1
 
-
-//if OUTPUT_FORMAT_EGSA == 0, the output format of BCR is at most 4 files - built one after the other
-//if OUTPUT_FORMAT_EGSA == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
-//if OUTPUT_FORMAT_EGSA == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa
-//if OUTPUT_FORMAT_EGSA == 3, the output format of BCR is at most 4 files at the same time
-#define OUTPUT_FORMAT_EGSA 3
+//if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other (use it if you want to build only the eBWT)
+//if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
+//if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: ebwt, lcp, da, sa
+//if OUTPUT_FORMAT == 3, the output format of BCR is at most 4 files at the same time
+//if OUTPUT_FORMAT == 4, the output format of BCR is at most 3 files (ebwt, da), lcp, sa
+//if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
+//if OUTPUT_FORMAT == 6, the output format of BCR is at most 3 files ebwt, lcp, (sa, da)
+#define OUTPUT_FORMAT 3
 
 //if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
 //if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
