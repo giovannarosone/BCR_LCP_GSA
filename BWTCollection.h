@@ -111,7 +111,7 @@ namespace SXSI
 			virtual int storeEGSAcomplete( const char* )=0;
 		#endif
 	    
-		#if OUTPUT_FORMAT_EGSA == 1
+		#if OUTPUT_FORMAT == 1
 			virtual int storeEGSAoutputFromEntireFiles (string input)= 0;
 		#endif
 		
