@@ -60,7 +60,7 @@ public:
 		virtual int storeEGSAcomplete( const char* );
 	#endif
 
-	#if OUTPUT_FORMAT_EGSA == 1
+	#if OUTPUT_FORMAT == 1
 		virtual int storeEGSAoutputFromEntireFiles (string );
 	#endif
 	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
