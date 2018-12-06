@@ -48,37 +48,20 @@ using SXSI::BWTCollection;
 int main(int argc, char *argv[])
 {
 
-	if( argc != 4 )
-    {
-      std::cerr << "usage: " << argv[0] << " file1 output mode" << std::endl;
+    if( argc != 4 )  {
+      std::cerr << "usage: " << argv[0] << " input output mode" << std::endl;
 	  	std::cerr << "where: " << std::endl;
 	  	std::cerr << "\tmode = 0 --> BCR " << std::endl;
 	    exit(1);
     }
 
 
-
-	int lung = strlen(argv[2]);
-
 	if( atoi(argv[3]) < 3 ) {
 		std::cout << "BWTCollection: The option is " << argv[3] << std::endl;
 		std::cout << "BWTCollection: The input is " << argv[1] << std::endl;
 
 		BWTCollection *BCRexternalBWT = BWTCollection::InitBWTCollection(argv[1], argv[2], atoi(argv[3]));
-		char *fnAux = new char[lung+50];
-		sprintf (fnAux,"%s%s",argv[2],".lenBWT_Nseq_SizaAlpha.aux\0");
-		FILE* OutFile = fopen(fnAux, "wb");
-		if (OutFile==NULL) {
-			std::cerr << "BWTCollection: (lengthBWT+NSequences+sizeAlpha) Error opening " << fnAux << std::endl;
-			exit (EXIT_FAILURE);
-		}
-		fwrite(&((*BCRexternalBWT).lengthTot_plus_eof),sizeof(dataTypeNChar),1,OutFile);
-		fwrite(&((*BCRexternalBWT).nText),sizeof(dataTypeNSeq),1,OutFile);
-		fwrite(&((*BCRexternalBWT).sizeAlpha),sizeof(dataTypeNSeq),1,OutFile);
-		fclose(OutFile);
-
-
-
+		
 		//cout << "finished iteration, usage: " << timer << endl;
 		delete BCRexternalBWT;
 
