@@ -75,15 +75,15 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 		exit (EXIT_FAILURE);
 	}
 	
-	char fileLen[512];
-	sprintf(fileLen, "%s.lenSeqs.aux", fileOutput.c_str());
+	char *fileLen = new char[fileOutput.length()+10];
+	sprintf(fileLen, "%s.len", fileOutput.c_str());
+
 	static FILE *OutFileLen;                  // output file of the end positions;
 	OutFileLen = fopen(fileLen, "wb");
 	if (OutFileLen==NULL) {
 			std::cerr << "TransposeFasta::findLengthNseq: could not open file \"" << fileLen << "\"!"<< std::endl;
 			exit (EXIT_FAILURE);
 	}
-
 
 	string bufChar;
 	
@@ -179,8 +179,8 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	//lengthSeqVector.shrink_to_fit();
 		
 	#if BUILD_BCR_FROM_EGSA==1   //We have to add the length of the sequences of EGSA
-		char fnOutLenOld [512];
-		sprintf(fnOutLenOld, "%s.lenSeqs.aux", input.c_str());
+		char *fnOutLenOld = new char[input.length()+10];
+		sprintf(fnOutLenOld, "%s.len", input.c_str());
 		FILE* OutFileLenOld = fopen(fnOutLenOld, "rb");
 		if (OutFileLenOld==NULL) {
 			std::cerr << "TransposeFasta::findLengthNseq: Error " << fnOutLenOld << "\n";
