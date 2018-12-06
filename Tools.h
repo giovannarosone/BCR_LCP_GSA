@@ -72,11 +72,24 @@
 #endif
 
 
-//struct __attribute__((__packed__)) ElementType {
-//struct ElementType {
-//	dataTypelenSeq sa;          //It is the position in the sequence, so it goes from 0 a length read
-//	dataTypeNSeq numSeq;		//It is the number of the sequence.
-//};
+//struct __attribute__((__packed__)) ElementTypeEBWTda {
+struct ElementTypeEBWTda {
+	uchar bwt;          //It is the position in the sequence, so it goes from 0 a length read
+	dataTypeNSeq da;		//It is the number of the sequence.
+};
+
+//struct __attribute__((__packed__)) ElementTypeLCPda {
+struct ElementTypeLCPda {
+	dataTypelenSeq lcp;          //It is the position in the sequence, so it goes from 0 a length read
+	dataTypeNSeq da;		//It is the number of the sequence.
+};
+
+//struct __attribute__((__packed__)) ElementTypeGSA {
+struct ElementTypeGSA {
+	dataTypelenSeq sa;          //It is the position in the sequence, so it goes from 0 a length read
+	dataTypeNSeq da;		//It is the number of the sequence.
+};
+
 
 class Tools
 {
