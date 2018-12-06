@@ -77,7 +77,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	
 	char *fileLen = new char[fileOutput.length()+10];
 	sprintf(fileLen, "%s.len", fileOutput.c_str());
-
+	
 	static FILE *OutFileLen;                  // output file of the end positions;
 	OutFileLen = fopen(fileLen, "wb");
 	if (OutFileLen==NULL) {
@@ -89,7 +89,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	
 
 	bool lenSeq = false;
-    vector <dataTypelenSeq> lengthSeqVector;
+   	vector <dataTypelenSeq> lengthSeqVector;
 
 	//Find max length and number of reads
 	dataTypelenSeq charsNumber=0;
