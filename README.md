@@ -35,6 +35,10 @@ The output format can be:
     - if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
     - if OUTPUT_FORMAT == 6, the output format of BCR is at most 3 files ebwt, lcp, (sa, da)
 
+Please check SIZEBUFFER in parameters.h. It should be set based on the total available memory.
+Default: SIZEBUFFER==10485760
+It means that BCR could need to (sizeof(bwt[i]) + sizeof(lcp[i]) + sizeof(da[i]) + sizeof(sa[i])) * SIZEBUFFER bytes in order to keep the I/O buffers.
+
 One should set the parameters in Parametes.h
 
 Default:
@@ -54,7 +58,6 @@ cd BCR_LCP_GSA-master
 ```
 Open parameters.h file and, please, set the parameters (data structured that must be computed, types, and so on...).
 
-Please check SIZEBUFFER in parameters.h. It should be set based on the total available memory.
 ```sh
 make
 ```
