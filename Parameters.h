@@ -40,7 +40,7 @@
 #include <iostream>
 #include <fstream>
 
-#define SIZEBUFFER 10485760     //Size of the buffer for partial ebwt/LCP/DA/SA
+#define SIZEBUFFER 1024     //Size of the buffer for partial ebwt/LCP/DA/SA
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
