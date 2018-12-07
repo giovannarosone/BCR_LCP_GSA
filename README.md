@@ -38,12 +38,12 @@ The output format can be:
 One should set the parameters in Parametes.h
 
 Default:
-- Build eBWT/LCP/DA.
-- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP and uint for DA (BUILD_LCP==1 and BUILD_DA==1)  
-- Store distinct files: OUTPUT_FORMAT == 3
+- Build eBWT/LCP.
+- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP (BUILD_LCP==1)  
+- Store distinct partial files at the same time: OUTPUT_FORMAT == 3
 
-For instance, the data structures LCP and SA depends on the setting of dataTypeLengthSequences/dataTypelenSeq.
-If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 1, so that dataTypelenSeq is set to uint. 
+For instance, the data structures LCP and SA depend on the setting of dataTypeLengthSequences/dataTypelenSeq.
+If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
 
 
 ### Install
@@ -53,6 +53,8 @@ git clone https://github.com/giovannarosone/BCR\_LCP\_GSA
 cd BCR_LCP_GSA-master
 ```
 Open parameters.h file and, please, set the parameters (data structured that must be computed, types, and so on...).
+
+Please check SIZEBUFFER in parameters.h. It should be set based on the total available memory.
 ```sh
 make
 ```
