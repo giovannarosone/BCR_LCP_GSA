@@ -46,11 +46,7 @@
 #include <string.h>    
 
 
-#define BUFFERSIZE 1048576
-
-//#define CYCLENUM 100
-
-//#define uchar unsigned char
+#define BUFFERSIZE 1024
 
 using std::string;
 using std::vector;
