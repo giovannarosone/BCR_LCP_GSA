@@ -52,6 +52,11 @@ For instance, the data structures LCP and SA depend on the setting of dataTypeLe
 If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
 
 
+If BCR suddenly stops working, you could use the script to remove the cyc files.
+```sh
+./removeCycFile path #CycFiles
+```
+
 ### Install
 
 ```sh
