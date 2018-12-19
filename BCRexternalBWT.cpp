@@ -496,7 +496,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	std::cout << "Length of the longest sequence: " << (unsigned int)lengthRead << "\n\n";
 	std::cout << "Total length (without $): " << lengthTot << "\n";
 
-    lengthTot_plus_eof = lengthTot+nText;
+    	lengthTot_plus_eof = lengthTot+nText;
 	std::cout << "Total length (with $): " << lengthTot_plus_eof << "\n";
 	
 	char *fnAux = new char[strlen(fileOutput)+10];
@@ -623,10 +623,11 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			tableOcc[j][h]=0;
 
 	//lengthTot = 0;  //Counts the number of symbols
-
-	std::cerr << "\nFirst symbols: "<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead-1 << "\n";
-	//cout << "Starting iteration " << 0 << ", time now: " << timer.timeNow();
-	//cout << "Starting iteration " << 0 << ", usage: " << timer << endl;
+	#if verboseEncode==1
+		std::cerr << "\nFirst symbols: "<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead-1 << "\n";
+		//cout << "Starting iteration " << 0 << ", time now: " << timer.timeNow();
+		//cout << "Starting iteration " << 0 << ", usage: " << timer << endl;
+	#endif
 
 	static FILE *InFileInputText;
 	dataTypeNChar num;
@@ -664,8 +665,9 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		
 	#endif
 
-
-	std::cerr << "\n"<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead - 1<< "\n";
+	#if verboseEncode==1
+		std::cerr << "\n"<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead - 1<< "\n";
+	#endif
 	InsertFirstsymbols(newSymb);
 
 	#if verboseEncode==1
@@ -757,11 +759,13 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#endif
 	}
 
-	//The last inserted symbol is in position 1 (or it is newSymb[j]),
-	//the next symbol (to insert) is in position 0
-	std::cerr << "\n"<< "j= "<< (long) lengthRead - 1 <<" - symbols in position " << 0 << "\n";
-	//cout << "Starting iteration " << (long) lengthRead - 1 << ", time now: " << timer.timeNow();
-    //cout << "Starting iteration " << (long) lengthRead - 1 << ", usage: " << timer << endl;
+	#if verboseEncode==1
+		//The last inserted symbol is in position 1 (or it is newSymb[j]),
+		//the next symbol (to insert) is in position 0
+		std::cerr << "\n"<< "j= "<< (long) lengthRead - 1 <<" - symbols in position " << 0 << "\n";
+		//cout << "Starting iteration " << (long) lengthRead - 1 << ", time now: " << timer.timeNow();
+    		//cout << "Starting iteration " << (long) lengthRead - 1 << ", usage: " << timer << endl;
+	#endif
 
 	#if BCR_SET == 0        //Build BCR for 1 sequence
 
@@ -799,9 +803,11 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 
 
   	//the next symbol (to insert) is in position m-1, that is, I have to insert the symbols $
-    std::cerr << "\n"<< "j= "<< (long) lengthRead <<" - symbols in position " << (long) lengthRead  << ". Inserting $=" << (unsigned int)TERMINATE_CHAR << "=" << TERMINATE_CHAR << " symbol\n\n";
-    //cout << "Starting iteration " << (long) lengthRead << ", time now: " << timer.timeNow();
-    //cout << "Starting iteration " << (long) lengthRead << ", usage: " << timer << endl;
+	#if verboseEncode==1
+    		std::cerr << "\n"<< "j= "<< (long) lengthRead <<" - symbols in position " << (long) lengthRead  << ". Inserting $=" << (unsigned int)TERMINATE_CHAR << "=" << TERMINATE_CHAR << " symbol\n\n";
+    		//cout << "Starting iteration " << (long) lengthRead << ", time now: " << timer.timeNow();
+    		//cout << "Starting iteration " << (long) lengthRead << ", usage: " << timer << endl;
+	#endif
 	for (dataTypeNSeq j = 0 ; j < nText; j++) {
 		#if (BCR_SET==1)
 			if ((newSymb[j] == TERMINATE_CHAR) || (newSymb[j] == TERMINATE_CHAR_LEN))
