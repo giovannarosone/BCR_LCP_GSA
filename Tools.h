@@ -42,11 +42,6 @@
 
 //#include <ctime>
 
-#define TERMINATE_CHAR '#'
-#define TERMINATE_CHAR_LEN '$'
-
-#define SIZE_ALPHA 256   
-
 #define BackByVector 1
 
 
