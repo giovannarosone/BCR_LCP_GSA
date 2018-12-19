@@ -40,7 +40,12 @@
 #include <iostream>
 #include <fstream>
 
-#define SIZEBUFFER 1024     //Size of the buffer for partial ebwt/LCP/DA/SA
+#define SIZEBUFFER 1024     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
+
+#define TERMINATE_CHAR '#'     //it is the symbol used as "end of strings", it must be lexicographically smaller than all the letters of the alphabet
+#define TERMINATE_CHAR_LEN '$'      //it is stored in cyc files, it is ignored by the algorithm, so it must not belong to the alphabet
+
+#define SIZE_ALPHA 256  
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
