@@ -200,10 +200,11 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 				nAddedTextEGSA_transp++;
 			}
 		}
-
+		delete [] fnOutLenOld;
 		fclose(OutFileLenOld);
 	#endif
 
+	delete [] fileLen;
 	fclose(OutFileLen);
 	infile.close();
 	
