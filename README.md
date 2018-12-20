@@ -47,7 +47,7 @@ Please check SIZEBUFFER in parameters.h. It should be set based on the total ava
 
 It means that BCR could need to (sizeof(bwt[i]) + sizeof(lcp[i]) + sizeof(da[i]) + sizeof(sa[i])) * SIZEBUFFER bytes in order to keep the I/O buffers.
 
-You also keep in mind that it uses (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + sizeof(da[i]) + sizeof(x)) bytes per text, where x is the type necessary to index the characters of (complete) ebwt.
+You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + sizeof(da[i]) + sizeof(x)) bytes per text, where x is the type necessary to index the characters of (complete) ebwt.
 
 Default:
 - Build eBWT/LCP.
