@@ -572,9 +572,9 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	#endif
 		
 	
-			
+		
 	#if  KEEP_eBWT_IN_EXT_MEMORY == 0				//eBWT in RAM
-		totRAMinMB = totRAMinMB +  lengthTot_plus_eof;
+		totRAMinMB = totRAMinMB +  (lengthTot_plus_eof * 2);
 	#endif
 	
 	totRAMinMB = totRAMinMB + nText; 				//symbols to insert - step i
