@@ -63,8 +63,8 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, dataTypeNChar ramA
         ramAvailable = ramAvailable * 1048576;   //in bytes
 
 	const char * fileOut = "cyc.\0";
-	if (mode == 0) {
-		time_t start,end;
+	
+	time_t start,end;
         double dif;
         time (&start);
 
@@ -84,60 +84,60 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, dataTypeNChar ramA
 		std::cout << "The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) - built one after the other.\n";
 	}
 		
-		if (OUTPUT_FORMAT==1) {
-			if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) )
+	if (OUTPUT_FORMAT==1) {
+		if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) )
 				std::cout << "The output format of BCR is as the output of eGSA.\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is as the output of EGSA. BUILD_LCP and BUILD_SA and BUILD_DA must be set to 1 (see Parameters.h).\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 
-		if (OUTPUT_FORMAT==2) {
-			if ((BUILD_LCP==1) )
+	if (OUTPUT_FORMAT==2) {
+		if ((BUILD_LCP==1) )
 				std::cout << "The output format of BCR is a unique file .egsa. Order: bwt, lcp, da, sa.\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is a unique file .egsa (we do not use a struct). BUILD_LCP must be set to 1  (see Parameters.h), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa.\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 
-		if (OUTPUT_FORMAT==3) {
-			if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
+	if (OUTPUT_FORMAT==3) {
+		if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
 				std::cout << "The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time.\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time\n";
 				std::cout << " BUILD_LCP or BUILD_DA==1 or BUILD_SA==1 or KEEP_eBWT_IN_EXT_MEMORY must be 1 (see Parameters.h).\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 		
-		if (OUTPUT_FORMAT==4) {
-			if (BUILD_DA==1) 
+	if (OUTPUT_FORMAT==4) {
+		if (BUILD_DA==1) 
 				std::cout << "The output format of BCR is at most 3 files (ebwt, da), lcp, sa.\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is at most 3 files (ebwt, da), lcp, sa. BUILD_DA must be set to 1 (see Parameters.h).\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 		
-		if (OUTPUT_FORMAT==5) {
-			if ( (BUILD_DA==1) && (BUILD_LCP==1) )
+	if (OUTPUT_FORMAT==5) {
+		if ( (BUILD_DA==1) && (BUILD_LCP==1) )
 				std::cout << "The output format of BCR is at most 3 files ebwt, (lcp, da), sa.\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is at most 3 files ebwt, (lcp, da), sa. BUILD_DA and BUILD_LCP must be set to 1 (see Parameters.h).\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 		
-		if (OUTPUT_FORMAT==6) {
-			if ( (BUILD_DA==1) && (BUILD_SA==1) )
+	if (OUTPUT_FORMAT==6) {
+		if ( (BUILD_DA==1) && (BUILD_SA==1) )
 				std::cout << "The output format of BCR is at most 3 files ebwt), lcp, (sa, da).\n";
-			else {
+		else {
 				std::cout << "Error! The output format of BCR is at most 3 files ebwt, lcp, (sa, da). BUILD_DA and BUILD_SA must be set to 1 (see Parameters.h).\n";
 				exit (EXIT_FAILURE);
-			}
 		}
+	}
 
 		int result = -1;
 		result = buildBCR(file1, fileOutput, fileOut, ramAvailable,BCRprefPrev);
@@ -201,10 +201,6 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, dataTypeNChar ramA
 	        std::cerr << "Start builBCR (including the writing the cyc files) " << start << " seconds\n";
         	std::cerr << "End   builBCR (including the writing the cyc files) " << end << " seconds\n";
         	std::cerr << "builBCR (including the writing the cyc files) tooks " << dif << " seconds\n";
-	}
-	else
-		std::cerr << "Mode Error \n";
-
 }
 
 
@@ -294,7 +290,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#endif
 
 		#if BUILD_BCR_FROM_BCRpartials==1
-			std::cerr << "Error: BUILD_BCR_FROM_BCRpartials==1 is not implemented! (see BUILD_BCR_FROM_EGSA in Parameters.h)" << endl;
+			std::cerr << "Error: BUILD_BCR_FROM_BCRpartials==1 is not implemented! (see BUILD_BCR_FROM_BCRpartials in Parameters.h)" << endl;
 			exit (EXIT_FAILURE);
 		#endif
 
@@ -367,7 +363,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#else
 			//cyc files in input
 			cout << "Builds the BCR (no cyc files)" << endl;
-			res = trasp.convertFromCycFile(file1, fileOutput);
+			res = trasp.convertFromCycFile(file1, fileOutput, ram);
 			if (res == false) {  //Error in the reading
 				std::cerr << "Error in transpose (no build cyc files)! \n";
 				exit (EXIT_FAILURE);
@@ -996,8 +992,8 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			tripla.seqN = j;	  // number of the sequence
 			tripla.pileN = 0;    //The first symbols are in $-pile
 			#if BUILD_LCP == 1
-				tripla.lcpCurN = 0;   //it could be -1?
-				tripla.lcpSucN = 0;   //it could be -1?
+				tripla.lcpCurN = 0;   //it could be -1
+				tripla.lcpSucN = 0;   //it could be -1
 			#endif
 			vectTriple.push_back(tripla);
 			vectInsTexts[j]=1;
@@ -1067,44 +1063,44 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	//assert( num == nText); // we should always read the same number of characters
 	//We don't store TERMINATE_CHAR_LEN symbol (the strings can have different length)
 	//dataTypeNChar num = fwrite (newSymb, sizeof(uchar), nExamedTexts , OutFileBWT);
-		#if KEEP_eBWT_IN_EXT_MEMORY==1
-        FILE *OutFileBWT;
-        #if BUILD_BCR_FROM_BCRpartials == 1
-            sprintf (filenameOut, "new_bwt_%d%s", 0,ext);
-            OutFileBWT = openFilePartialOut(0); //new_bwt_0 in append mode
-        #else
-            sprintf (filename, "bwt_%d",0);
-            sprintf (filenameOut,"%s%s",filename,ext);
-            OutFileBWT = openWriteFilePartialBWT_0();  //bwt_0
-        #endif
+	#if KEEP_eBWT_IN_EXT_MEMORY==1
+        	FILE *OutFileBWT;
+        	#if BUILD_BCR_FROM_BCRpartials == 1
+            		sprintf (filenameOut, "new_bwt_%d%s", 0,ext);
+            		OutFileBWT = openFilePartialOut(0); //new_bwt_0 in append mode
+        	#else
+            		sprintf (filename, "bwt_%d",0);
+            		sprintf (filenameOut,"%s%s",filename,ext);
+            		OutFileBWT = openWriteFilePartialBWT_0();  //bwt_0
+        	#endif
     
-	//dataTypeNChar num = writeFilePartial(newSymb, OutFileBWT);
-        dataTypeNChar num = fwrite (newSymb, sizeof(uchar), nExamedTexts , OutFileBWT);
-	assert( num == nExamedTexts); // we should always read the same number of characters
-	//new_bwt0 only contains the synbols of the new collection
-        #if (BUILD_BCR_FROM_BCRpartials == 1)
-            //Now we have to add the symbols of the previous BCR files
-            FILE *InFileBWT = openFilePartialIn (0);  // Open "bwt_0
+		//dataTypeNChar num = writeFilePartial(newSymb, OutFileBWT);
+       		dataTypeNChar num = fwrite (newSymb, sizeof(uchar), nExamedTexts , OutFileBWT);
+		assert( num == nExamedTexts); // we should always read the same number of characters
+		//new_bwt0 only contains the synbols of the new collection
+        	#if (BUILD_BCR_FROM_BCRpartials == 1)
+         	   //Now we have to add the symbols of the previous BCR files
+         	   FILE *InFileBWT = openFilePartialIn (0);  // Open "bwt_0
     
-            uchar *buffer = new uchar[SIZEBUFFER];
-            dataTypeNChar numchar=0, numcharWrite=0;
-            while ( (numchar=  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT)) && (numchar > 0) ) {
-                numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
-                assert(numchar == numcharWrite); // we should always read/write the same number of characters
-            }
-            closeFilePartial(InFileBWT);
-            renameFilePartial(0);
-        #endif
-        closeFilePartial(OutFileBWT);
-	#elif (KEEP_eBWT_IN_EXT_MEMORY==0)
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-            #if (BUILD_BCR_FROM_BCRpartials == 1)
-                vectVectBWT[0].insert(vectVectBWT[0].begin()+vectTriple[g].posN, newSymb[g]);
-            #else
-                vectVectBWT[0].push_back (newSymb[g]);
-            #endif
-		}
-	#endif
+          	   uchar *buffer = new uchar[SIZEBUFFER];
+            	   dataTypeNChar numchar=0, numcharWrite=0;
+            	   while ( (numchar=  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT)) && (numchar > 0) ) {
+                	numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
+                	assert(numchar == numcharWrite); // we should always read/write the same number of characters
+            	   }
+            	   closeFilePartial(InFileBWT);
+            	   renameFilePartial(0);
+        	#endif
+        	closeFilePartial(OutFileBWT);
+		#elif (KEEP_eBWT_IN_EXT_MEMORY==0)
+			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
+            		   #if (BUILD_BCR_FROM_BCRpartials == 1)
+                		vectVectBWT[0].insert(vectVectBWT[0].begin()+vectTriple[g].posN, newSymb[g]);
+            		   #else
+                		vectVectBWT[0].push_back (newSymb[g]);
+            		   #endif
+			}
+		#endif
 
 	//if (num != nText)
 	//	std::cerr << "the written characters is not equal to number of the texts" << num << " and "<< nText <<"\n";
@@ -4059,19 +4055,20 @@ void BCRexternalBWT::storeEntireBWTIntMem( const char* fn ) {
 	char *fnBWT = new char[lung+7];
 	sprintf (fnBWT,"%s%s",fn,".ebwt");		
 	
-	OutFileBWT = fopen(fnBWT, "rb");
+	OutFileBWT = fopen(fnBWT, "wb");
 	if (OutFileBWT==NULL) {
-		std::cerr << "Entire BWT file: Error opening " << fnBWT << std::endl;
+		std::cerr << "(storeEntireBWTIntMem) Entire BWT file: Error opening " << std::endl;
 		exit (EXIT_FAILURE);
 	}
+
 
 	std::cerr << "Build the entire BWT file and compute the distribution of chars.\n";
 	std::cerr << "Distribution in BWT\n";
 	for (dataTypedimAlpha g = 0 ; g < sizeAlpha; g++) {
-			std::cerr << "BWT segment: " << (unsigned int)g << " size " << vectVectBWT[g].size() << std::endl;
-			for (dataTypeNChar mm = 0 ; mm < vectVectBWT[g].size(); mm++) {
-				numcharWrite = fwrite (&vectVectBWT[g][mm], sizeof(uchar), 1 , OutFileBWT);
-			}
+		std::cerr << "BWT segment: " << (unsigned int)g << " size " << vectVectBWT[g].size() << std::endl;
+		for (dataTypeNChar mm = 0 ; mm < vectVectBWT[g].size(); mm++) {
+			numcharWrite = fwrite (&vectVectBWT[g][mm], sizeof(uchar), 1 , OutFileBWT);
+		}
 	}
 
 	fclose(OutFileBWT);
@@ -4094,9 +4091,9 @@ void BCRexternalBWT::storeEntireBWTIntMem( const char* fn ) {
 	#if verboseEncode==1
 		uchar *buffer = new uchar[SIZEBUFFER];
 		std::cerr << "\nThe Entire BWT:"<< std::endl;
-		OutFileBWT = fopen(fn, "rb");
+		OutFileBWT = fopen(fnBWT, "rb");
 		if (OutFileBWT==NULL) {
-			std::cerr << "Entire BWT file: Error opening " << std::endl;
+			std::cerr << "Entire BWT file: Error opening " << fnBWT << std::endl;
 			exit (EXIT_FAILURE);
 		}
 
@@ -4108,13 +4105,13 @@ void BCRexternalBWT::storeEntireBWTIntMem( const char* fn ) {
 			   std::cerr  << "empty\n";
 		else
 			    std::cerr  << buffer;
-       	while (numcharWrite!=0) {
+       		while (numcharWrite!=0) {
 	     		for (dataTypeNChar g = 0 ; g < SIZEBUFFER; g++)
 		     		buffer[g] = '\0';
 			   numcharWrite = fread(buffer,sizeof(uchar),SIZEBUFFER,OutFileBWT);
 			   if (numcharWrite!=0)
 			      std::cerr  << buffer;
-        }
+        	}
 		std::cerr << std::endl;
 		fclose(OutFileBWT);
 		delete [] buffer;
