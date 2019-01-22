@@ -47,7 +47,8 @@ Please check SIZEBUFFER in parameters.h. It should be set based on the total ava
 
 It means that BCR could need to (sizeof(bwt[i]) + sizeof(lcp[i]) + sizeof(da[i]) + sizeof(sa[i])) * SIZEBUFFER bytes in order to keep the I/O buffers.
 
-You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + sizeof(da[i]) + sizeof(x)) bytes per text, where x is the type necessary to index the characters of (complete) ebwt.
+You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + sizeof(da[i]) + sizeof(x)) bytes per text, where x is the type necessary to index the characters of the (complete) ebwt.
+
 
 Default:
 - Build eBWT/LCP.
@@ -56,6 +57,21 @@ Default:
 
 For instance, the data structures LCP and SA depend on the setting of dataTypeLengthSequences/dataTypelenSeq.
 If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
+
+In [Bauer el al, 2013] and [Cox et al, 2016], we explain the BCR supports the inserting and deleting of new elements belonging to a sequence in the computed data structures. 
+Now, BCR can add the elements of a new string collection in input by starting with the previously computed data structures. 
+In this case, BCR takes in input the collection (.fasta) that to be inserted and the BCR partial files.
+In order to do this, BUILD_BCR_FROM_BCRpartials must to be set to 1.
+For instance:
+```sh
+./BCR_LCP_GSA test/2seqsVar.fa test/2seqsVar.fa.out 1024 test/part_7seqsVar
+```
+where part_7seqsVar is the prefix of the filenames of BCR partial files.
+
+In order to get BCR partial files from eGSA [https://github.com/felipelouza/egsa], one can use the script eGSA_2_BCR_partials.
+```sh
+./eGSA_2_BCR_partials 7seqsVar.gesa part_7seqsVar
+```
 
 
 If BCR suddenly stops working, you could use the script to remove the cyc files.
