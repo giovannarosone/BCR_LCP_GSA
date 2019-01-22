@@ -58,9 +58,12 @@ public:
     TransposeFasta();
     ~TransposeFasta();
 
-  bool convert (const string& input, char const * fileOutput, const string& output );       //it reads a file in fasta format and builds cyc files
-	bool convertFromCycFile(const string& input, char const * fileOutput);        //it reads the file input for find the length and the number of sequences. Does not build cyc files.
-  bool convert1Sequence(char const * filename1) ;
+   	bool convert (const string& input, char const * fileOutput, const string& output, dataTypeNChar ram, string BCRprefPrev );       //it reads a file in fasta format and builds cyc files
+	bool convertFromCycFile(const string& input, char const * fileOutput, string BCRprefPrev);        //it reads the file input for find the length and the number of sequences. Does not build cyc files.
+ 	bool convert1Sequence(char const * filename1, dataTypeNChar ram) ;
+
+	dataTypeNChar SIZEBUFFERcycFiles;
+
 
 	dataTypelenSeq lengthRead;    //Length of each text
 	dataTypeNChar lengthTexts;   //Total length of all texts without $-symbols
@@ -73,15 +76,14 @@ public:
 		uchar * strInput;
 	#endif
 
-    #if BUILD_BCR_FROM_EGSA == 1
-			dataTypeNSeq nAddedTextEGSA_transp;
+        #if BUILD_BCR_FROM_BCRpartials == 1
+		dataTypeNSeq nAddedTextEGSA_transp;
 	#endif
 
 
 private:
 
-  bool findLengthNseq( const string& input, const string& fileOutput);
-
+    bool findLengthNseq( const string& input, const string& fileOutput, string BCRprefPrev);
 
 //    FILE* outputFiles_[CYCLENUM];
 //    uchar buf_[CYCLENUM][BUFFERSIZE];
