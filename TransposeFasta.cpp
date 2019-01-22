@@ -57,8 +57,7 @@ TransposeFasta::~TransposeFasta()
 
 }
 
-bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutput)
-{
+bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutput, string BCRprefPrev){
 	#if BCR_FROMCYC==1
 		for (dataTypedimAlpha z = 0 ; z < SIZE_ALPHA-1; z++)
 			freq[z]=0;
@@ -170,20 +169,20 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	//Store vector in file
 	dataTypeNSeq numchar = fwrite (&lengthSeqVector[0], sizeof(dataTypelenSeq), lengthSeqVector.size(), OutFileLen);
 	
-	std::cerr << "lengthTexts= " << (lengthTexts) << " lengthRead= " << (int)lengthRead << std::endl;
-	std::cerr << "lengthSeqVector.size= " << (lengthSeqVector.size()) << " nSeq= " << nSeq << std::endl;
+	//std::cerr << "lengthTexts= " << (lengthTexts) << " lengthRead= " << (int)lengthRead << std::endl;
+	//std::cerr << "lengthSeqVector.size= " << (lengthSeqVector.size()) << " nSeq= " << nSeq << std::endl;
 	assert (lengthSeqVector.size() == numchar);
 	assert (lengthSeqVector.size() == nSeq);
 	
 	lengthSeqVector.clear();
 	//lengthSeqVector.shrink_to_fit();
-		
-	#if BUILD_BCR_FROM_EGSA==1   //We have to add the length of the sequences of EGSA
-		char *fnOutLenOld = new char[input.length()+10];
-		sprintf(fnOutLenOld, "%s.len", input.c_str());
+			
+	#if ( (BUILD_BCR_FROM_BCRpartials==1) && (STORE_LENGTH_IN_FILE==1)  )   //We have to add the length of the sequences from BCR partial files
+		char *fnOutLenOld = new char[BCRprefPrev.length()+10];
+		sprintf(fnOutLenOld, "%s.len", BCRprefPrev.c_str());
 		FILE* OutFileLenOld = fopen(fnOutLenOld, "rb");
 		if (OutFileLenOld==NULL) {
-			std::cerr << "TransposeFasta::findLengthNseq: Error " << fnOutLenOld << "\n";
+			std::cerr << "TransposeFasta::findLengthNseq (BUILD_BCR_FROM_BCRpartials): Error " << fnOutLenOld << "\n";
 			exit (EXIT_FAILURE);
 		}
 		numchar =0;
@@ -213,11 +212,11 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 
 
 
-bool TransposeFasta::convert( const string& input, char const * fileOutput, const string& output )
+bool TransposeFasta::convert( const string& input, char const * fileOutput, const string& output, dataTypeNChar ram, string BCRprefPrev )
 {
 
 	int resu=true;
-	resu=findLengthNseq(input, fileOutput);
+	resu=findLengthNseq(input, fileOutput,BCRprefPrev);
 	if (resu == false) {  //Error in the reading
 		std::cerr << "Error in transpose findLengthNseq! \n";
 		exit (EXIT_FAILURE);
@@ -226,7 +225,22 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	cerr << "Number of reads: " << nSeq << endl;
 	cerr << "Number of chars: " << 	lengthTexts << endl;
 	
-	
+	    #if (BUILD_BCR_FROM_BCRpartials == 1)
+        cerr << "In the new collection (excluding the previous BCR files): "<< endl;
+    #else
+        cerr << "In the new collection, we have: "<< endl;
+    #endif
+	cerr << "  The max length (Read) is: " << (int)lengthRead << endl;
+	cerr << "  Number of reads: " << nSeq << endl;
+	cerr << "  Number of chars: " << 	lengthTexts << endl;
+
+	SIZEBUFFERcycFiles = ram / lengthRead;
+	if ( SIZEBUFFERcycFiles > nSeq )
+		SIZEBUFFERcycFiles = nSeq;
+	else if ( SIZEBUFFERcycFiles == 0 )
+		SIZEBUFFERcycFiles = 1048576;
+	cerr << "Size of buffer in TrasposeFasta: " <<  SIZEBUFFERcycFiles << " bytes" << endl;
+
 	for (dataTypedimAlpha z = 0 ; z < SIZE_ALPHA-1; z++)
 		freq[z]=0;
 	freq[SIZE_ALPHA-1]=0;
@@ -262,21 +276,22 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
     //for(dataTypeNChar i=0;i<BUFFER_SIZELEN;i++ )
 	//	buf[i] = '\0';
 
-	//TO DO: CHECK THE CASE OF charsBuffered >= BUFFERSIZE
-	if (nSeq > BUFFERSIZE) {
-		cerr << "Warning: Number of sequences is: " << (unsigned long)nSeq << " and BUFFERSIZE (in TransposeFasta.h) is " << BUFFERSIZE << endl;
+	//TO DO: CHECK THE CASE OF charsBuffered >= SIZEBUFFERcycFiles
+	if (nSeq > SIZEBUFFERcycFiles) {
+		cerr << "Warning: Number of sequences is: " << (unsigned long)nSeq << " and SIZEBUFFERcycFiles (in TransposeFasta.h) is " << SIZEBUFFERcycFiles << endl;
 	}
-	std::cerr << "TrasposeFasta: init buf_ of size " << (unsigned long) lengthRead << " x " << BUFFERSIZE << std::endl;
+	std::cerr << "TrasposeFasta: init buf_ of size " << (unsigned long) lengthRead << " x " << SIZEBUFFERcycFiles << std::endl;
 
 	vector<vector<uchar> > buf_;
 	buf_.resize(lengthRead);    //For each symbol/column of the read
 	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
-		buf_[x].resize(BUFFERSIZE);
+		buf_[x].resize(SIZEBUFFERcycFiles);
 	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
-		for (dataTypeNChar y = 0 ; y < BUFFERSIZE; y++)         //For each buffered symbol of the read
+		for (dataTypeNChar y = 0 ; y < SIZEBUFFERcycFiles; y++)         //For each buffered symbol of the read
 			buf_[x][y]=TERMINATE_CHAR_LEN;
 
-	std::cerr << "TrasposeFasta: end init buf_" << std::endl;
+	//std::cerr << "TrasposeFasta: end init buf_" << std::endl;
+
 	
 	
 	std::ifstream infile(input.c_str());
@@ -298,7 +313,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		
 		tmpLen = bufChar.length();          //tmpLen = strlen(buf)-1;
 		
-		if ( (charsBuffered > 0) && ( charsBuffered-1 == BUFFERSIZE))   //it is linked to the number of sequences
+		if ( (charsBuffered > 0) && ( charsBuffered-1 == SIZEBUFFERcycFiles))   //it is linked to the number of sequences
         {
 			// write buffers to the files, clear buffers
             for(dataTypelenSeq i=0;i<lengthRead;i++ )  {       //For each symbol/column of the read   (for each string)
@@ -414,10 +429,10 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 
 
 
-bool TransposeFasta::convertFromCycFile(const string& input, char const * fileOutput) {
+bool TransposeFasta::convertFromCycFile(const string& input, char const * fileOutput, string BCRprefPrev) {
 
 	int res=true;
-	res=findLengthNseq(input, fileOutput);
+	res=findLengthNseq(input, fileOutput, BCRprefPrev);
 	if (res == false) {  //Error in the reading
 		std::cerr << "Error in transpose findLengthNseq! \n";
 		exit (EXIT_FAILURE);
@@ -456,7 +471,7 @@ ulong TransposeFasta::readln(char* s, int n, FILE* iop) {
   return z;
 }
 
-bool TransposeFasta::convert1Sequence(char const * filename1) {
+bool TransposeFasta::convert1Sequence(char const * filename1, dataTypeNChar ram) {
   		//TO DO
 	//lengthRead = CYCLENUM;
     std::cerr << "***TransposeFasta::convert1Sequence "<< std::endl;
