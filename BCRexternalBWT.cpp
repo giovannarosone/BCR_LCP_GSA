@@ -1008,8 +1008,8 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		tripla.seqN = j;	  // number of the sequence
 		tripla.pileN = 0;    //The first symbols are in $-pile
 		#if BUILD_LCP == 1
-			tripla.lcpCurN = 0;   //it should be -1?
-			tripla.lcpSucN = 0;   //it should be -1?
+			tripla.lcpCurN = 0;   //it could be -1
+			tripla.lcpSucN = 0;   //it could be -1
 		#endif
 		vectTriple.push_back(tripla);
 		vectInsTexts[j]=1;
@@ -1101,10 +1101,6 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
             		   #endif
 			}
 		#endif
-
-	//if (num != nText)
-	//	std::cerr << "the written characters is not equal to number of the texts" << num << " and "<< nText <<"\n";
-
 
 	#if BUILD_LCP == 1
 		
