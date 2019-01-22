@@ -94,12 +94,12 @@ make
 
 ### Run
 ```sh
-./BCR_LCP_GSA inputFile outputFile 0
+./BCR_LCP_GSA inputFile outputFile 1024
 ```
 
 ### Example
 ```sh
-./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out 0
+./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out 1024
 ```
 
 
