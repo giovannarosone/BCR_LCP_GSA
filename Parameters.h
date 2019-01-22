@@ -40,7 +40,7 @@
 #include <iostream>
 #include <fstream>
 
-#define SIZEBUFFER 1024     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
+//#define SIZEBUFFER 1024     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
 
 #define TERMINATE_CHAR '#'     //it is the symbol used as "end of strings", it must be lexicographically smaller than all the letters of the alphabet
 #define TERMINATE_CHAR_LEN '$'      //it is stored in cyc files, it is ignored by the algorithm, so it must not belong to the alphabet
@@ -48,6 +48,7 @@
 #define SIZE_ALPHA 256  
 
 typedef unsigned char uchar;
+typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
@@ -105,8 +106,7 @@ typedef unsigned long ulong;
 
 //Print of the output (BWT/DA/SA/LCP)
 //Store a txt file containing (BWT/DA/SA/LCP)
-//MUST: (BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) && (OUTPUT_FORMAT_EGSA)==0
-#define printEGSA 0
+#define printFinalOutput 0
 
 //Verbose
 #define verboseEncode 0
@@ -147,6 +147,9 @@ typedef unsigned long ulong;
 //In both cases, SA, DA, LCP are stored in files.
 #define KEEP_eBWT_IN_EXT_MEMORY  1
 
+//Save lengths of each sequence in a file .len
+#define STORE_LENGTH_IN_FILE  0
+
 //if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other
 //if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
 //if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: ebwt, lcp, da, sa
@@ -162,9 +165,10 @@ typedef unsigned long ulong;
 
 //Computes the EGSA starting to another EGSA
 //See output EGSA of Felipe Louze
-//if BUILD_BCR_FROM_EGSA == 1, BCR takes in input the output of EGSA and adds the symbols of new symbols, BCR needs of the file outputFileName.occ that contains the occurrences of each symbols in the BWT already computed. 
-//if BUILD_BCR_FROM_EGSA == 0, BCR does not take in input the output of EGSA 
-#define BUILD_BCR_FROM_EGSA 0 
+//if BUILD_BCR_FROM_BCRpartials == 1, BCR takes in input the BCR partial files and adds the symbols of new sequences.
+//if BUILD_BCR_FROM_BCRpartials == 0, BCR starts from scratch
+#define BUILD_BCR_FROM_BCRpartials 0
+
 
 //BCR reads the cyc files already computed by transpose.cpp in a previous execution.
 //if BCR_FROMCYC=0 then BCR builds the cyc files before, otherwise BCR does not build the cyc files.
