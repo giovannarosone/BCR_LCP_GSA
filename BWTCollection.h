@@ -95,7 +95,7 @@ namespace SXSI
          */
     virtual ~BWTCollection() { };
 
-		virtual int buildBCR(char const *, char const *, char const *) = 0;
+    virtual int buildBCR(char const *, char const *, char const *, dataTypeNChar, string) = 0;
 
     virtual void storeBWTFilePartial(uchar const *, dataTypelenSeq) = 0;
 		#if BUILD_LCP == 1
@@ -125,8 +125,8 @@ namespace SXSI
 		#endif
 
 	private:
-		#if BUILD_BCR_FROM_EGSA == 1
-			virtual dataTypeNChar readEGSA(char const *)=0;
+		#if BUILD_BCR_FROM_BCRpartials == 1
+            		virtual dataTypeNChar readPreviousBCR(string)=0;
 		#endif
 		virtual void printSegments()=0;
 		virtual void printOutput(char *)=0;
