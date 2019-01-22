@@ -53,6 +53,7 @@ namespace SXSI
     class BWTCollection
     {
     public:
+	        dataTypeNChar SIZEBUFFER;
 
 		std::vector <sortElement> vectTriple;  //Is is used both encoding, decoding, searching.
 		//ulong seqN;  //contains a number of a sequence
@@ -71,7 +72,7 @@ namespace SXSI
 		dataTypedimAlpha sizeAlpha;  //number of the different symbols in the input texts
 		dataTypedimAlpha *alphaInverse;  //Corresponding between alpha[i] and the symbol as char
 
-		#if BUILD_BCR_FROM_EGSA == 1
+		#if BUILD_BCR_FROM_BCRpartials == 1
 			dataTypeNSeq nAddedTextEGSA;
 			//char c_aux[512] = "7seqsVar.fasta.7.gesa";
 		#endif
@@ -87,7 +88,7 @@ namespace SXSI
 
 		vector<sortElement> FirstVector, LastVector;
 
-    static BWTCollection * InitBWTCollection(char*,char*, int);
+    static BWTCollection * InitBWTCollection(char*,char*, int, string);
 
 		/**
          * Virtual destructor
