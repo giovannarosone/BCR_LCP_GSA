@@ -47,6 +47,8 @@
 
 #define SIZE_ALPHA 256  
 
+#define ext  ".aux"
+
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
