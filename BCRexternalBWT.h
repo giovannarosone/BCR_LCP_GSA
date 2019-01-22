@@ -44,10 +44,11 @@ public:
     /**
      * Constructor
      */
-        explicit BCRexternalBWT(char*, char*, int);
-    ~BCRexternalBWT();
+        explicit BCRexternalBWT(char*, char*, dataTypeNChar, string);
 
-	int buildBCR(char const *, char const *, char const *);
+	~BCRexternalBWT();
+
+	int buildBCR(char const *, char const *, char const *, dataTypeNChar, string);
 
   void storeBWTFilePartial(uchar const *, dataTypelenSeq);
 	#if BUILD_LCP == 1
@@ -77,8 +78,8 @@ public:
 	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
 	
 private:
-	#if BUILD_BCR_FROM_EGSA == 1
-		dataTypeNChar readEGSA(char const *);
+	#if BUILD_BCR_FROM_BCRpartials == 1
+		dataTypeNChar readPreviousBCR(string);
 	#endif
 	void printSegments();
 	void printOutput(char *);
