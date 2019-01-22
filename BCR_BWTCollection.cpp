@@ -36,6 +36,7 @@
 #include <sstream>
 #include "Timer.hh"
 #include <stdio.h>
+#include <math.h> 
 
 using std::cout;
 using std::endl;
@@ -48,27 +49,51 @@ using SXSI::BWTCollection;
 int main(int argc, char *argv[])
 {
 
-    if( argc != 4 )  {
-      std::cerr << "usage: " << argv[0] << " input output mode" << std::endl;
-	  	std::cerr << "where: " << std::endl;
-	  	std::cerr << "\tmode = 0 --> BCR " << std::endl;
-	    exit(1);
-    }
-
-
-	if( atoi(argv[3]) < 3 ) {
-		std::cout << "BWTCollection: The option is " << argv[3] << std::endl;
+    string inputPrevBCR="";
+    #if BUILD_BCR_FROM_BCRpartials==0
+        if( argc != 4 )  {
+            std::cerr << "usage: " << argv[0] << " input output ram" << std::endl;
+            std::cerr << "where: " << std::endl;
+            std::cerr << "\tram --> in MB" << std::endl;
+            exit(1);
+        }
+    #elif BUILD_BCR_FROM_BCRpartials==1
+        if( argc != 5 )  {
+            std::cerr << "usage: " << argv[0] << " input output ram inputPrevBCR" << std::endl;
+            std::cerr << "where: " << std::endl;
+            std::cerr << "\tram --> in MB" << std::endl;
+            std::cerr << "\tinputPrevBCR --> prefix filename BCR partial files" << std::endl;
+            exit(1);
+        }
+        inputPrevBCR = argv[4];
+    #endif
+    
+	if( ( atoi(argv[3]) > 0) && (atoi(argv[3]) < pow(2,(sizeof(dataTypeNChar)*8 ) )-1 ) ) {
 		std::cout << "BWTCollection: The input is " << argv[1] << std::endl;
+		std::cout << "BWTCollection: The output is " << argv[2] << std::endl;
+		std::cout << "BWTCollection: RAM is set to " << argv[3] << " in MB" << std::endl;
+        #if BUILD_BCR_FROM_BCRpartials==1
+            std::cout << "BWTCollection: inputPrevBCR is set to " << inputPrevBCR << std::endl;
+        #endif
 
-		BWTCollection *BCRexternalBWT = BWTCollection::InitBWTCollection(argv[1], argv[2], atoi(argv[3]));
+    
+        #if dataTypeNumChar == 2
+            dataTypeNChar ram = atoi(argv[3]);
+        #elif dataTypeNumChar == 3
+            dataTypeNChar ram = atol(argv[3]);
+        #endif
+        
+		BWTCollection *BCRexternalBWT = BWTCollection::InitBWTCollection(argv[1], argv[2], ram, inputPrevBCR );
 		
 		//cout << "finished iteration, usage: " << timer << endl;
 		delete BCRexternalBWT;
 
 		std::cerr << "\nThe BWT et al. is ready! " << std::endl;
 	}
-
-
+	else {
+		std::cerr << "\nthe value for the third parameter is not valid!" << std::endl;	
+		std::cerr << "It must be 0 < ram < " << pow(2,(sizeof(dataTypeNChar)*8 ) )-1 << std::endl;
+	}
 
 	std::cerr << "The End!\n";
 }
