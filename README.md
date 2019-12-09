@@ -53,7 +53,7 @@ You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + siz
 
 
 Default:
-- Build eBWT/LCP.
+- Build eBWT/QS permutation.
 - Types: uchar for eBWT, uchar (max length of sequences 256) for LCP (BUILD_LCP==1)  
 - Store distinct partial files at the same time: OUTPUT_FORMAT == 3
 
