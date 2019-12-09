@@ -12,11 +12,11 @@
 #include "../Parameters.h" 
 #include "../Tools.h"
 
+
 using namespace std;
 
 
 //See Felipe Louza tool: eGSA
-
 	typedef unsigned int int_text;
 	typedef unsigned int int_suff; 	//-2^31 to 2^31
 	typedef unsigned int int_lcp;
