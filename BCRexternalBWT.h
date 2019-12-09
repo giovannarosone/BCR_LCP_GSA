@@ -44,11 +44,11 @@ public:
     /**
      * Constructor
      */
-        explicit BCRexternalBWT(char*, char*, dataTypeNChar, string);
+        explicit BCRexternalBWT(char*, char*, string);
 
 	~BCRexternalBWT();
 
-	int buildBCR(char const *, char const *, char const *, dataTypeNChar, string);
+	int buildBCR(char const *, char const *, char const *, string);
 
   void storeBWTFilePartial(uchar const *, dataTypelenSeq);
 	#if BUILD_LCP == 1

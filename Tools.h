@@ -69,8 +69,8 @@
 
 //struct __attribute__((__packed__)) ElementTypeEBWTda {
 struct ElementTypeEBWTda {
-	uchar bwt;          //It is the position in the sequence, so it goes from 0 a length read
-	dataTypeNSeq da;		//It is the number of the sequence.
+	uchar bwt;         
+	dataTypeNSeq da;		//It is the number of the sequence.	
 };
 
 //struct __attribute__((__packed__)) ElementTypeLCPda {

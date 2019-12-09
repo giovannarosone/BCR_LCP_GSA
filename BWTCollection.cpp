@@ -40,8 +40,8 @@ namespace SXSI
      *
      * See BCRexternalBWT.h for more details.
      */
-    BWTCollection * BWTCollection::InitBWTCollection(char* file1, char* fileOut, int ram, string inputPrevBCR)  {
-	BWTCollection *result = new BCRexternalBWT(file1, fileOut, ram, inputPrevBCR);
+    BWTCollection * BWTCollection::InitBWTCollection(char* file1, char* fileOut, string inputPrevBCR)  {
+	BWTCollection *result = new BCRexternalBWT(file1, fileOut, inputPrevBCR);
         return result;
     }
 }

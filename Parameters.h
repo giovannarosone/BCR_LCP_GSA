@@ -40,7 +40,7 @@
 #include <iostream>
 #include <fstream>
 
-//#define SIZEBUFFER 1024     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
+#define SIZEBUFFER 1048576     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
 
 #define TERMINATE_CHAR '#'     //it is the symbol used as "end of strings", it must be lexicographically smaller than all the letters of the alphabet
 #define TERMINATE_CHAR_LEN '$'      //it is stored in cyc files, it is ignored by the algorithm, so it must not belong to the alphabet
@@ -118,19 +118,28 @@ typedef unsigned long ulong;
 #define deletePartialBWT 1 
 #define deletePartialLCP 1 
 #define deletePartialGSA 1 
-#define deleteCycFiles 1 
+#define deletePartialQS 1
+#define deleteCycFiles 1
 
-//if you want to complete the LCP array, please set it to 1
-#define BUILD_LCP 1
+//Compute the BWT permutation of the quality values
+#define USE_QS 1
+
+//if you want to compute the LCP array, please set it to 1
+#define BUILD_LCP 0
 
 //The pair (da[i], sa[i]) is the gsa[i]
-//if you want to complete the SA array, please set it to 1
+//if you want to compute the SA array, please set it to 1
 #define BUILD_SA 0
-//if you want to complete the DA array, please set it to 1
+//if you want to compute the DA array \in [0..nSeq], please set it to 1
 #define BUILD_DA 0
+//if you want to compute the bit DA array, please set it to 1
+//it works in internal memory
+#define BUILD_DA_bit 0
+
+
 
 //if you want to Store the 'end positions' of the end-markers (one for each sequence), please set it to 1
-#define STORE_ENDMARKER_POS 0
+#define STORE_ENDMARKER_POS 1
 
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
 //if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
@@ -152,20 +161,20 @@ typedef unsigned long ulong;
 //Save lengths of each sequence in a file .len
 #define STORE_LENGTH_IN_FILE  0
 
-//if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other
+//if OUTPUT_FORMAT == 0, the output format of BCR is at most 5 files - built one after the other
 //if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
 //if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: ebwt, lcp, da, sa
-//if OUTPUT_FORMAT == 3, the output format of BCR is at most 4 files at the same time
+//if OUTPUT_FORMAT == 3, the output format of BCR is at most 5 files at the same time
 //if OUTPUT_FORMAT == 4, the output format of BCR is at most 3 files (ebwt, da), lcp, sa
 //if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
 //if OUTPUT_FORMAT == 6, the output format of BCR is at most 3 files ebwt, lcp, (sa, da)
-#define OUTPUT_FORMAT 3
+#define OUTPUT_FORMAT 0
 
 //if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
 //if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
 #define OUTPUT_linear_SuffixArray 0
 
-//Computes the EGSA starting to another EGSA
+//Computes the EGSA by starting to another EGSA data structure
 //See output EGSA of Felipe Louze
 //if BUILD_BCR_FROM_BCRpartials == 1, BCR takes in input the BCR partial files and adds the symbols of new sequences.
 //if BUILD_BCR_FROM_BCRpartials == 0, BCR starts from scratch

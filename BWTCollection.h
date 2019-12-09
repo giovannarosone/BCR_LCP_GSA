@@ -53,8 +53,16 @@ namespace SXSI
     class BWTCollection
     {
     public:
-	        dataTypeNChar SIZEBUFFER;
-
+	    #if BUILD_DA_bit == 1
+			dataTypeNSeq numberFirstSet;
+			dataTypeNSeq numberSecondSet;
+			std::vector< std::vector<bool> > vectVectBitDA;
+		#endif
+		
+		#if USE_QS==1
+			uchar *newSymbQS;
+		#endif 
+			
 		std::vector <sortElement> vectTriple;  //Is is used both encoding, decoding, searching.
 		//ulong seqN;  //contains a number of a sequence
 		//ulong posN;  //contains the position of the last inserted symbol of the sequence seqN[i]
@@ -88,14 +96,14 @@ namespace SXSI
 
 		vector<sortElement> FirstVector, LastVector;
 
-    static BWTCollection * InitBWTCollection(char*,char*, int, string);
+    static BWTCollection * InitBWTCollection(char*,char*, string);
 
 		/**
          * Virtual destructor
          */
     virtual ~BWTCollection() { };
 
-    virtual int buildBCR(char const *, char const *, char const *, dataTypeNChar, string) = 0;
+    virtual int buildBCR(char const *, char const *, char const *, string) = 0;
 
     virtual void storeBWTFilePartial(uchar const *, dataTypelenSeq) = 0;
 		#if BUILD_LCP == 1

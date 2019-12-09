@@ -60,6 +60,10 @@ public:
 
    	bool convert (const string& input, char const * fileOutput, const string& output, dataTypeNChar ram, string BCRprefPrev );       //it reads a file in fasta format and builds cyc files
 	bool convertFromCycFile(const string& input, char const * fileOutput, string BCRprefPrev);        //it reads the file input for find the length and the number of sequences. Does not build cyc files.
+	
+	
+	bool convertQS(const string& input, const string& output, dataTypeNChar ram);       //it reads a file in fasta format and builds cyc files
+	
  	bool convert1Sequence(char const * filename1, dataTypeNChar ram) ;
 
 	dataTypeNChar SIZEBUFFERcycFiles;
