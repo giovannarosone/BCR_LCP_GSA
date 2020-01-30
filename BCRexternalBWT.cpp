@@ -1395,7 +1395,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 				}
 			}
 		
-			dataTypeNChar numchar = fwrite (&nText, sizeof(dataTypeNChar), 1 , OutFileEndPos);
+			dataTypeNChar numchar = fwrite (&nText, sizeof(dataTypeNSeq), 1 , OutFileEndPos);
 			assert( numchar == 1); // we should always read the same number of characters
 
 			#if (verboseEncode == 1) 
