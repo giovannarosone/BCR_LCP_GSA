@@ -45,7 +45,7 @@
 #define BackByVector 1
 
 
-#if ((BUILD_BCR_FROM_EGSA == 1) || (OUTPUT_FORMAT_EGSA == 1))
+#if ((BUILD_BCR_FROM_EGSA == 1) || (OUTPUT_FORMAT == 1))
 
 	typedef struct{
 		dataTypelenSeq	suff;
