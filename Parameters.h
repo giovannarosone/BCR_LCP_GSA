@@ -122,7 +122,7 @@ typedef unsigned long ulong;
 #define deleteCycFiles 1
 
 //Compute the BWT permutation of the quality values
-#define USE_QS 1
+#define USE_QS 0
 
 //if you want to compute the LCP array, please set it to 1
 #define BUILD_LCP 0
