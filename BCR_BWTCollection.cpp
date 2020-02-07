@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
             std::cerr << "\tinputPrevBCR --> prefix filename BCR partial files" << std::endl;
             exit(1);
         }
-        inputPrevBCR = argv[43];
+        inputPrevBCR = argv[3];
     #endif
     
 	
