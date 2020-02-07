@@ -303,20 +303,22 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
         fclose(outputFiles_[i]);
     }
 
-	vector <FILE*> outputFilesQS_;
-	outputFilesQS_.resize(lengthRead);    //One for each symbol of the read.
-    // create output files   (cyc qs files)
-    for(dataTypelenSeq i=0;i<lengthRead;i++ )
-    {
-        std::stringstream fnQS;
-        fnQS << output << "qs." << (int)i << ".txt";
-        outputFilesQS_[i] = fopen( fnQS.str().c_str(),"w" );
-        if (outputFilesQS_[i] == NULL) {
-                std::cerr << "TrasposeFasta: could not open file "  <<  fnQS.str().c_str() << std::endl;
-				exit (EXIT_FAILURE);
-		}
-        fclose(outputFilesQS_[i]);
-    }
+	#if  (USE_QS==1) 
+	    vector <FILE*> outputFilesQS_;
+	    outputFilesQS_.resize(lengthRead);    //One for each symbol of the read.
+	    // create output files   (cyc qs files)
+	    for(dataTypelenSeq i=0;i<lengthRead;i++ )
+	    {
+		std::stringstream fnQS;
+		fnQS << output << "qs." << (int)i << ".txt";
+		outputFilesQS_[i] = fopen( fnQS.str().c_str(),"w" );
+		if (outputFilesQS_[i] == NULL) {
+			std::cerr << "TrasposeFasta: could not open file "  <<  fnQS.str().c_str() << std::endl;
+					exit (EXIT_FAILURE);
+			}
+		fclose(outputFilesQS_[i]);
+	    }
+	#endif
 
 	ram = ram * nSeq;   //ram used in BCR for vector 
 	#if ( (USE_QS==1) && (FASTQ==1) )
@@ -351,13 +353,15 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		for (dataTypeNChar y = 0 ; y < SIZEBUFFERcycFiles; y++)         //For each buffered symbol of the read
 			buf_[x][y]=TERMINATE_CHAR_LEN;
 
-	vector<vector<uchar> > bufQS_;
-	bufQS_.resize(lengthRead);    //For each symbol/column of the read
-	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
-		bufQS_[x].resize(SIZEBUFFERcycFiles);
-	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
-		for (dataTypeNChar y = 0 ; y < SIZEBUFFERcycFiles; y++)         //For each buffered symbol of the read
-			bufQS_[x][y]=TERMINATE_CHAR_LEN;
+	#if  (USE_QS==1)
+		vector<vector<uchar> > bufQS_;
+		bufQS_.resize(lengthRead);    //For each symbol/column of the read
+		for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
+			bufQS_[x].resize(SIZEBUFFERcycFiles);
+		for (dataTypelenSeq x = 0 ; x < lengthRead; x++)         //For each symbol/column of the read
+			for (dataTypeNChar y = 0 ; y < SIZEBUFFERcycFiles; y++)         //For each buffered symbol of the read
+				bufQS_[x][y]=TERMINATE_CHAR_LEN;
+	#endif
 	
 	nSeq = 0;
 	dataTypeNChar num_write = 0;
@@ -512,22 +516,23 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 					fclose(outputFiles_[i]);
 				}
 				
-				
-				// write buffers to the files, clear buffers
-				for(dataTypelenSeq i=0;i<lengthRead;i++ )  {       //For each symbol/column of the read   (for each string)
-					std::stringstream fnQS;
-					fnQS << output << "qs." << (int)i << ".txt";
-					outputFilesQS_[i] = fopen( fnQS.str().c_str(),"a" );
-					num_write = fwrite ( &bufQS_[i][0],sizeof(char),charsBuffered-1,outputFilesQS_[i] );
-					assert( num_write == charsBuffered-1 );
-					for(dataTypeNChar x=0; x<charsBuffered-1; x++ ) {
-						//For each buffered symbol of the read (a symbol for each string)
-						if (bufQS_[i][x] != TERMINATE_CHAR_LEN) {
-							bufQS_[i][x] = TERMINATE_CHAR_LEN;
+				#if  (USE_QS==1)
+					// write buffers to the files, clear buffers
+					for(dataTypelenSeq i=0;i<lengthRead;i++ )  {       //For each symbol/column of the read   (for each string)
+						std::stringstream fnQS;
+						fnQS << output << "qs." << (int)i << ".txt";
+						outputFilesQS_[i] = fopen( fnQS.str().c_str(),"a" );
+						num_write = fwrite ( &bufQS_[i][0],sizeof(char),charsBuffered-1,outputFilesQS_[i] );
+						assert( num_write == charsBuffered-1 );
+						for(dataTypeNChar x=0; x<charsBuffered-1; x++ ) {
+							//For each buffered symbol of the read (a symbol for each string)
+							if (bufQS_[i][x] != TERMINATE_CHAR_LEN) {
+								bufQS_[i][x] = TERMINATE_CHAR_LEN;
+							}
 						}
+						fclose(outputFilesQS_[i]);
 					}
-					fclose(outputFilesQS_[i]);
-				}
+				#endif
 				
 				charsBuffered=1;
 			}
@@ -618,18 +623,21 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	//Requests the removal of unused capacity
 	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)  {
 		buf_[x].clear();
-		bufQS_[x].clear();
+		#if  (USE_QS==1)
+			bufQS_[x].clear();
+		#endif
 		//buf_[x].shrink_to_fit();
 	}
 	buf_.clear();
-	bufQS_.clear();
-	//buf_.shrink_to_fit();
-	
 	//outputFiles_.shrink_to_fit();
 	outputFiles_.clear();
-	outputFilesQS_.clear();
 	
-	
+	#if  (USE_QS==1)
+		bufQS_.clear();
+		outputFilesQS_.clear();
+	#endif
+	//buf_.shrink_to_fit();
+			
 	dataTypedimAlpha sizeAlpha=0;
 	for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
 		if (freq[i] > 0) {
