@@ -130,13 +130,13 @@ typedef unsigned long ulong;
 
 
 //if you want to compute the LCP array, please set it to 1
-#define BUILD_LCP 0
+#define BUILD_LCP 1
 
 //The pair (da[i], sa[i]) is the gsa[i]
 //if you want to compute the SA array, please set it to 1
 #define BUILD_SA 0
 //if you want to compute the DA array \in [0..nSeq], please set it to 1
-#define BUILD_DA 0
+#define BUILD_DA 1
 //if you want to compute the bit DA array, please set it to 1
 //it works in internal memory
 #define BUILD_DA_bit 0
