@@ -66,7 +66,7 @@ In this case, BCR takes in input the collection (.fasta) that to be inserted and
 In order to do this, BUILD_BCR_FROM_BCRpartials must to be set to 1.
 For instance:
 ```sh
-./BCR_LCP_GSA test/2seqsVar.fa test/2seqsVar.fa.out 1024 test/part_7seqsVar
+./BCR_LCP_GSA test/2seqsVar.fa test/2seqsVar.fa.out test/part_7seqsVar
 ```
 where part_7seqsVar is the prefix of the filenames of BCR partial files.
 
@@ -96,12 +96,12 @@ make
 
 ### Run
 ```sh
-./BCR_LCP_GSA inputFile outputFile 1024
+./BCR_LCP_GSA inputFile outputFile
 ```
 
 ### Example
 ```sh
-./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out 1024
+./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out
 ```
 
 
