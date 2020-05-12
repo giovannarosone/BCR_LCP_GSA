@@ -1,7 +1,7 @@
 # BCR_LCP_GSA
 
 Multi-string eBWT/LCP/GSA(DA/SA) computation
-December 9th 2019
+(updated December 9th 2019)
 
     BCR is part of:
     BEETL: Burrows-Wheeler Extended Tool Library
