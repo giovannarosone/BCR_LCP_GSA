@@ -103,7 +103,7 @@ make FASTQ=1
 ./BCR_LCP_GSA inputFile outputFile
 ```
 
-### Example
+### Examples
 ```sh
 ./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out
 ```
