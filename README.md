@@ -93,7 +93,7 @@ Open parameters.h file and, please, set the parameters (data structured that mus
 make
 ```
 
-If the input is a gz file containing a fastQ file and if you also want to build the permutation of the QS values then you should compile like this
+If the input is a fastQ file (or a gz file containing a fastQ file) and you also want to build the permutation of the QS values then you should compile like this
 ```sh
 make FASTQ=1
 ```
@@ -106,6 +106,10 @@ make FASTQ=1
 ### Example
 ```sh
 ./BCR_LCP_GSA test/7seqsVar.fa test/7seqsVar.fa.out
+```
+
+```sh
+./BCR_LCP_GSA test/prova.fq test/prova.fq.out
 ```
 
 ```sh
