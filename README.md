@@ -109,11 +109,11 @@ make FASTQ=1
 ```
 
 ```sh
-./BCR_LCP_GSA test/prova.fq test/prova.fq.out
+./BCR_LCP_GSA test/test.fq test/test.fq.out
 ```
 
 ```sh
-./BCR_LCP_GSA test/prova.fq.gz test/prova.fq.out
+./BCR_LCP_GSA test/test.fq.gz test/test.fq.out
 ```
 
 
