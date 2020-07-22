@@ -121,11 +121,14 @@ typedef unsigned long ulong;
 #define deletePartialQS 1
 #define deleteCycFiles 1
 
-//Compute the quality score permutation associated to BWT permutation
 #if FASTQ==1
+    //Compute the quality score permutation associated to BWT   permutation
 	#define USE_QS 1
+
+    //if you want to store the titles of each read in fastQ into a file with extension .title, please set it to 1
+    #define STORE_TITLE_FASTQ 1
 #else
-	#define USE_QS 0             //if you want to build QS permutation from fasta and qs file, please set USE_QS to 1
+    #define USE_QS 0             //if you want to build QS permutation from fasta and qs file, please set USE_QS to 1
 #endif
 
 
