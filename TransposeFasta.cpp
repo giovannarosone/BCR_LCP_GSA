@@ -160,11 +160,24 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 		kseq_t *seq;
 		//int l;
 		//cout << input.c_str() << "\n";
+		#if  STORE_TITLE_FASTQ == 1
+		    char *fnAux = new char[fileOutput.length()+10];
+		    sprintf (fnAux,"%s%s",fileOutput.c_str(),".title\0");
+		    FILE* OutFile = fopen(fnAux, "wb");
+		    if (OutFile==NULL) {
+			std::cerr << "TransposeFasta: (lengthBWT+NSequences+sizeAlpha) Error opening " << fnAux << std::endl;
+			exit (EXIT_FAILURE);
+		    }
+		#endif
+	
 		fp = gzopen(input.c_str(), "r");
 		seq = kseq_init(fp);
 		while ((kseq_read(seq)) >= 0) {
 			nSeq++;
 			//printf("name: %s\n", seq->name.s);
+			#if  STORE_TITLE_FASTQ == 1
+                		fprintf(OutFile, "%s\n", seq->name.s);
+            		#endif
 			//if (seq->comment.l) 
 				//printf("comment: %s\n", seq->comment.s);
 			
@@ -183,15 +196,20 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 			//if (seq->qual.l) 
 			//	printf("qual: %s\n", seq->qual.s);
 		} //end-while
+	
+		#if  STORE_TITLE_FASTQ == 1
+            		fclose(OutFile);
+        	#endif
+	
 		kseq_destroy(seq);
 		gzclose(fp);
 	#endif
 	
 	
 	#if verboseEncode==1
-	   dataTypeNChar sum=0;
-       for (dataTypeNSeq m=0; m < lengthSeqVector.size(); m++) {
-           sum += lengthSeqVector[m];
+	   	dataTypeNChar sum=0;
+		for (dataTypeNSeq m=0; m < lengthSeqVector.size(); m++) {
+           		sum += lengthSeqVector[m];
        }
 	#endif
 
