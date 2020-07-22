@@ -165,7 +165,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 		    sprintf (fnAux,"%s%s",fileOutput.c_str(),".title\0");
 		    FILE* OutFile = fopen(fnAux, "wb");
 		    if (OutFile==NULL) {
-			std::cerr << "TransposeFasta: (lengthBWT+NSequences+sizeAlpha) Error opening " << fnAux << std::endl;
+			std::cerr << "TransposeFasta: (title) Error opening " << fnAux << std::endl;
 			exit (EXIT_FAILURE);
 		    }
 		#endif
