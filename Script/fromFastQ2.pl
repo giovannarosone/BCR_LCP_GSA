@@ -12,7 +12,7 @@ open(FILE,"$ARGV[0]");
 open(FASTA,">$ARGV[0].fasta");
 #open(SEQS,">$ARGV[0].seqs");
 #open(MANZINI,">$ARGV[0].cat");
-open(QUALSCORE,">FASTA.qs");
+open(QUALSCORE,">$ARGV[0].qs");
 
 
 my $cur_seq_header = "";
