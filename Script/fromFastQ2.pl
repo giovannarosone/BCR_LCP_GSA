@@ -30,8 +30,8 @@ while( <FILE> )
 
     print FASTA ">" . $cur_seq_header;
     print FASTA $cur_seq_seq;
-
-	print QUALSCORE "{" . $cur_seq_header;
+    
+    print QUALSCORE "{" . $cur_seq_header;
     print QUALSCORE $cur_qual_seq;
 	
     #print SEQS $cur_seq_seq;
