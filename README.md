@@ -97,6 +97,12 @@ If the input is a multi-line fastQ file (or a gz file containing a fastQ file) a
 ```sh
 make FASTQ=1
 ```
+If you have a single-line fastQ file, you could use:
+```sh
+Fold long FASTA/Q lines and remove FASTA/Q comments:
+./seqtk seq -l100 in.fa > out.fa
+(https://github.com/lh3/seqtk.git)
+```
 
 ### Run
 ```sh
