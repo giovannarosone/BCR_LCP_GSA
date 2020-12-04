@@ -24,7 +24,7 @@ BCR_LCP_GSA can compute at the same time:
     - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
 - the quality score permutation
     
-of a very large collection of strings **having different or same length**. 
+of a very large collection of strings **having different or same length** and **any alphabet**. 
 
 The output format can be:
 - EGSA (OUTPUT_FORMAT must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
@@ -125,14 +125,8 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
 
 #### References:
 
-    Markus J. Bauer, Anthony J. Cox and Giovanna Rosone
-    Lightweight BWT Construction for Very Large String Collections.
-    Proceedings of CPM 2011, pp.219-231
+    *** BWT and LCP
     
-    Markus J. Bauer, Anthony J. Cox, Giovanna Rosone and Marinella Sciortino
-    Lightweight LCP Construction for Next-Generation Sequencing Datasets. 
-    Proceedings of WABI 2012, pp 326-337
- 
     Markus J. Bauer, Anthony J. Cox, Giovanna Rosone 
     Lightweight algorithms for constructing and inverting the BWT of string collections. 
     Theoretical Computer Science 483: 134-148 (2013)
@@ -140,6 +134,25 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
     Anthony J. Cox, Fabio Garofalo, Giovanna Rosone, Marinella Sciortino
     Lightweight LCP construction for very large collections of strings. 
     Journal of Discrete Algorithms (2016) 37: 17-33
+    
+    *** The Alternating BWT
+    
+    Raffaele Giancarlo, Giovanni Manzini, Giovanna Rosone, Marinella Sciortino: 
+    A new class of searchable and provably highly compressible string transformations. 
+    CPM 2019. Leibniz International Proceedings in Informatics (LIPIcs), 128, art. no. 12. 
+    Schloss Dagstuhl- Leibniz-Zentrum fur Informatik GmbH, Dagstuhl Publishing.
+    
+    Raffaele Giancarlo, Giovanni Manzini, Antonio Restivo, Giovanna Rosone, Marinella Sciortino: 
+    The Alternating BWT: An algorithmic perspective. 
+    Theoretical Computer Science (2020), Volume 812, Pages 230-243, Elsevier B.V. 
+    doi: 10.1016/j.tcs.2019.11.002.
+    
+    *** QS permutation
+    
+    Lilian Janin, Giovanna Rosone, and Anthony J. Cox: 
+    Adaptive reference-free compression of sequence quality scores. 
+    Bioinformatics (2014) 30 (1): 24-30, 
+    doi: 10.1093/bioinformatics/btt257.
 
 
 ---
