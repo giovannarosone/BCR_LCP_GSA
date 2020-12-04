@@ -24,7 +24,7 @@ BCR_LCP_GSA can compute at the same time:
     - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
 - the quality score permutation
     
-of a very large collection of strings having different or same length. 
+of a very large collection of strings **having different or same length**. 
 
 The output format can be:
 - EGSA (OUTPUT_FORMAT must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
