@@ -135,7 +135,7 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
     Lightweight LCP construction for very large collections of strings. 
     Journal of Discrete Algorithms (2016) 37: 17-33
     
-    *** The Alternating BWT
+    *** Alternating BWT
     
     Raffaele Giancarlo, Giovanni Manzini, Giovanna Rosone, Marinella Sciortino: 
     A new class of searchable and provably highly compressible string transformations. 
@@ -146,6 +146,11 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
     The Alternating BWT: An algorithmic perspective. 
     Theoretical Computer Science (2020), Volume 812, Pages 230-243, Elsevier B.V. 
     doi: 10.1016/j.tcs.2019.11.002.
+    
+    Ira M. Gessel, Antonio Restivo, Christophe Reutenauer,
+    A bijection between words and multisets of necklaces, 
+    European Journal of Combinatorics, Volume 33, Issue 7, 2012, Pages 1537-1546,
+    https://doi.org/10.1016/j.ejc.2012.03.016.
     
     *** QS permutation
     
