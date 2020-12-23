@@ -1308,11 +1308,6 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			fclose(InFileInputTextQS);
 		#endif
 		
-		#if (deleteCycFiles == 1)
-			if (remove(filename)!=0)
-				std::cerr << "buildBCR: Error deleting " << filename << " file" << std::endl;
-		#endif
-		
 	#endif
 
 	InsertNsymbols(newSymb, 1);
