@@ -1773,7 +1773,8 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
             fclose(FileSA);
             fclose(OutFileSA);
         #else
-            fclose(OutFileDA);
+            //fclose(OutFileDA);
+	    fclose(OutFileSA);
         #endif
 
 		delete[] newEleSA;
