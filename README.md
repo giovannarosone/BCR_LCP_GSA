@@ -1,3 +1,5 @@
+Main author: Giovanna Rosone (giovanna.rosone (at) unipi.it)
+
 # BCR_LCP_GSA
 
 Multi-string eBWT/LCP/GSA(DA/SA) computation
