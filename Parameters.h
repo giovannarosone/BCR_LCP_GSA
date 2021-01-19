@@ -176,7 +176,7 @@ typedef unsigned long ulong;
 //if OUTPUT_FORMAT == 4, the output format of BCR is at most 3 files (ebwt, da), lcp, sa
 //if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
 //if OUTPUT_FORMAT == 6, the output format of BCR is at most 3 files ebwt, lcp, (sa, da)
-#define OUTPUT_FORMAT 0
+#define OUTPUT_FORMAT 3
 
 //if OUTPUT_linear_SuffixArray == 1, BCR also computes the SA of the concatenated strings 
 //if OUTPUT_linear_SuffixArray == 0, BCR does not compute the SA of the concatenated strings 
