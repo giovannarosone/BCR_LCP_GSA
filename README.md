@@ -62,7 +62,7 @@ Default:
 For instance, the data structures LCP and SA depend on the setting of dataTypeLengthSequences/dataTypelenSeq.
 If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
 
-In [Bauer el al, 2013] and [Cox et al, 2016], we explain the BCR supports the inserting and deleting of new elements belonging to a sequence in the computed data structures. 
+BCR supports the inserting and deleting of new elements belonging to a sequence in the computed data structures. 
 Now, BCR can add the elements of a new string collection in input by starting with the previously computed data structures. 
 In this case, BCR takes in input the collection (.fasta) that to be inserted and the BCR partial files.
 In order to do this, BUILD_BCR_FROM_BCRpartials must to be set to 1.
