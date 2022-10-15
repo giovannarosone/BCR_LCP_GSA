@@ -63,5 +63,6 @@
 
 void quickSort(std::vector< sortElement > &v);
 
+void sapSort(std::vector< sortElement > &v, dataTypeNSeq start, dataTypeNSeq end);
 
 #endif
