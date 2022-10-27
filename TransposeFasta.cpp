@@ -387,7 +387,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	dataTypeNChar num_write = 0;
 	dataTypeNChar charsBuffered = 0;
 	
-	#if KSEQ_PARSER==1
+	#if KSEQ_PARSER==0
 		std::ifstream infile(input.c_str());
 		string bufChar;
 		dataTypelenSeq tmpLen = 0;
