@@ -48,14 +48,16 @@ void quickSort(std::vector< sortElement > &v)
   sort( v.begin(),v.end(),cmpSortEl);  
 }
 
-bool cmpSapSort (sortElement a,sortElement b) { 
-	if (a.bwt == b.bwt)
-		return (a.seqN < b.seqN);
-	else
-		return (a.bwt < b.bwt); 
-}
+#if BUILD_SAP
+	bool cmpSapSort (sortElement a,sortElement b) { 
+		if (a.bwt == b.bwt)
+			return (a.seqN < b.seqN);
+		else
+			return (a.bwt < b.bwt); 
+	}
 
-void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)
-{	
-	sort( v.begin()+start,v.begin()+end, cmpSapSort);  
-}
+	void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)
+	{	
+		sort( v.begin()+start,v.begin()+end, cmpSapSort);  
+	}
+#endif
