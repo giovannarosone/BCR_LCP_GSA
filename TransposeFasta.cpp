@@ -338,6 +338,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	    }
 	#endif
 
+	/*
 	ram = ram * nSeq;   //ram used in BCR for vector 
 	#if ( (USE_QS==1) && (FASTQ==1) )
 		SIZEBUFFERcycFiles = ram / lengthRead / 2;    //I have two buffers at the same time
@@ -353,7 +354,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	//char buf[BUFFER_SIZELEN];
     //for(dataTypeNChar i=0;i<BUFFER_SIZELEN;i++ )
 	//	buf[i] = '\0';
-
+	*/
+	
 	//TO DO: CHECK THE CASE OF charsBuffered >= SIZEBUFFERcycFiles
 	//if (nSeq > SIZEBUFFERcycFiles) { //Number of columns of the matrix buffer
 	//	cerr << "Warning: Number of sequences is: " << (unsigned long)nSeq << " and SIZEBUFFERcycFiles (in TransposeFasta.h) is " << SIZEBUFFERcycFiles << endl;
@@ -641,20 +643,22 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	//Requests the removal of unused capacity
 	for (dataTypelenSeq x = 0 ; x < lengthRead; x++)  {
 		buf_[x].clear();
+		buf_[x].shrink_to_fit();
 		#if  (USE_QS==1)
 			bufQS_[x].clear();
+			bufQS_[x].shrink_to_fit();
 		#endif
-		//buf_[x].shrink_to_fit();
 	}
 	buf_.clear();
-	//outputFiles_.shrink_to_fit();
+	buf_.shrink_to_fit();	
 	outputFiles_.clear();
+	outputFiles_.shrink_to_fit();
 	
 	#if  (USE_QS==1)
 		bufQS_.clear();
+		bufQS_[x].shrink_to_fit();
 		outputFilesQS_.clear();
 	#endif
-	//buf_.shrink_to_fit();
 			
 	dataTypedimAlpha sizeAlpha=0;
 	for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
