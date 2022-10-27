@@ -620,22 +620,24 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			fclose( outputFiles_[i]);
 		}
 		
-		for(dataTypelenSeq i=0;i<lengthRead;i++ )
-		{
-			std::stringstream fnQS;
-			fnQS << output << "qs." << (int)i << ".txt";
-			outputFilesQS_[i] = fopen( fnQS.str().c_str(),"a" );
-			num_write = fwrite ( &bufQS_[i][0],sizeof(char),charsBuffered,outputFilesQS_[i] );
-			assert( num_write == charsBuffered );
+		#if USE_QS==1
+			for(dataTypelenSeq i=0;i<lengthRead;i++ )
+			{
+				std::stringstream fnQS;
+				fnQS << output << "qs." << (int)i << ".txt";
+				outputFilesQS_[i] = fopen( fnQS.str().c_str(),"a" );
+				num_write = fwrite ( &bufQS_[i][0],sizeof(char),charsBuffered,outputFilesQS_[i] );
+				assert( num_write == charsBuffered );
 			
-			for(dataTypeNChar x=0; x<charsBuffered; x++ ) {
-				if (bufQS_[i][x] != TERMINATE_CHAR_LEN) {
-					//cerr << "*bufQS_["<< (int)i<<"]["<< (int)x << "]= " << (int)bufQS_[i][x] << ". " << endl;
-					bufQS_[i][x] = TERMINATE_CHAR_LEN;
+				for(dataTypeNChar x=0; x<charsBuffered; x++ ) {
+					if (bufQS_[i][x] != TERMINATE_CHAR_LEN) {
+						//cerr << "*bufQS_["<< (int)i<<"]["<< (int)x << "]= " << (int)bufQS_[i][x] << ". " << endl;
+						bufQS_[i][x] = TERMINATE_CHAR_LEN;
+					}
 				}
+				fclose( outputFilesQS_[i]);
 			}
-			fclose( outputFilesQS_[i]);
-		}
+		#endif
 		
 		
 	#endif   //end KSEQ_PARSER
