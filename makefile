@@ -6,7 +6,7 @@ FASTQ = 0
 
 DEFINES = -DFASTQ=$(FASTQ) 
 
-CPPFLAGS = -Wall -ansi -pedantic -g -O2 $(DEFINES)
+CPPFLAGS = -Wall -ansi -pedantic -g -O3 -std=c++11 $(DEFINES)
 
 
 BCR_BWTCollection_obs = BCR_BWTCollection.o BWTCollection.o BCRexternalBWT.o Tools.o Sorting.o TransposeFasta.o Timer.o -lz
