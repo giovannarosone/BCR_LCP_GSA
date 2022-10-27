@@ -66,3 +66,5 @@ void quickSort(std::vector< sortElement > &v);
 #if BUILD_SAP
 	void sapSort(std::vector< sortElement > &v, dataTypeNSeq start, dataTypeNSeq end);
 #endif
+
+#endif
