@@ -47,7 +47,7 @@
 
 
 #define BUFFERSIZE 1024
-#define SIZEBUFFERcycFiles 1024
+
 
 using std::string;
 using std::vector;
@@ -84,7 +84,8 @@ public:
 
 
 private:
-
+	dataTypeNChar SIZEBUFFERcycFiles;
+	
     bool findLengthNseq( const string& input, const string& fileOutput, string BCRprefPrev);
 
 //    FILE* outputFiles_[CYCLENUM];
@@ -92,7 +93,7 @@ private:
 
 	ulong readln(char* s, int n, FILE* iop);
 
-};
+	};
 
 
 
