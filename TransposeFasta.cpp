@@ -565,9 +565,11 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			//if (seq->qual.l) 
 			//	printf("qual: %s\n", seq->qual.s);
 			
-			for(dataTypelenSeq i=0; i < strlen(seq->qual.s);i++) {				
-				bufQS_[i][charsBuffered-1] = seq->qual.s[i];				
-			}
+			#if USE_QS==1
+				for(dataTypelenSeq i=0; i < strlen(seq->qual.s);i++) {				
+					bufQS_[i][charsBuffered-1] = seq->qual.s[i];				
+				}
+			#endif
 			
 			/*
 			for(dataTypelenSeq i=0;i<lengthRead;i++ ) {
