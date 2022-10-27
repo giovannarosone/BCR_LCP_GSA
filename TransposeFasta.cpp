@@ -355,6 +355,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
     //for(dataTypeNChar i=0;i<BUFFER_SIZELEN;i++ )
 	//	buf[i] = '\0';
 	*/
+	SIZEBUFFERcycFiles = 1048576;
+	
 	
 	//TO DO: CHECK THE CASE OF charsBuffered >= SIZEBUFFERcycFiles
 	//if (nSeq > SIZEBUFFERcycFiles) { //Number of columns of the matrix buffer
