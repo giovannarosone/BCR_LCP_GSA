@@ -44,7 +44,7 @@
 
 #include <zlib.h>
 
-#if FASTQ==1
+#if KSEQ_PARSER==1
 	#include "external/kseq/kseq.h"
 	KSEQ_INIT(gzFile, gzread)
 #endif
@@ -387,7 +387,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	dataTypeNChar num_write = 0;
 	dataTypeNChar charsBuffered = 0;
 	
-	#if (FASTQ==0)
+	#if KSEQ_PARSER==1
 		std::ifstream infile(input.c_str());
 		string bufChar;
 		dataTypelenSeq tmpLen = 0;
@@ -497,7 +497,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			fclose( outputFiles_[i]);
 		}
 		
-	#else   //end no fastQ
+	#else    //KSEQ_PARSER==1
 		//kseq 2019-11-08
 		gzFile fp;
 		kseq_t *seq;
@@ -636,8 +636,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		}
 		
 		
-	#endif   //end fastq==1
-
+	#endif   //end KSEQ_PARSER
 
 	//Free memory
 	//Requests the removal of unused capacity
