@@ -47,6 +47,7 @@
 
 
 #define BUFFERSIZE 1024
+#define SIZEBUFFERcycFiles 1024
 
 using std::string;
 using std::vector;
@@ -65,9 +66,6 @@ public:
 	bool convertQS(const string& input, const string& output, dataTypeNChar ram);       //it reads a file in fasta format and builds cyc files
 	
  	bool convert1Sequence(char const * filename1, dataTypeNChar ram) ;
-
-	dataTypeNChar SIZEBUFFERcycFiles;
-
 
 	dataTypelenSeq lengthRead;    //Length of each text
 	dataTypeNChar lengthTexts;   //Total length of all texts without $-symbols
