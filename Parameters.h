@@ -131,6 +131,11 @@ typedef unsigned long ulong;
     #define USE_QS 0             //if you want to build QS permutation from fasta and qs file, please set USE_QS to 1
 #endif
 
+//Use kseq to read sequences
+#define KSEQ_PARSER 1
+
+//if you want to compute the SAP array, please set it to 1
+#define BUILD_SAP 0
 
 //if you want to compute the LCP array, please set it to 1
 #define BUILD_LCP 0
