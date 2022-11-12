@@ -72,7 +72,8 @@ public:
 
 	dataTypeNSeq nSeq;   //number total of texts in filename1
 	dataTypeNChar freq[256];  //contains the distribution of the symbols. It is useful only for testing. It depends on the #characters
-
+	dataTypedimAlpha sizeAlpha;
+	
 	#if BCR_INPUT_IN_MEMORY==1
 		//std::wstring strInput;
 		uchar * strInput;
