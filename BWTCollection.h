@@ -41,6 +41,8 @@
 #include <iostream>
 using namespace std;
 
+//2022-10-28
+#include <algorithm>
 
 namespace SXSI
 {
@@ -62,7 +64,11 @@ namespace SXSI
 		#if USE_QS==1
 			uchar *newSymbQS;
 		#endif 
-			
+		
+	    	#if BUILD_SAP==1
+			uchar *newSymbSAP;
+		#endif 
+	    
 		std::vector <sortElement> vectTriple;  //Is is used both encoding, decoding, searching.
 		//ulong seqN;  //contains a number of a sequence
 		//ulong posN;  //contains the position of the last inserted symbol of the sequence seqN[i]
@@ -131,7 +137,10 @@ namespace SXSI
 			virtual void storeEntireBWTIntMem(const char*) = 0;
 			virtual dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *, dataTypeNChar, dataTypeNChar , uchar *) =0;
 		#endif
-
+		#if BUILD_SAP
+			virtual void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)=0;
+		#endif
+	    
 	private:
 		#if BUILD_BCR_FROM_BCRpartials == 1
             		virtual dataTypeNChar readPreviousBCR(string)=0;
