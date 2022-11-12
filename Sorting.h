@@ -37,34 +37,43 @@
 #include "Parameters.h" // Defines ulong and uchar.
 #include "Tools.h"
 
-#if BUILD_LCP == 1
-	//struct __attribute__((__packed__)) sortElement {
-	struct sortElement {	
-	sortElement() {};
-	sortElement( dataTypedimAlpha z, dataTypeNChar x,dataTypeNSeq y, dataTypelenSeq l1, dataTypelenSeq l2) { pileN = z; posN = x; seqN = y; lcpCurN = l1; lcpSucN = l2; };
-	~sortElement() {};
-	dataTypedimAlpha pileN;
-	dataTypelenSeq lcpCurN;
-	dataTypelenSeq lcpSucN;
-	dataTypeNSeq seqN;	
-	dataTypeNChar posN;
-	};
+#if BUILD_SAP==1
+		//struct __attribute__((__packed__)) sortElement {
+		struct sortElement {	
+		sortElement() {};
+		sortElement( dataTypedimAlpha z, dataTypedimAlpha sap_value, dataTypeNChar x,dataTypeNSeq y) { pileN = z; sap = sap_value; posN = x; seqN = y;};
+		~sortElement() {};
+		dataTypedimAlpha pileN;
+		dataTypedimAlpha sap;
+		dataTypeNSeq seqN;
+		dataTypeNChar posN;
+		};
 #else
-	//struct __attribute__((__packed__)) sortElement {
-	struct sortElement {	
-	sortElement() {};
-	sortElement( dataTypedimAlpha z, dataTypeNChar x,dataTypeNSeq y) { pileN = z; posN = x; seqN = y;};
-	~sortElement() {};
-	dataTypedimAlpha pileN;
-	dataTypeNSeq seqN;
-	dataTypeNChar posN;
-	};
+	#if BUILD_LCP == 1
+		//struct __attribute__((__packed__)) sortElement {
+		struct sortElement {	
+		sortElement() {};
+		sortElement( dataTypedimAlpha z, dataTypeNChar x,dataTypeNSeq y, dataTypelenSeq l1, dataTypelenSeq l2) { pileN = z; posN = x; seqN = y; lcpCurN = l1; lcpSucN = l2; };
+		~sortElement() {};
+		dataTypedimAlpha pileN;
+		dataTypelenSeq lcpCurN;
+		dataTypelenSeq lcpSucN;
+		dataTypeNSeq seqN;	
+		dataTypeNChar posN;
+		};
+	#else
+		//struct __attribute__((__packed__)) sortElement {
+		struct sortElement {	
+		sortElement() {};
+		sortElement( dataTypedimAlpha z, dataTypeNChar x,dataTypeNSeq y) { pileN = z; posN = x; seqN = y;};
+		~sortElement() {};
+		dataTypedimAlpha pileN;
+		dataTypeNSeq seqN;
+		dataTypeNChar posN;
+		};
+	#endif
 #endif
 
 void quickSort(std::vector< sortElement > &v);
-
-#if BUILD_SAP
-	void sapSort(std::vector< sortElement > &v, dataTypeNSeq start, dataTypeNSeq end);
-#endif
 
 #endif
