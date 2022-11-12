@@ -560,17 +560,34 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			}
 			
 			
-			for(dataTypelenSeq i=0; i < strlen(seq->seq.s);i++) {				
-				buf_[i][charsBuffered-1] = seq->seq.s[i];				
-			}			
-			
-			//if (seq->qual.l) 
-			//	printf("qual: %s\n", seq->qual.s);
-			
-			#if USE_QS==1
+			#if BCR_SET_ALN_RH==0   //align left
+				dataTypelenSeq i;
+				for(i=0; i < strlen(seq->seq.s);i++) {				
+					buf_[i][charsBuffered-1] = seq->seq.s[i];				
+				}			
+				
+				//if (seq->qual.l) 
+				//	printf("qual: %s\n", seq->qual.s);
+				#if USE_QS==1
 				for(dataTypelenSeq i=0; i < strlen(seq->qual.s);i++) {				
 					bufQS_[i][charsBuffered-1] = seq->qual.s[i];				
 				}
+				#endif
+				
+			#else 
+				//align right
+				dataTypelenSeq index=lengthRead-strlen(seq->seq.s);
+				if(index>0)	buf_[index-1][charsBuffered-1] = TERMINATE_CHAR;
+				for(dataTypelenSeq i=0; i < strlen(seq->seq.s); i++) {				
+					buf_[index+i][charsBuffered-1] = seq->seq.s[i];	
+				}
+				
+				#if USE_QS==1
+				for(dataTypelenSeq i=0; i < strlen(seq->qual.s);i++) {				
+					bufQS_[index+i][charsBuffered-1] = seq->qual.s[i];
+				}
+				#endif
+				
 			#endif
 			
 			/*
@@ -594,8 +611,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			cerr << "The last Buf_ " << endl;
 			cerr << "Buf_ " << endl;
 			for(dataTypelenSeq i=0;i<lengthRead;i++ ) {
-				for(dataTypeNChar x=0; x<charsBuffered; x++ )
-					cerr << buf_[i][x] ;
+				for(dataTypeNChar x=0; x<charsBuffered-1; x++ )
+					cerr << buf_[i][x];
 				cerr << endl;
 			}
 		#endif 
@@ -661,11 +678,11 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	
 	#if  (USE_QS==1)
 		bufQS_.clear();
-		bufQS_[x].shrink_to_fit();
+		bufQS_.shrink_to_fit();
 		outputFilesQS_.clear();
 	#endif
 			
-	dataTypedimAlpha sizeAlpha=0;
+	sizeAlpha=0;
 	for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
 		if (freq[i] > 0) {
 			sizeAlpha++;
