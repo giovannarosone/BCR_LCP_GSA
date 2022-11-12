@@ -38,6 +38,9 @@
 #include <fstream>
 #include <iostream>
 
+//2022-10-28
+#include <algorithm>
+#include "Sorting.h"
 
 class BCRexternalBWT : public SXSI::BWTCollection {
 public:
@@ -76,6 +79,11 @@ public:
 	#endif
 	
 	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
+			
+	#if BUILD_SAP
+		void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+		static bool cmpSapSort (sortElement a,sortElement b);
+	#endif
 	
 private:
 	#if BUILD_BCR_FROM_BCRpartials == 1
