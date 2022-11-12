@@ -119,6 +119,7 @@ typedef unsigned long ulong;
 #define deletePartialLCP 1 
 #define deletePartialGSA 1 
 #define deletePartialQS 1
+#define deletePartialSAP 1 
 #define deleteCycFiles 1
 
 #if FASTQ==1
@@ -161,6 +162,10 @@ typedef unsigned long ulong;
 //if BCR_SET=1 then BCR computes the EBWT (the input is a set) (one can have strings of different length, so BCR uses the symbol TERMINATE_CHAR_LEN) 
 //if BCR_SET=0 then BCR computes the BWT (the input is a single sequence)
 #define BCR_SET 1				
+
+//if BCR_SET_ALN_RH=0 then BCR computes the EBWT (the input is a set) aligning strings left 
+//if BCR_SET_ALN_RH=1 then BCR computes the EBWT (the input is a set) aligning strings right 
+#define BCR_SET_ALN_RH 0
 
 //if BCR_INPUT_IN_MEMORY==1, BCR loads the input file in a string and compute the BWT of the string (it computes the BWT of the reverse string),  
 //if BCR_INPUT_IN_MEMORY==0, BCR reads from files (cyc files)
