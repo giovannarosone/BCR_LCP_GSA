@@ -2656,7 +2656,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					assert(numchar == numcharWrite); // we should always read/write the same number of characters
 				}
 			#endif
-			#if BUILD_SAP==1 && KEEP_SAP_IN_EXT_MEMORY==1
+			#if BUILD_SAP==1
 				numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 				numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
 				assert(numcharSap == numcharWriteSap);
