@@ -5836,7 +5836,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             #if BUILD_LCP==1
                 numcharLCP = fread(bufferLCP,sizeof(dataTypelenSeq),SIZEBUFFER,InFileLCP);
             #endif
-	    #if BUILD_SAP==1 && KEEP_SAP_IN_EXT_MEMORY==1
+	    #if BUILD_SAP==1
 		numcharSAP = fread(bufferSAP,sizeof(uchar),SIZEBUFFER,InFileSAP);
 		assert(numcharSAP == numcharBWT);
 	    #endif
