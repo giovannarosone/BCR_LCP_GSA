@@ -4290,11 +4290,11 @@ int BCRexternalBWT::storeEGSAcomplete( const char* fn ) {
 		#if ( (OUTPUT_FORMAT == 3) || ( (OUTPUT_FORMAT == 5) || (OUTPUT_FORMAT == 6) ) )
 			char *fnBWT = new char[strlen(fn)+100];
 			static FILE *OutFileBWT; 
-			#if (BUILD_SAP == 0)
+			//#if (BUILD_SAP == 0)
 				sprintf (fnBWT,"%s%s",fn,".ebwt");
-			#else
-				sprintf (fnBWT,"%s%s",fn,".rlobwt");
-			#endif
+			//#else
+			//	sprintf (fnBWT,"%s%s",fn,".rlobwt");
+			//#endif
 			OutFileBWT = fopen(fnBWT, "wb");
 			if (OutFileBWT==NULL) {
 				std::cerr << "storeEGSAcomplete: Error opening " << std::endl;
