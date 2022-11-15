@@ -90,7 +90,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	nSeq = 0;
 	lengthTexts = 0;       //Total length of all texts without $-symbols
 	
-	#if FASTQ==0
+	#if KSEQ_PARSER==0
 	
 		std::ifstream infile(input.c_str());
 		
