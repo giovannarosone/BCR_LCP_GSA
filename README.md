@@ -2,8 +2,8 @@ Main author: Giovanna Rosone (giovanna.rosone (at) unipi.it)
 
 # BCR_LCP_GSA
 
-Multi-string eBWT/LCP/GSA(DA/SA) computation
-(Last Updated: December 9th 2019)
+Multi-string BWT (and related data structures) computation
+(Last Updated: November 15th 2022)
 
     BCR is part of:
     BEETL: Burrows-Wheeler Extended Tool Library
@@ -24,16 +24,17 @@ BCR_LCP_GSA can compute at the same time:
 - the generalize suffix array (optional):
     - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i]), set BUILD_DA to 1
     - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
-- the quality score permutation
+- the quality score permutation (see Install)
+- the SAP-array and BWT-RLO (see Install)
     
 of a very large collection of strings **having different or same length** and **any alphabet**. 
 
-The output format can be:
+The output format for eBWT/LCP/GSA(DA/SA) can be:
 - EGSA (OUTPUT_FORMAT must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
 - at most four files: .ebwt, .lcp, .da, posSA (OUTPUT_FORMAT != 1). The end-marker in .bwt file is the symbol '#'
     - if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other
     - if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
-    - if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: ebwt, lcp, da, sa
+    - if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to either 0 or 1.  Order: ebwt, lcp, da, sa
     - if OUTPUT_FORMAT == 3, the output format of BCR is at most 4 files at the same time
     - if OUTPUT_FORMAT == 4, the output format of BCR is at most 3 files (ebwt, da), lcp, sa
     - if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
@@ -55,7 +56,7 @@ You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + siz
 
 
 Default:
-- Build eBWT/QS permutation.
+- Build eBWT permutation
 - Types: uchar for eBWT, uchar (max length of sequences 256) for LCP (BUILD_LCP==1)  
 - Store distinct partial files at the same time: OUTPUT_FORMAT == 3
 
@@ -105,6 +106,11 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
 ./seqtk seq -l100 in.fa > out.fa
 (https://github.com/lh3/seqtk.git)
 ```
+
+If you want to compute the SAP-array along with the multi-string BWT of a string collection implicitly sorted in reverse lexicographical order (BWT-RLO), please compile using
+```sh
+make SAP=1
+```sh
 
 ### Run
 ```sh
@@ -160,7 +166,13 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
     Adaptive reference-free compression of sequence quality scores. 
     Bioinformatics (2014) 30 (1): 24-30, 
     doi: 10.1093/bioinformatics/btt257.
-
+    
+    *** SAP array
+    
+    Anthony J. Cox, Markus J. Bauer, Tobias Jakobi, Giovanna Rosone, 
+    Large-scale compression of genomic sequence databases with the Burrows–Wheeler transform, 
+    Bioinformatics (2012) 28 (11): 1415–1419, 
+    doi: 10.1093/bioinformatics/bts173.
 
 ---
 <small> Supported by the project Italian MIUR-SIR [CMACBioSeq][240fb5f5] ("_Combinatorial methods for analysis and compression of biological sequences_") grant n.~RBSI146R5L. P.I. Giovanna Rosone</small>
