@@ -21,7 +21,7 @@ BCR_LCP_GSA can compute at the same time:
 
 - the (extended) Burrows-Wheeler transform (multi-string BWT)
 - the longest common prefix array (optional, set BUILD_LCP to 1)
-- the generalize suffix array (optional):
+- the generalized suffix array (optional):
     - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i]), set BUILD_DA to 1
     - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
 - the quality score permutation (see Install)
@@ -110,7 +110,7 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
 If you want to compute the SAP-array along with the multi-string BWT of a string collection implicitly sorted in reverse lexicographical order (BWT-RLO), please compile using
 ```sh
 make SAP=1
-```sh
+```
 
 ### Run
 ```sh
