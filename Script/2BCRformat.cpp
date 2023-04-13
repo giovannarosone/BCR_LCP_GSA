@@ -7,7 +7,7 @@
 //
 
 //Computes the BCR partial files starting to another EGSA
-//See output EGSA of Felipe Louze
+//See output EGSA of Felipe Louza
 
 
 #include <stdlib.h>
