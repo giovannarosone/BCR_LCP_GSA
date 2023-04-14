@@ -3193,7 +3193,7 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSymb) {
 	//if (verboseEncode==1)
 	//	std::cerr << "Store nText symbols in the old bwts" << std::endl;
-	dataTypelenSeq maxValueLen = lengthRead+2;
+	dataTypelenSeq maxValueLen = lengthRead+1;
 	vector <dataTypelenSeq> minLCPcur;
 	vector <bool> minLCPcurFound;
 	vector <dataTypelenSeq> minLCPsuc;
