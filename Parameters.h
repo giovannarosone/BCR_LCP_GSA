@@ -56,10 +56,11 @@ typedef unsigned long ulong;
 
 #define dataTypedimAlpha uchar  //size of the alphabet (in biologic case 6 ($,A,C,G,N,T))
 
-/* USE: 0 - below 255 (unsigned char)
- *		1 - between 256 and 65.536 (unsigned short)
- *		2 - between 65.536 and 4.294.967.296 (unsigned int)
- *		3 - otherwise (unsigned long)
+/* For dataTypeLengthSequences USE: 
+ *      0 (unsigned char)  - for read length <= (255-1) 
+ *	1 (unsigned short) - for read length between 256 and (65.536-1)
+ *	2 (unsigned int)   - for read length <= between 65.536 and (4.294.967.296-1) 
+ *	3 (unsigned long)  - for read length <= otherwise 
  */
 
 // Type size for Sequences Length (in biologic case 100)
