@@ -2231,7 +2231,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 						std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
 						std::cerr << "symb=";
 						for (dataTypeNSeq j=0; j<end-start; j++)
-							 std::cerr << vectTriple[start+j].seqN]  <<" ";
+							 std::cerr << vectTriple[start+j].seqN  <<" ";
 						std::cerr << std::endl;
 						std::cerr << "sap=";
 						for (dataTypeNSeq j=0; j<end-start; j++)
