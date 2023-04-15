@@ -58,8 +58,8 @@ typedef unsigned long ulong;
 
 /* For dataTypeLengthSequences USE: 
  *      0 (unsigned char)  - for read length <= (255-1) 
- *	1 (unsigned short) - for read length between 256 and (65.536-1)
- *	2 (unsigned int)   - for read length <= between 65.536 and (4.294.967.296-1) 
+ *	1 (unsigned short) - for read length between 255 and (65.536-1)
+ *	2 (unsigned int)   - for read length <= between 65.535 and (4.294.967.296-1) 
  *	3 (unsigned long)  - for read length <= otherwise 
  */
 
