@@ -2166,7 +2166,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		difWhile = difWhile + difftime (endWhile,startWhile);
 		std::cerr << "Start while " << startWhile << " seconds\n";
 		std::cerr << "End while " << endWhile << " seconds\n";
-		std::cerr << "while (before sortin) tooks " << difWhile << " seconds\n";
+		std::cerr << "while (before sorting) tooks " << difWhile << " seconds\n";
 		difWhile = 0.0;
 		
 		time (&startSorting);
