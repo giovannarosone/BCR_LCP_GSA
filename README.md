@@ -57,11 +57,11 @@ You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + siz
 
 Default:
 - Build eBWT permutation
-- Types: uchar for eBWT, uchar (max length of sequences 256) for LCP (BUILD_LCP==1)  
+- Types: uchar (you have to reserve two characters) for eBWT, uchar (max length of sequences 256-1) for LCP (BUILD_LCP==1)  
 - Store distinct partial files at the same time: OUTPUT_FORMAT == 3
 
 For instance, the data structures LCP and SA depend on the setting of dataTypeLengthSequences/dataTypelenSeq.
-If your dataset contains sequences having a length greater than 256, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
+If your dataset contains sequences having a length greater than 256-1, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
 
 BCR supports the inserting and deleting of new elements belonging to a sequence in the computed data structures. 
 Now, BCR can add the elements of a new string collection in input by starting with the previously computed data structures. 
