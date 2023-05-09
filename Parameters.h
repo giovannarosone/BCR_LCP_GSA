@@ -42,12 +42,10 @@
 
 #define SIZEBUFFER 1024     //Size of the buffer for I/O partial ebwt/LCP/DA/SA
 
-#define TERMINATE_CHAR '#'     //it is the symbol used as "end of strings", it must be lexicographically smaller than all the letters of the alphabet
-#define TERMINATE_CHAR_LEN '$'      //it is stored in cyc files, it is ignored by the algorithm, so it must not belong to the alphabet
+#define ext  ".aux"
 
 #define SIZE_ALPHA 256  
 
-#define ext  ".aux"
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
@@ -55,6 +53,9 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 
 #define dataTypedimAlpha uchar  //size of the alphabet (in biologic case 6 ($,A,C,G,N,T))
+//note that you have to reserve two characters:
+#define TERMINATE_CHAR '$'     //it is the symbol used as "end of strings", it must be lexicographically smaller than all the letters of the alphabet
+#define TERMINATE_CHAR_LEN uchar(255)      //it is stored in cyc files, it is ignored by the algorithm, so it must not belong to the alphabet
 
 /* For dataTypeLengthSequences USE: 
  *      0 (unsigned char)  - for read length <= (255-1) 
