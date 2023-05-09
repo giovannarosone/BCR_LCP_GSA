@@ -293,7 +293,7 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 	for (dataTypedimAlpha z = 0 ; z < SIZE_ALPHA-1; z++)
 		freq[z]=0;
 	freq[SIZE_ALPHA-1]=0;
-	freq[(unsigned int)(TERMINATE_CHAR)]=nSeq;
+	freq[(unsigned int)(TERMINATE_CHAR)]=0;
 
 	//FILE* ifile;
 	//ifile = fopen(input.c_str(), "rb");
@@ -577,7 +577,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 			#else 
 				//align right
 				dataTypelenSeq index=lengthRead-strlen(seq->seq.s);
-				if(index>0)	buf_[index-1][charsBuffered-1] = TERMINATE_CHAR;
+				if(index>0)	
+					buf_[index-1][charsBuffered-1] = TERMINATE_CHAR;
 				for(dataTypelenSeq i=0; i < strlen(seq->seq.s); i++) {				
 					buf_[index+i][charsBuffered-1] = seq->seq.s[i];	
 				}
@@ -681,7 +682,8 @@ bool TransposeFasta::convert( const string& input, char const * fileOutput, cons
 		bufQS_.shrink_to_fit();
 		outputFilesQS_.clear();
 	#endif
-			
+	
+	freq[(unsigned int)(TERMINATE_CHAR)]=nSeq;
 	sizeAlpha=0;
 	for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
 		if (freq[i] > 0) {
