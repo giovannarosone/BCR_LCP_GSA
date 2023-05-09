@@ -3225,12 +3225,12 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	vector <bool> minLCPcurFound;
 	vector <dataTypelenSeq> minLCPsuc;
 	vector <dataTypeNSeq> minLCPsucText;
-    vector <bool> minLCPsucToFind;
+    	vector <bool> minLCPsucToFind;
 	minLCPcur.resize(sizeAlpha);       //for each symbol of the alphabet
 	minLCPcurFound.resize(sizeAlpha);
 	minLCPsuc.resize(sizeAlpha);
 	minLCPsucText.resize(sizeAlpha);
-    minLCPsucToFind.resize(sizeAlpha);
+    	minLCPsucToFind.resize(sizeAlpha);
 
 	//I have found the position where I have to insert the chars in the position t of the each text
 	//Now I have to update the BWT in each file.
@@ -3253,6 +3253,16 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	char *filenameInLCP = new char[120];
 	char *filenameLCP = new char[120];
 	char *filenameIn = new char[100];
+
+	#if BUILD_SAP==1 
+		static FILE *OutFileSap, *InFileSap;                  // output and input file BWT SAP;
+		char *filenameInSap = new char[120];
+		char *filenameOutSap = new char[110];
+		char *filenameSap = new char[100];
+		uchar *bufferSap = new uchar[SIZEBUFFER];
+		dataTypeNChar numcharSap=0;
+		dataTypeNChar numcharWriteSap=0;
+	#endif
 
 	#if USE_QS==1
 		static FILE *OutFileQS, *InFileQS;                  // output and input file BWT QS;
@@ -3391,6 +3401,26 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 				}
 			#endif
 		#endif
+		
+		#if BUILD_SAP==1 
+			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
+			numcharSap=sprintf (filenameInSap,"%s%s",filenameSap,ext);
+			//cerr << "TMP - storeBWTFilePartial: filenameInSap=" << filenameInSap << endl;
+			InFileSap = fopen(filenameInSap, "rb");
+			if (InFileSap==NULL) {
+				std::cerr << "storeBWTFilePartial: In SAP file, j=" << (unsigned int)j <<": Error opening: " << filenameInSap << std::endl;
+				exit (EXIT_FAILURE);
+			}
+			numcharSap=sprintf (filenameOutSap,"new_%s%s",filenameSap,ext);
+			//cerr << "TMP - storeBWTFilePartial: filenameOutSap=" << filenameOutSap << endl;
+			OutFileSap = fopen(filenameOutSap, "wb");
+		
+			if (OutFileSap==NULL) {
+				std::cerr << "storeBWTFilePartial: Out Sap file, j= " << (unsigned int)j <<": Error opening: " << filenameOutSap << std::endl;
+				exit (EXIT_FAILURE);
+			}
+		#endif
+		
 		//For each new symbol in the same pile
 		dataTypeNSeq k=j;
 		dataTypeNChar cont = 0;
@@ -3445,6 +3475,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 							//std::cerr << "In LCP: numchar " << numchar << " numchar " << numcharWrite << " to Read " << toRead << "\n";
 						assert(numchar == numcharWrite); // we should always read/write the same number of characters 
 						
+						#if (BUILD_SAP==1)
+							numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
+							assert(numcharSap == toRead);
+							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
+							assert(numcharSap == numcharWriteSap);
+						#endif
+
 						#if USE_QS==1
 							numcharQS = fread(bufferQS,sizeof(char),toRead,InFileQS);
 							assert(numcharQS == toRead);
@@ -3495,6 +3532,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 						assert(numchar == SIZEBUFFER); // we should always read/write the same number of characters
 						numcharWrite = fwrite (bufferLCP,sizeof(dataTypelenSeq), numchar , OutFileLCP);
 						assert(numchar == numcharWrite); // we should always read/write the same number of characters.
+
+						#if (BUILD_SAP==1)
+							numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
+							assert(numcharSap == SIZEBUFFER);
+							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
+							assert(numcharSap == numcharWriteSap);
+						#endif
 
 						#if USE_QS==1
 							numcharQS = fread(bufferQS,sizeof(char),SIZEBUFFER,InFileQS);
@@ -3598,6 +3642,19 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					#endif
 					tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[k].seqN]]]++;       //update the number of occurrences in BWT of the pileN[k]
 					//std::cerr << "new number write " << numchar << "\n";
+
+					#if BCR_SET_ALN_RH ==1
+						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
+							vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
+							numToRemove++;
+							//vectInsTexts[vectTriple[k].seqN] = 0;
+						}
+					#endif
+					
+					#if BUILD_SAP==1
+						numcharWriteSap = fwrite (&newSymbSAP[k], sizeof(char), 1 , OutFileSap);
+						assert(numcharWriteSap == 1);
+					#endif
 
 					#if USE_QS==1
 						numcharWriteQS = fwrite (&newSymbQS[vectTriple[k].seqN], sizeof(char), 1 , OutFileQS);
@@ -3809,6 +3866,14 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 									vectBWTcurrentPile.push_back ( sucSymbol );  //vectVectBWT[currentPile][eleCurrentPile]			
 								#endif
 								
+								#if BUILD_SAP==1
+									numcharSap = fread(bufferSap,sizeof(uchar),1,InFileSap);
+									assert(numcharSap == 1);
+									numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
+									assert(numcharSap == numcharWriteSap);
+								#endif
+
+								
 								#if USE_QS==1
 									numcharQS = fread(&sucQSSymbol,sizeof(char),1,InFileQS);
 									assert(numcharQS == 1);
@@ -3981,7 +4046,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 
 			//it means that posN[k]<>currentPile, so I have to change BWT-segment
 			//But before, I have to copy the remainder symbols from the old BWT to new BWT
-		while (numchar!=0) {
+		while (numchar!=0) {	
+			#if BUILD_SAP==1
+				numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
+				numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
+				assert(numcharSap == numcharWriteSap);
+			#endif
+
 			#if USE_QS==1
 				numcharQS = fread(bufferQS,sizeof(char),SIZEBUFFER,InFileQS);
 				numcharWriteQS = fwrite (bufferQS, sizeof(char), numcharQS , OutFileQS);
@@ -4111,7 +4182,19 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			if(rename(filenameOutLCP,filenameInLCP))
 				std::cerr << filenameOutLCP <<": Error renaming " << std::endl;
 		
-		
+		#if BUILD_SAP==1
+			fclose(InFileSap);
+			fclose(OutFileSap);
+			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
+			numcharSap=sprintf (filenameInSap,"%s%s",filenameSap,ext);
+			numcharSap=sprintf (filenameOutSap,"new_%s%s",filenameSap,ext);
+			if (remove(filenameInSap)!=0)
+				std::cerr << filenameInSap <<": Error deleting Sap file" << std::endl;
+			else
+				if(rename(filenameOutSap,filenameInSap))
+					std::cerr << filenameOutSap <<": Error renaming Sap file " << std::endl;
+		#endif
+
 		#if USE_QS==1
 			fclose(InFileQS);
 			fclose(OutFileQS);
@@ -4189,6 +4272,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	delete [] filenameInLCP;
 	delete [] filenameLCP;
 	delete [] filenameOutLCP;
+
+	#if BUILD_SAP==1
+		delete [] filenameInSap;
+		delete [] filenameOutSap;
+		delete [] filenameSap;
+		delete [] bufferSap;
+	#endif
 
 	#if USE_QS==1
 		delete [] bufferQS;
