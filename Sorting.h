@@ -49,6 +49,10 @@
 		~sortElement() {};
 		dataTypedimAlpha pileN;
 		dataTypedimAlpha sap;
+		#if BUILD_LCP == 1
+			dataTypelenSeq lcpCurN;
+			dataTypelenSeq lcpSucN;
+		#endif
 		dataTypeNSeq seqN;
 		dataTypeNChar posN;
 		};
