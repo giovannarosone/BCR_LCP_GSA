@@ -2185,9 +2185,9 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	quickSort(vectTriple);
 
 	#if BCR_SET_ALN_RH ==1
-		vectTriple.erase (vectTriple.begin() + (vectTriple.size() - numEndstrings) , vectTriple.end());
-		nExamedTexts -= numEndstrings;
-		numEndstrings=0;
+		vectTriple.erase (vectTriple.begin() + (vectTriple.size() - numToRemove) , vectTriple.end());
+		nExamedTexts -= numToRemove;
+		numToRemove=0;
 	#endif
 		
 	#if verboseEncode==1
@@ -2636,7 +2636,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					#if BCR_SET_ALN_RH ==1
 						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
 							vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
-							numEndstrings++;
+							numToRemove++;
 							//vectInsTexts[vectTriple[k].seqN] = 0;
 						}
 					#endif
