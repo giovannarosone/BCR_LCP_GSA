@@ -86,6 +86,10 @@ public:
 	#endif
 	
 private:
+	#if BCR_SET_ALN_RH ==1
+		dataTypeNSeq numToRemove=0;
+	#endif
+	
 	#if BUILD_BCR_FROM_BCRpartials == 1
 		dataTypeNChar readPreviousBCR(string);
 	#endif
