@@ -653,6 +653,14 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			std::cerr << (unsigned int)SIZE_ALPHA-1 << " " << SIZE_ALPHA-1 << " " << freq[SIZE_ALPHA-1] << " " << (unsigned int)alpha[SIZE_ALPHA-1] << "\n";
     }
 	
+	if (freq[(unsigned int)(TERMINATE_CHAR_LEN)] > 0) {
+		std::cerr << "The input file contains the symbol (TERMINATE_CHAR_LEN)" << TERMINATE_CHAR_LEN << ". Change TERMINATE_CHAR_LEN (see Parameters.h)" <<std::endl;
+		exit (EXIT_FAILURE);
+	}
+	if (freq[(unsigned int)(TERMINATE_CHAR)] > nText) {
+		std::cerr << "The input file contains the symbol (TERMINATE_CHAR)" << TERMINATE_CHAR << ". Change TERMINATE_CHAR (see Parameters.h)" <<std::endl;
+		exit (EXIT_FAILURE);
+	}
 	
 	tableOcc = new dataTypeNChar*[sizeAlpha];
 	//Counting for each pile, es. $-pile, A-pile, C-pile, G-pile, N-pile, T-pile
@@ -2016,7 +2024,9 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	dataTypeNSeq j = 0;
 	//Insert the symbols belonging to old strings
 	while (j < nExamedTexts) {
-		//std::cerr << "+++j= " << j << " vectInsTexts[j]= " << vectInsTexts[j] << " newSymb[j]= " << newSymb[j]  << std::endl;
+		//std::cerr << "+++j= " << j << " vectTriple[j].seqN= " << vectTriple[j].seqN << " vectTriple[j].pileN= " <<  (unsigned int)vectTriple[j].pileN  ;
+		//std::cerr << " vectInsTexts[j]= " << vectInsTexts[j] << " newSymb[j]= " << newSymb[j]  << std::endl;
+
 		//if ((vectInsTexts[j]==0) && (newSymb[j] == TERMINATE_CHAR_LEN))  //nothing to do
 		#if (BCR_SET==1)
 			if ((vectInsTexts[vectTriple[j].seqN]==1) && (newSymb[vectTriple[j].seqN] != TERMINATE_CHAR_LEN)) { //The new symbol have to be inserted in some y-pile with y>0
@@ -2174,6 +2184,12 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	
 	quickSort(vectTriple);
 
+	#if BCR_SET_ALN_RH ==1
+		vectTriple.erase (vectTriple.begin() + (vectTriple.size() - numEndstrings) , vectTriple.end());
+		nExamedTexts -= numEndstrings;
+		numEndstrings=0;
+	#endif
+		
 	#if verboseEncode==1
 		time (&endSorting);
 		difSorting = difSorting + difftime (endSorting,startSorting);
@@ -2256,7 +2272,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			if (vectInsTexts[g]==1)
 				std::cerr << newSymb[g] << " ";
 		std::cerr << std::endl;
-		std::cerr << "After Sorting" << std::endl;
+		std::cerr << "After Sorting - Triples" << std::endl;
 		std::cerr << "Q  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << (unsigned int)vectTriple[g].pileN << " ";
@@ -2322,6 +2338,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				std::cerr << tableOcc[j][h] << " ";
 			std::cerr << std::endl;
 		}
+		std::cerr << "Triples at the end of the current iteration:" << std::endl;
 
 		std::cerr << "Q  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
@@ -2514,8 +2531,9 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 
 		   #if (BCR_SET==1)
-			if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
-    	   #endif
+			//if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {    //Added check vectInsTexts
+			if ((vectInsTexts[vectTriple[k].seqN]==1) && (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)) {
+    	   	   #endif
 				//if (verboseEncode==1)
 				 //   std::cerr << "k= " << k << " Q[k]= " << (unsigned int)vectTriple[k].pileN << " P[k]= " << vectTriple[k].posN << " cont = "<< cont << std::endl;
 				//So I have to read the k-BWT and I have to count the number of the symbols up to the position posN.
@@ -2615,6 +2633,15 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					//update the number of occurrences in BWT of the pileN[k]
 					tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[k].seqN]]]++;       
 
+					#if BCR_SET_ALN_RH ==1
+						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
+							vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
+							numEndstrings++;
+							//vectInsTexts[vectTriple[k].seqN] = 0;
+						}
+					#endif
+
+					
 					#if BUILD_SAP==1
 						numcharWriteSap = fwrite (&newSymbSAP[k], sizeof(char), 1 , OutFileSap);
 						assert(numcharWriteSap == 1);
