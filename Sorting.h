@@ -41,7 +41,11 @@
 		//struct __attribute__((__packed__)) sortElement {
 		struct sortElement {	
 		sortElement() {};
-		sortElement( dataTypedimAlpha z, dataTypedimAlpha sap_value, dataTypeNChar x,dataTypeNSeq y) { pileN = z; sap = sap_value; posN = x; seqN = y;};
+		#if BUILD_LCP == 0
+			sortElement( dataTypedimAlpha z, dataTypedimAlpha sap_value, dataTypeNChar x,dataTypeNSeq y) { pileN = z; sap = sap_value; posN = x; seqN = y;};
+		#else
+			sortElement( dataTypedimAlpha z, dataTypedimAlpha sap_value, dataTypeNChar x,dataTypeNSeq y, dataTypelenSeq l1, dataTypelenSeq l2) { pileN = z; sap = sap_value; posN = x; seqN = y; lcpCurN = l1; lcpSucN = l2; };
+		#endif	
 		~sortElement() {};
 		dataTypedimAlpha pileN;
 		dataTypedimAlpha sap;
