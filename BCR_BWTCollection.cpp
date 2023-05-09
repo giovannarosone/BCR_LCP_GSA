@@ -37,6 +37,7 @@
 #include "Timer.hh"
 #include <stdio.h>
 #include <math.h> 
+#include <fstream>
 
 using std::cout;
 using std::endl;
@@ -67,9 +68,19 @@ int main(int argc, char *argv[])
     
 	
 	std::cout << "BWTCollection: The input is " << argv[1] << std::endl;
+	ifstream f(argv[1]);
+    	if (f.good() == 0) {
+		std::cerr  << argv[1] << " does not exist." << std::endl;
+        	exit(1);
+	} 
 	std::cout << "BWTCollection: The output is " << argv[2] << std::endl;
 	#if BUILD_BCR_FROM_BCRpartials==1
 		std::cout << "BWTCollection: inputPrevBCR is set to " << inputPrevBCR << std::endl;
+		ifstream f2(argv[2]);
+		if (f2.good() == 0) {
+			std::cerr  << argv[2] << " does not exist." << std::endl;
+			exit(1);
+		} 
 	#endif
 
 
