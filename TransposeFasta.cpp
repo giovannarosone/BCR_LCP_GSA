@@ -133,7 +133,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 			{
 
 				#if BCR_FROMCYC==1
-					for (dataTypelenSeq z = 0 ; z < strlen(bufChar); z++)
+					for (dataTypelenSeq z = 0 ; z < bufChar.length(); z++)
 						freq[(unsigned int)(bufChar[z])]=1;
 				#endif
 
@@ -732,7 +732,7 @@ bool TransposeFasta::convertFromCycFile(const string& input, char const * fileOu
 	//for alpha[SIZE_ALPHA] -->Corresponding between the alphabet, the piles and tableOcc
 	//and to know sizeAlpha
 
-	lengthTexts = lengthRead * nSeq;
+	//lengthTexts = lengthRead * nSeq;
 	
 		dataTypedimAlpha sizeAlpha=0;
 	for (dataTypedimAlpha i = 0; i < SIZE_ALPHA-1; ++i)
