@@ -88,6 +88,7 @@ public:
 private:
 	#if BCR_SET_ALN_RH ==1
 		dataTypeNSeq numToRemove=0;
+		dataTypeNSeq contToRemove=0;
 	#endif
 	
 	#if BUILD_BCR_FROM_BCRpartials == 1
