@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
         if(BCR_FROMCYC==0 )
             std::cout << " and builds the cyc files" << endl;
         else
-            std::cout << " and uses pre-computed cyc files" << endl;
+            std::cout << " and using pre-computed cyc files" << endl;
     #else
         std::cout << "\t\tin internal memory (no cyc files)" << endl;
     #endif
