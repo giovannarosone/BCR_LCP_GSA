@@ -283,7 +283,7 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsIntMem(dataTypedimAlpha currentPile
 	//		std::cerr << "rankManySymbolsIntMem: WARNING --> Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;		
 	//#else   //RIGHT ALIGN
 	//	std::cerr << ""rankManySymbolsIntMem: Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;
-	#endif
+	//#endif
 
 
 	
