@@ -242,6 +242,13 @@ int main(int argc, char *argv[])
         std::cout << "\t\tAlternate lexicographic order" << endl;
     #endif
 
+    std::cout << "\tStrings order:\n";
+    #if BUILD_SAP == 0
+        std::cout << "\t\tInput order" << endl;
+    #else
+        std::cout << "\t\tReverse lexicographic order" << endl;
+    #endif
+	
     std::cout << "\tEBWT computation (.ebwt file)" << endl;
 
     #if (BUILD_LCP==1)
@@ -264,6 +271,10 @@ int main(int argc, char *argv[])
         std::cout << "\t\ttogether QS permutation" << endl;
     #endif
 
+    #if BUILD_SAP == 1
+        std::cout << "\t\ttogether SAP array" << endl;	
+    #endif
+	
     std::cout << "\tBWT partial:\n";
     #if  KEEP_eBWT_IN_EXT_MEMORY == 1    //BCR uses the internal memory for the BWT partial
         std::cout << "\t\tin external memory" << endl;
