@@ -70,108 +70,19 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, string BCRprefPrev
 		//	}
 		//const char * fileOut = "cycFiles/cyc.\0";
 		
-		const char * fileOut = "cyc.\0";
-		time_t start,end;
+	const char * fileOut = "cyc.\0";
+	time_t start,end;
         double dif;
         time (&start);
 	
-		if ( (BCR_SET!=1) && (BCR_SET_ALN_RH) && (BUILD_BCR_FROM_BCRpartials!=0) && (BUILD_BCR_ALTERNATE!=0) && (BUILD_LCP!=1) )
-		{
-			std::cerr << "Error! The input is a set. BCR_SET must be set to 1, BUILD_BCR_FROM_BCRpartials must be set to 0, BUILD_BCR_ALTERNATE must be set to 1  (see Parameters.h).\n";
-			exit (EXIT_FAILURE);
-		}
-		
-		if(BCR_SET_ALN_RH!=1 && BUILD_SAP )
-		{
-			std::cerr << "Error! BUILD_SAP works if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
-			exit (EXIT_FAILURE);
-		}
-	
-		if (BUILD_LCP==0)
-			std::cout << "Compute the EBWT\n";
-		else
-			std::cout << "Compute the EBWT and the LCP (ebwt and lcp files)\n";
-
-		#if ( (USE_QS==1) &&  (FASTQ==0) )
-			std::cout << "The title of the quality score file must start with '{'. Please use the script\n";
-		#endif
-		
-		if (BUILD_SA==1)
-			std::cout << "Compute also the SA, i.e. positions in the sequence, so they go from 0 to sequence length (posSA file)\n";
-		
-		if (BUILD_DA==1)
-			std::cout << "Compute also the DA, i.e. ID/Colour of the sequence (DA file)\n";
-		
-		if (BUILD_DA_bit==1) {
-			std::cout << "Compute also the DA (bit vector) of the sets, i.e. ID/Colour of two sets (bitDA file)\n";
-		}
-		
-		if (OUTPUT_FORMAT==0) {
-			std::cout << "The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, ebwt.qs) - built one after the other.\n";
-		}
-		
-		if (OUTPUT_FORMAT==1) {
-			if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) )
-				std::cout << "The output format of BCR is as the output of eGSA.\n";
-			else {
-				std::cerr << "Error! The output format of BCR is as the output of EGSA. BUILD_LCP and BUILD_SA and BUILD_DA must be set to 1 (see Parameters.h).\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-
-		if (OUTPUT_FORMAT==2) {
-			if ((BUILD_LCP==1) )
-				std::cout << "The output format of BCR is a unique file .egsa. Order: bwt, lcp, da, sa.\n";
-			else {
-				std::cout << "Error! The output format of BCR is a unique file .egsa (we do not use a struct). BUILD_LCP must be set to 1  (see Parameters.h), BUILD_DA and BUILD_SA could be set to a either 0 or 1.  Order: bwt, lcp, da, sa.\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-
-		if (OUTPUT_FORMAT==3) {
-			if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (BUILD_SAP==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
-				std::cout << "The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, SAP-array) at the same time.\n";
-			else {
-				std::cout << "Error! The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time\n";
-				std::cout << " BUILD_LCP or BUILD_DA==1 or BUILD_SA==1 or KEEP_eBWT_IN_EXT_MEMORY must be 1 (see Parameters.h).\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-		
-		if (OUTPUT_FORMAT==4) {
-			if (BUILD_DA==1) 
-				std::cout << "The output format of BCR is at most 3 files (ebwt, da), lcp, sa.\n";
-			else {
-				std::cout << "Error! The output format of BCR is at most 3 files (ebwt, da), lcp, sa. BUILD_DA must be set to 1 (see Parameters.h).\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-		
-		if (OUTPUT_FORMAT==5) {
-			if ( (BUILD_DA==1) && (BUILD_LCP==1) )
-				std::cout << "The output format of BCR is at most 3 files ebwt, (lcp, da), sa.\n";
-			else {
-				std::cout << "Error! The output format of BCR is at most 3 files ebwt, (lcp, da), sa. BUILD_DA and BUILD_LCP must be set to 1 (see Parameters.h).\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-		
-		if (OUTPUT_FORMAT==6) {
-			if ( (BUILD_DA==1) && (BUILD_SA==1) )
-				std::cout << "The output format of BCR is at most 3 files ebwt), lcp, (sa, da).\n";
-			else {
-				std::cout << "Error! The output format of BCR is at most 3 files ebwt, lcp, (sa, da). BUILD_DA and BUILD_SA must be set to 1 (see Parameters.h).\n";
-				exit (EXIT_FAILURE);
-			}
-		}
-
-		int result = -1;
-		result = buildBCR(file1, fileOutput, fileOut, BCRprefPrev);
-			//BCR_SET == 0
-          //For a sequence, we read the file one symbol at time
-          //we assume that the input file is the inverse file
-		  //result = buildBCR(file1, fileOutput, fileOut, ramAvailable,BCRprefPrev);
-		assert (result != '1');
+	int result = -1;
+	result = buildBCR(file1, fileOutput, fileOut, BCRprefPrev);
+	//BCR_SET == 0
+        
+	//For a sequence, we read the file one symbol at time
+        //we assume that the input file is the inverse file
+	//result = buildBCR(file1, fileOutput, fileOut, ramAvailable,BCRprefPrev);
+	assert (result != '1');
 
 		//Separated output built in sequential way
 		#if OUTPUT_FORMAT == 0
@@ -324,9 +235,12 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsFilePartial(FILE & InFileBWT, dataT
 			assert(numchar == toRead); // we should always read/write the same number of characters
 			*foundSymbol = buffer[numchar-1];     //The symbol of the sequence k.  It is the symbol in the last position in the partial BWT that we have read.
 
-			if (*foundSymbol == TERMINATE_CHAR) {
-				std::cerr << "--> Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;
-			}
+			//#if BCR_SET_ALN_RH ==0    //LEFT ALIGN
+			//	if (*foundSymbol == TERMINATE_CHAR)
+			//		std::cerr << "rankManySymbolsFilePartial: WARNING --> Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;			
+				//#else   //RIGHT ALIGN
+				//	std::cerr << "--> Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;
+			//#endif	
 		}
 		else {   //Read sizebuffer characters
 			numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,&InFileBWT);
@@ -364,6 +278,15 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsIntMem(dataTypedimAlpha currentPile
 
 	*foundSymbol = vectVectBWT[currentPile][alreadyRead+toRead-1];     //The symbol of the sequence k.  It is the symbol in the last position in the partial BWT that we have read.
 
+	//#if BCR_SET_ALN_RH ==0    //LEFT ALIGN
+	//	if (*foundSymbol == TERMINATE_CHAR)
+	//		std::cerr << "rankManySymbolsIntMem: WARNING --> Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;		
+	//#else   //RIGHT ALIGN
+	//	std::cerr << ""rankManySymbolsIntMem: Rank toRead=" << (unsigned int)toRead << " foundSymbol= " << (unsigned int)(*foundSymbol) << std::endl;
+	#endif
+
+
+	
 	return toRead;
 }
 #endif
@@ -372,84 +295,6 @@ dataTypeNChar BCRexternalBWT::rankManySymbolsIntMem(dataTypedimAlpha currentPile
 
 int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char const * fileOut, string filenameBCRprefPrev)
 {
-	#if  KEEP_eBWT_IN_EXT_MEMORY == 1    //BCR uses the internal memory for the BWT partial
-		std::cout << "BCR uses the external memory for the BWT partial" << endl;
-	#else
-		std::cout << "BCR uses the internal memory for the BWT partial" << endl;
-	#endif
-	
-	#if BUILD_BCR_FROM_BCRpartials==1
-		std::cerr << "WARNING!: BUILD_BCR_FROM_BCRpartials==1 The types must be equal to previous BCR partial files (see BUILD_BCR_FROM_BCRpartials in Parameters.h)" << endl;
-	#endif
-
-	#if ( FASTQ==1) 
-		if (USE_QS==0) {
-			std::cerr << "Error: if FASTQ==1 then USE_QS==1 (see USE_QS in Tools.h)" << endl;
-			exit (EXIT_FAILURE);
-		}
-	#endif
-
-	#if BCR_SET == 0        //Build BCR for 1 sequence
-		std::cout << "BCR of 1 sequence" << endl;
-
-		if ( (BUILD_DA_bit == 1) || (BUILD_DA == 1)  )  {
-			std::cout << "Error! Since BCR_SET == 0, then BUILD_DA or BUILD_DA_bit must be set to 0 (see Parameters.h).\n";
-			exit (EXIT_FAILURE);
-		}
-		
-		#if BCR_FROMCYC==1
-			std::cerr << "Error: BCR_FROMCYC==1 (cyc files in input) is not implemented! (see BCR_FROMCYC in Parameters.h)" << endl;
-			exit (EXIT_FAILURE);
-		#endif
-		
-		#if USE_QS==1
-			std::cerr << "Error: USE_QS==1 (quality score is not implemented! (see USE_QS in Tools.h)" << endl;
-			exit (EXIT_FAILURE);
-		#endif
-		    
-
-		#if BUILD_BCR_FROM_BCRpartials==1
-			std::cerr << "Error: BUILD_BCR_FROM_BCRpartials==1 is not implemented! (see BUILD_BCR_FROM_BCRpartials in Parameters.h)" << endl;
-			exit (EXIT_FAILURE);
-		#endif
-
-		#if BCR_FROMCYC==1
-			std::cerr << "Error: BCR_FROMCYC==1 is not implemented! (see BCR_FROMCYC in Parameters.h)" << endl;
-			exit (EXIT_FAILURE);
-		#endif
-
-		#if BCR_INPUT_IN_MEMORY==1  	// BCR reads from string
-			std::cout << "loads the input file in a string and compute the BWT of the string." << std::endl;
-		#else 							// BCR reads from file
-			std::cout << "reads from file and computes the BWT of the reverse string." << std::endl;
-		#endif
-	#else
-		std::cout << "BCR of multi-sequences" << endl;
-		#if BCR_INPUT_IN_MEMORY==1  	// BCR reads from string
-			std::cout << "Error BCR_SET == 0, so that BCR_INPUT_IN_MEMORY must be 0." << std::endl;
-			exit (EXIT_FAILURE);
-		#endif
-	#endif
-	
-	#if BUILD_BCR_ALTERNATE == 0
-		std::cout << "Lexicographic order" << endl;
-	#else
-		std::cout << "Alternate lexicographic order" << endl;
-	#endif
-	
-	#if USE_QS == 1
-		std::cout << "Computes QS permutation" << endl;
-	#endif
-    
-    std::cout << "dataTypedimAlpha: sizeof(type size of alpha): " << sizeof(dataTypedimAlpha) << " bytes \n";
-    std::cout << "dataTypelenSeq: sizeof(type of seq length): " << sizeof(dataTypelenSeq) << " bytes \n";
-    std::cout << "dataTypeNSeq: sizeof(type of #sequences): " << sizeof(dataTypeNSeq) << " bytes\n";
-    std::cout << "dataTypeNChar: sizeof(type of #sequences): " << sizeof(dataTypeNChar) << " bytes\n";
-    
-    #if OUTPUT_linear_SuffixArray ==  1
-        std::cerr << "dataTypeNChar: sizeof(type of #characters): " << sizeof(dataTypeNChar) << "\n";
-    #endif
-
 	//std::cerr << "Build BCR before of transpose\n";
 	Timer timer;
 	cerr << "TIMER start buildBCR " << timer<< endl;
@@ -473,7 +318,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	#else
 		#if BCR_FROMCYC==0
 			//Build the cyc files
-			cout << "\nBuilds " << fileOut << " files and the builds the BCR " << endl;
+			//cout << "\nBuilds " << fileOut << " files and the builds the BCR " << endl;
 			res = trasp.convert( file1, fileOutput, fileOut, sizeof(sortElement)+1, filenameBCRprefPrev);
 
 			if (res == false) {  //Error in the reading
@@ -505,7 +350,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 
 		#else
 			//cyc files in input
-			cout << "Builds the BCR (no compute cyc files)" << endl;
+			//cout << "Builds the BCR (no compute cyc files)" << endl;
 			res = false;
 			res = trasp.convertFromCycFile(file1, fileOutput, filenameBCRprefPrev);
 			if (res == false) {  //Error in the reading
@@ -2029,7 +1874,12 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 
 		//if ((vectInsTexts[j]==0) && (newSymb[j] == TERMINATE_CHAR_LEN))  //nothing to do
 		#if (BCR_SET==1)
-			if ((vectInsTexts[vectTriple[j].seqN]==1) && (newSymb[vectTriple[j].seqN] != TERMINATE_CHAR_LEN)) { //The new symbol have to be inserted in some y-pile with y>0
+			//The new symbol have to be inserted in some y-pile with y>0
+			#if BCR_SET_ALN_RH == 0 //left alignment
+				if ((vectInsTexts[vectTriple[j].seqN]==1) && (newSymb[vectTriple[j].seqN] != TERMINATE_CHAR_LEN)) { 
+			#else
+				if ((vectInsTexts[vectTriple[j].seqN]==1) || (newSymb[vectTriple[j].seqN] != TERMINATE_CHAR_LEN)) { 
+			#endif
 		#else
 			if (vectInsTexts[vectTriple[j].seqN]==1) { //The new symbol have to be inserted in some y-pile with y>0
 		#endif
@@ -2118,6 +1968,17 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 						if( !sapInterval && vectTriple[k].sap == 1 )
 							sapInterval=true;	
 					#endif
+
+					#if BCR_SET_ALN_RH ==1
+						if (foundSymbol == TERMINATE_CHAR)  {
+							// We no longer have to enter string symbols, now pilaN is a dummy symbol
+							numToRemove++;
+							vectTriple[k].posN = 0;
+							vectTriple[k].pileN=TERMINATE_CHAR_LEN;
+							vectInsTexts[vectTriple[k].seqN] = 0;	
+						}
+					#endif
+
 				k++;
 			}
 
@@ -2187,7 +2048,12 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	#if BCR_SET_ALN_RH ==1
 		vectTriple.erase (vectTriple.begin() + (vectTriple.size() - numToRemove) , vectTriple.end());
 		nExamedTexts -= numToRemove;
+		//if (contToRemove !=numToRemove) {
+		//	std::cerr << "ERROR - posSymb= " << (int)posSymb << " contToRemove= " << contToRemove << " numToRemove= " << numToRemove << endl;			
+		//}
+		assert(contToRemove ==numToRemove);
 		numToRemove=0;
+		contToRemove=0;
 	#endif
 		
 	#if verboseEncode==1
@@ -2635,9 +2501,10 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 					#if BCR_SET_ALN_RH ==1
 						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
-							vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
-							numToRemove++;
+							//vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
+							//numToRemove++;
 							//vectInsTexts[vectTriple[k].seqN] = 0;
+							contToRemove++;
 						}
 					#endif
 
@@ -2838,7 +2705,8 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 		dataTypeNChar numcharGSA=0;
 		dataTypeNChar toReadpairSA=0, contGSA=0;		
 	#endif
-	
+
+	std::cerr << "storeBWTIntMem: posSymb= " << (int)posSymb << std::endl;
 	
 	dataTypeNSeq j=0;
 	dataTypedimAlpha currentPile=vectTriple[0].pileN;
@@ -3022,6 +2890,13 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 					cont++;
 					//toRead--;
 					tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[k].seqN]]]++;   
+
+					#if BCR_SET_ALN_RH ==1
+						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
+							contToRemove++;
+						}
+					#endif					
+
 				}
 				
 				#if ( (BUILD_DA==1) || (BUILD_SA==1) || (USE_QS==1) )
@@ -3091,7 +2966,7 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 				if (numcharDA > 0) {
 					numcharWriteDA = fwrite (bufferDA, sizeof(dataTypeNSeq), numcharDA , OutFileDA);
 				}
-				std::cerr << numcharDA << " " << numcharWriteDA << "\n";
+				//std::cerr << numcharDA << " " << numcharWriteDA << "\n";
 				assert(numcharDA == numcharWriteDA);
 			}
 		#endif
@@ -3103,7 +2978,7 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 				if (numcharSA > 0) {
 					numcharWriteSA = fwrite (bufferSA, sizeof(dataTypelenSeq), numcharSA , OutFileSA);
 				}
-				std::cerr << numcharSA << " " << numcharWriteSA << "\n";
+				//std::cerr << numcharSA << " " << numcharWriteSA << "\n";
 				assert(numcharSA == numcharWriteSA);
 			}
 		#endif
@@ -3144,10 +3019,10 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 					if (OutFileQS!=NULL) { //If it exists
 						fclose(OutFileQS);
 						if (remove(filenameInQS)!=0)
-							std::cerr << filenameInQS <<": Error deleting QS file" << std::endl;
+							std::cerr << "storeBWTIntMem: " << filenameInQS <<": Error deleting QS file" << std::endl;
 						else
 							if(rename(filenameOutQS,filenameInQS))
-								std::cerr << filenameOutQS <<": Error renaming QS file " << std::endl;
+								std::cerr << "storeBWTIntMem: " << filenameOutQS <<": Error renaming QS file " << std::endl;
 					}
 				#endif
 				
@@ -3160,10 +3035,10 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 					if (OutFileDA!=NULL) { //If it exists
 						fclose(OutFileDA);
 						if (remove(filenameInDA)!=0)
-							std::cerr << filenameInDA <<": Error deleting DA file" << std::endl;
+							std::cerr << "storeBWTIntMem: " << filenameInDA <<": Error deleting DA file" << std::endl;
 						else
 							if(rename(filenameOutDA,filenameInDA))
-								std::cerr << filenameOutDA <<": Error renaming DA file " << std::endl;
+								std::cerr << "storeBWTIntMem: " << filenameOutDA <<": Error renaming DA file " << std::endl;
 					}
 				#endif					
 				#if (BUILD_SA==1) 
@@ -3175,16 +3050,21 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 					if (OutFileSA!=NULL) { //If it exists
 						fclose(OutFileSA);
 						if (remove(filenameInSA)!=0)
-							std::cerr << filenameInSA <<": Error deleting SA file" << std::endl;
+							std::cerr << "storeBWTIntMem: " << filenameInSA <<": Error deleting SA file" << std::endl;
 						else
 							if(rename(filenameOutSA,filenameInSA))
-								std::cerr << filenameOutSA <<": Error renaming SA file " << std::endl;
+								std::cerr << "storeBWTIntMem: " << filenameOutSA <<": Error renaming SA file " << std::endl;
 					}
 				#endif
 			}
 		#endif
 		
 	}
+
+	std::cerr << "storeBWTIntMem - Size partial BWT vector in this iteration:" << std::endl;
+	for (dataTypedimAlpha g=0; g<sizeAlpha; g++)
+		std::cerr << "vectVectBWT[" << (int)g << "]:" << vectVectBWT[g].size() << std::endl;
+
 	
 	#if USE_QS==1
 		delete [] filenameInQS;
@@ -3645,7 +3525,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 
 					#if BCR_SET_ALN_RH ==1
 						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
-							vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
+							//vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
 							numToRemove++;
 							//vectInsTexts[vectTriple[k].seqN] = 0;
 						}
@@ -4001,7 +3881,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 				//}
 
 			    if (verboseEncode==1) {
-				    std::cerr << "\nFine inserimento del simbolo= " << newSymb[vectTriple[k].seqN] << " della sequenza " << vectTriple[k].seqN << std::endl;
+				    std::cerr << "\nEnd of symbol insertion= " << newSymb[vectTriple[k].seqN] << " della sequenza " << vectTriple[k].seqN << std::endl;
                     std::cerr << std::endl;
 					std::cerr << "Q  ";
 					for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
@@ -4506,7 +4386,7 @@ int BCRexternalBWT::storeEGSAcomplete( const char* fn ) {
 			sprintf (filenameInQS,"%s%s",filenameQS,ext);
 			InFileBWTQS = fopen(filenameInQS, "rb");
 			if (InFileBWTQS==NULL) {
-				std::cerr << "BWT QS file " << (unsigned int)g <<": Error opening " << std::endl;
+				std::cerr << "storeEGSAcomplete: BWT QS file " << (unsigned int)g <<": Error opening " << std::endl;
 				exit (EXIT_FAILURE);
 			}
 		#endif
