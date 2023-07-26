@@ -641,13 +641,13 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	delete [] filenameOutSAP;
 	delete [] filenameSAP;	
      #endif
-				
-	time (&endTranpose);
+	
+    time (&endTranpose);
     difTranspose = difftime (endTranpose,startTranspose);
 
 	///////////////////////
     
-	std::cerr << "\nStart Preprocessing " << startTranspose << " seconds\n";
+    std::cerr << "\nStart Preprocessing " << startTranspose << " seconds\n";
     std::cerr << "End   Preprocessing " << endTranpose << " seconds\n";
     std::cerr << "Preprocessing tooks " << difTranspose << " seconds\n";
 	
@@ -868,7 +868,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
     #if BUILD_BCR_FROM_BCRpartials==1
 		time_t startPreviousBCR, endPreviousBCR;
 		time (&startPreviousBCR);
-        dataTypeNChar numAddedSymb = readPreviousBCR(filenameBCRprefPrev);
+		dataTypeNChar numAddedSymb = readPreviousBCR(filenameBCRprefPrev);
 		time (&endPreviousBCR);
 		std::cerr << "readPreviousBCR tooks " << difftime (endPreviousBCR,startPreviousBCR) << " seconds\n";
     #endif
@@ -1105,7 +1105,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
     
 	
 
-    #if verboseEncode==1
+    #if verboseEncode==1 || KEEP_eBWT_IN_EXT_MEMORY == 0
         std::cerr << "\n"<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead - 1<< "\n";
     #endif
     InsertFirstsymbols(newSymb);
@@ -1125,7 +1125,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		
 	//maxLengthRead-2
 	for (dataTypelenSeq t = lengthRead-2 ; t > 0; t--) {
-		#if verboseEncode==1
+		#if verboseEncode==1 || KEEP_eBWT_IN_EXT_MEMORY == 0
 			std::cerr << "\n"<< "j= "<< (long) lengthRead - t - 1 <<" - symbols in position " << (long) t << "\n";
 		#endif
 		
@@ -1222,7 +1222,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#endif
 	}
 
-	#if verboseEncode==1
+	#if verboseEncode==1 || KEEP_eBWT_IN_EXT_MEMORY == 0
 		//The last inserted symbol is in position 1 (or it is newSymb[j]),
 		//the next symbol (to insert) is in position 0
 		std::cerr << "\n"<< "j= "<< (long) lengthRead - 1 <<" - symbols in position " << 0 << "\n";
@@ -1279,7 +1279,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 
 
   	//the next symbol (to insert) is in position m-1, that is, I have to insert the symbols $
-	#if verboseEncode==1
+	#if verboseEncode==1 || KEEP_eBWT_IN_EXT_MEMORY == 0
     		std::cerr << "\n"<< "j= "<< (long) lengthRead <<" - symbols in position " << (long) lengthRead  << ". Inserting $=" << (unsigned int)TERMINATE_CHAR << "=" << TERMINATE_CHAR << " symbol\n\n";
     		//cout << "Starting iteration " << (long) lengthRead << ", time now: " << timer.timeNow();
     		//cout << "Starting iteration " << (long) lengthRead << ", usage: " << timer << endl;
@@ -2786,7 +2786,7 @@ void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSym
 		**/
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 		   #if (BCR_SET==1)
-			if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
+			if ((vectInsTexts[vectTriple[k].seqN]==1) && (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)) {	  
 		   #endif
 				//As PosN starts to the position 1 and I have to insert the new symbol in position posN[k]
 				// I have to read posN[k]-1 symbols
@@ -3204,13 +3204,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			numchar=sprintf (filenameIn,"%s%s",filename,ext);
 			InFileBWT = fopen(filenameIn, "rb");
 			if (InFileBWT==NULL) {
-				std::cerr << "In BWT file " << (unsigned int)j <<": Error opening: " << filenameIn << std::endl;
+				std::cerr << "storeBWTandLCP: In BWT file " << (unsigned int)j <<": Error opening: " << filenameIn << std::endl;
 				exit (EXIT_FAILURE);
 			}
 			numchar=sprintf (filenameOut,"new_%s%s",filename,ext);
 			OutFileBWT = fopen(filenameOut, "wb");
 			if (OutFileBWT==NULL) {
-					std::cerr << "Out BWT file " << (unsigned int)j <<": Error opening: " << filenameOut << std::endl;
+					std::cerr << "storeBWTandLCP: Out BWT file " << (unsigned int)j <<": Error opening: " << filenameOut << std::endl;
 					exit (EXIT_FAILURE);
 			}
 		#else
@@ -3223,13 +3223,13 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 		numchar=sprintf (filenameInLCP,"%s%s",filenameLCP,ext);
 		InFileLCP = fopen(filenameInLCP, "rb");
 		if (InFileLCP==NULL) {
-			std::cerr << "In LCP file " << (unsigned int)j <<": Error opening: " << filenameInLCP << std::endl;
+			std::cerr << "storeBWTandLCP: In LCP file " << (unsigned int)j <<": Error opening: " << filenameInLCP << std::endl;
 			exit (EXIT_FAILURE);
 		}
 		numchar=sprintf (filenameOutLCP,"new_%s%s",filenameLCP,ext);
 		OutFileLCP = fopen(filenameOutLCP, "wb");
 		if (OutFileLCP==NULL) {
-				std::cerr << "Out LCP file " << (unsigned int)j <<": Error opening: " << filenameOutLCP << std::endl;
+				std::cerr << "storeBWTandLCP: Out LCP file " << (unsigned int)j <<": Error opening: " << filenameOutLCP << std::endl;
 				exit (EXIT_FAILURE);
 		}
 
@@ -3306,9 +3306,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 		dataTypeNChar cont = 0;
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 			//std::cerr << "Start k= "<< k <<": Symb="<< newSymb[vectTriple[k].seqN] << ", Seq=" << vectTriple[k].seqN << ", Pos=" << vectTriple[k].posN << ", cont="<< cont << "\n";
-		  //#if (BCR_SET==1)
-          //  if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
-		  //#endif
+		  #if (BCR_SET==1)
+                      if ((vectInsTexts[vectTriple[k].seqN]==1) && (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)) {
+		  #endif
                 //if (verboseEncode==1)
 				     //std::cerr << "++++++++++++++k= " << k << " Q[k]= " << (unsigned int)vectTriple[k].pileN << " P[k]= " << vectTriple[k].posN << " cont = "<< cont << std::endl;
 				//So I have to read the k-BWT and I have to count the number of the symbols up to the position posN.
@@ -3526,8 +3526,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					#if BCR_SET_ALN_RH ==1
 						if (newSymb[vectTriple[k].seqN] == TERMINATE_CHAR) {   
 							//vectTriple[k].pileN=TERMINATE_CHAR_LEN;  // We no longer have to enter string symbols, now pilaN is a dummy symbol (TERMINATE_CHAR_LEN)
-							numToRemove++;
+							//numToRemove++;
 							//vectInsTexts[vectTriple[k].seqN] = 0;
+							contToRemove++;
 						}
 					#endif
 					
@@ -3910,9 +3911,9 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					std::cerr << std::endl;
 				}
 
-		   //#if (BCR_SET==1)
-			//}  //close if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)
-		   // #endif
+		   #if (BCR_SET==1)
+			}  //close if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN)
+		   #endif
             //}
 
 
