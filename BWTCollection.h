@@ -65,7 +65,7 @@ namespace SXSI
 			uchar *newSymbQS;
 		#endif 
 		
-	    	#if BUILD_SAP==1
+	    #if BUILD_SAP==1 || BUILD_RED_SAP==1
 			uchar *newSymbSAP;
 		#endif 
 	    
@@ -137,7 +137,7 @@ namespace SXSI
 			virtual void storeEntireBWTIntMem(const char*) = 0;
 			virtual dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *, dataTypeNChar, dataTypeNChar , uchar *) =0;
 		#endif
-		#if BUILD_SAP
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			virtual void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)=0;
 		#endif
 	    
