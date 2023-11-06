@@ -158,6 +158,11 @@ int main(int argc, char *argv[])
             std::cerr << "Error! SAP array is computed only if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
             exit (EXIT_FAILURE);
         }
+		
+		if(BUILD_SAP && BUILD_RED_SAP))
+        {
+            std::cerr << "Warning! To compute the reduced SAP array BUILD_SAP must be set to 0 (see Parameters.h).\n";
+        }
          
         if (OUTPUT_FORMAT==0) {
             std::cout << "The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, ebwt.qs) - built one after the other.\n";
@@ -273,9 +278,7 @@ int main(int argc, char *argv[])
 
     #if BUILD_SAP == 1
         std::cout << "\t\ttogether SAP array" << endl;	
-    #endif
-	
-	#if BUILD_RED_SAP == 1
+    #elif BUILD_RED_SAP == 1
 		std::cout << "\t\ttogether reduced SAP array" << endl;
 	#endif
 	
