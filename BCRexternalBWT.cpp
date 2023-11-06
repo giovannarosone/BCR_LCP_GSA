@@ -140,11 +140,20 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, string BCRprefPrev
 
 	#if BUILD_SAP==1
 		std::cerr << "\nBuild entire SAP file" << std::endl;
+	#elif BUILD_RED_SAP==1
+		std::cerr << "\nBuild reduced SAP file" << std::endl;
+	#endif
+	
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		char *filenameIn = new char[120];
 		char *filename = new char[110];			
 		static FILE *OutFileSAP;                  // output and input file SAP;
 		char *fnSAP = new char[strlen(fileOutput)+100];
+		#if BUILD_SAP==1
 		dataTypeNChar numcharRead=sprintf (fnSAP,"%s%s",fileOutput,".bwt.sap");
+		#elif BUILD_RED_SAP==1
+		dataTypeNChar numcharRead=sprintf (fnSAP,"%s%s",fileOutput,".bwt.red_sap");
+		#endif
 
 		OutFileSAP = fopen(fnSAP, "wb");
 		if (OutFileSAP==NULL) {
@@ -180,7 +189,7 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, string BCRprefPrev
 
 			fclose(InFileSAP);
 					
-			#if deletePartialSAP == 1 && BUILD_SAP==1
+			#if deletePartialSAP == 1 && (BUILD_SAP==1 || BUILD_RED_SAP==1)
 				if (remove(filenameIn)!=0)
 					std::cerr << "Error deleting da aux files" << std::endl;
 			#endif		
@@ -623,7 +632,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
         delete [] filenameSA;
     #endif
 	
-    #if BUILD_SAP==1
+    #if BUILD_SAP==1 || BUILD_RED_SAP==1
         char *filenameOutSAP = new char[110];
 	char *filenameSAP = new char[100];
 	FILE *OutFileSAP;
@@ -1095,7 +1104,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			#endif
 		#endif
     
-        	#if BUILD_SAP==1
+        #if BUILD_RED_SAP==1
 			newSymbSAP = new uchar[nText];
 			for (dataTypeNSeq v = 0 ; v < nText; v++) 
 				newSymbSAP[v]=48; //set it to false
@@ -1109,12 +1118,6 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
         std::cerr << "\n"<< "j= "<< 0 <<" - symbols in position " << (long) lengthRead - 1<< "\n";
     #endif
     InsertFirstsymbols(newSymb);
-
-    #if BUILD_SAP==1
-	newSymbSAP = new uchar[nText];
-	for (dataTypeNSeq v = 0 ; v < nText; v++) 
-		newSymbSAP[v]=48; //set it to false
-    #endif
 
     /////////////////////////////
     
@@ -1215,7 +1218,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			difWhile = 0.0;
 		#endif
 		
-		#if BUILD_SAP==1
+		#if BUILD_RED_SAP==1
 			//Reset newSymbSAP
 			for (dataTypeNSeq v = 0 ; v < nText; v++) 
 				newSymbSAP[v]=48; //set it to false
@@ -1298,7 +1301,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			newSymbQS[j] = '\0';
 		#endif
 		
-		#if BUILD_SAP==1
+		#if BUILD_RED_SAP==1
 			newSymbSAP[j]=48; //set it to false
 		#endif
 	}
@@ -1318,7 +1321,7 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	#if USE_QS==1
 		delete [] newSymbQS;
 	#endif
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		delete [] newSymbSAP;
 	#endif
 	#if BCR_SET == 0        //Build BCR for 1 sequence
@@ -1461,7 +1464,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			tripla.posN = nExamedTexts+1;  // position of the suffix (1-based)
 			tripla.seqN = j;	  // number of the sequence
 			tripla.pileN = 0;    //The first symbols are in $-pile
-			#if BUILD_SAP==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1
 				//Inizialize sap to 1
 				tripla.sap = 1;
 			#endif
@@ -1493,25 +1496,32 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
         #endif
 	}
 	
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		//Sort by bwt and then by seqN
 		sapSort(vectTriple,0,nExamedTexts);
 		
 		//Set first sap entry =0
 		vectTriple[0].sap = 0;
 		
+		#if BUILD_RED_SAP==1
 		//To check if the SAP-interval is just one run
-		dataTypedimAlpha numRunSAP=0;
-		
+		bool oneRunSAP=0, moreRunSAP=0;
+		#endif
+
 		//Rewrite newSymb and reset posN
-		dataTypeNSeq i_pile = 0;
+		dataTypeNSeq i_pile_fin, i_pile = 0;
 		for (dataTypedimAlpha h = 1 ; h < sizeAlpha; h++){
-			dataTypeNSeq i_pile_fin = i_pile + tableOcc[0][h];
-			numRunSAP+=(i_pile_fin==i_pile)?0:1;
-			while(i_pile < i_pile_fin){
-				newSymb[i_pile]=alphaInverse[h];
-				vectTriple[i_pile].posN = i_pile+1;
-				i_pile++;
+			if(tableOcc[0][h]>0){
+				i_pile_fin = i_pile + tableOcc[0][h];
+				while(i_pile < i_pile_fin){
+					newSymb[i_pile]=alphaInverse[h];
+					vectTriple[i_pile].posN = i_pile+1;
+					i_pile++;
+				}
+				#if BUILD_RED_SAP==1
+					if (not oneRunSAP) oneRunSAP=1;
+					else if(not moreRunSAP) moreRunSAP=1;
+				#endif
 			}
 		}
 		assert(i_pile == nExamedTexts);
@@ -1540,7 +1550,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			std::cerr << vectTriple[g].seqN  << " ";
 		}
 		std::cerr << std::endl;
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			std::cerr << "S  ";
 			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 				std::cerr << vectTriple[g].sap + 48  << " ";
@@ -1794,12 +1804,19 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	delete [] alphaInverse;
 	
 	#if BUILD_SAP==1
-		if (numRunSAP>1) {  //SAP-interval of type II
+		newSymbSAP = new uchar[nExamedTexts];
+		newSymbSAP[0]=48;
+		for (dataTypeNSeq j = 1 ; j < nExamedTexts; j++) 
+			newSymbSAP[j]=49; //set it to true
+	#elif BUILD_RED_SAP==1
+		if (moreRunSAP) {  //SAP-interval of type II
 			for (dataTypeNSeq j = 1 ; j < nExamedTexts; j++) {
 				newSymbSAP[j]= 49;
 			}
 		}
-
+	#endif
+	
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		static FILE *OutFileSap;                  // output and input file SAP;
 		char *filenameOutSap = new char[110];
 		char *filenameSap = new char[100];
@@ -1815,11 +1832,16 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		//Store into $-pile SAP
 		dataTypeNChar numcharWriteSap = fwrite (newSymbSAP, sizeof(char), nExamedTexts, OutFileSap);
 		assert(numcharWriteSap == nExamedTexts);
-
+		
+		#if BUILD_RED_SAP==1
+			//Reset newSymbSAP
+			for (dataTypeNSeq v = 0 ; v < nText; v++) 
+				newSymbSAP[v]=48; //set it to false
+		#endif
+		
 		fclose(OutFileSap);
 		delete [] filenameOutSap;
 		delete [] filenameSap;
-	
    	 #endif
 	
 	#if USE_QS==1
@@ -1860,7 +1882,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		double difStore=0.0;
 	#endif 
 	
-	#if BUILD_SAP
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 	bool sapInterval=false;
 	#endif
 	
@@ -1886,7 +1908,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 
 			dataTypedimAlpha currentPile = vectTriple[j].pileN;
 			
-			#if BUILD_SAP==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1
 				dataTypedimAlpha prevSymbol = DUMMY_TERM;
 			#endif
 			
@@ -1958,7 +1980,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 					//I have to insert the new symbol in the symbol-pile
 					vectTriple[k].pileN=alpha[(unsigned int)foundSymbol];
 					
-					#if BUILD_SAP==1
+					#if BUILD_SAP==1 || BUILD_RED_SAP==1
 						//Set sap according to the previous symbol
 						if ( (prevSymbol != vectTriple[k].pileN) && vectTriple[k].sap == 1 )
 							vectTriple[k].sap=0;
@@ -2065,7 +2087,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		difSorting = 0.0;
 	#endif 
 		
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		//For each sap-interval, call sapSort
 		if( sapInterval ){
 			//There exists at least one SAP-interval (Type I or Type II)
@@ -2083,31 +2105,35 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 					
 					//Reorder symbols in [start,end)
 					sapSort(vectTriple,start,end);
-					
+					#if BUILD_RED_SAP==1
 					//To check if the SAP-interval is type II
 					uchar currentCh=newSymb[vectTriple[start].seqN];
 					bool notOneRunSAP = true;
-		
+					#endif
+					
 					//Reset posN and sap in [start,end)
 					vectTriple[start].posN = init_posN;
 					vectTriple[start].sap = 0;
-					//newSymbSAP[start]=48;  by default
+
 					for (dataTypeNSeq j=start+1; j<end; j++){
 						vectTriple[j].posN = ++init_posN;
 						vectTriple[j].sap = 1;
-						
+						#if BUILD_RED_SAP==1
 						if ( (notOneRunSAP==true) && (currentCh != newSymb[vectTriple[j].seqN])) {
 							notOneRunSAP=false;
 						}
+						#endif
 					}
 					
+					#if BUILD_RED_SAP==1
 					//Modify newSymbSAP in case of SAP-interval of Type II
+					//newSymbSAP[start]=48;  by default
 					if (notOneRunSAP==false) {  //SAP-interval of type II
 						for (dataTypeNSeq j = start+1; j<end; j++) {
 							newSymbSAP[j]= 49; //==true
 						}	
 					}
-					
+					#endif
 					
 					#if verboseEncode==1
 						std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
@@ -2154,7 +2180,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			std::cerr << vectTriple[g].seqN  << " ";
 		}
 		std::cerr << std::endl;
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		std::cerr << "S  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << vectTriple[g].sap + 48 << " ";
@@ -2221,7 +2247,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			std::cerr << vectTriple[g].seqN  << " ";
 		}
 		std::cerr << std::endl;
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		std::cerr << "S  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << vectTriple[g].sap + 48 << " ";
@@ -2256,7 +2282,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		dataTypeNChar numcharWrite=0;
 	#endif
 	
-	#if BUILD_SAP==1 
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		static FILE *OutFileSap, *InFileSap;                  // output and input file BWT SAP;
 		char *filenameInSap = new char[120];
 		char *filenameOutSap = new char[110];
@@ -2372,7 +2398,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 			}
 		#endif
 		
-		#if BUILD_SAP==1 
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
 			numcharSap=sprintf (filenameInSap,"%s%s",filenameSap,ext);
 	        //cerr << "TMP - storeBWTFilePartial: filenameInSap=" << filenameInSap << endl;
@@ -2422,7 +2448,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 							numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
 							assert(numchar == numcharWrite); // we should always read/write the same number of characters
 						#endif						
-						#if (BUILD_SAP==1)
+						#if (BUILD_SAP==1) || BUILD_RED_SAP==1
 								numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
 								assert(numcharSap == toRead);
 								numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -2454,7 +2480,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 							numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
 							assert(numchar == numcharWrite); // we should always read/write the same number of characters
 						#endif
-						#if (BUILD_SAP==1)
+						#if (BUILD_SAP==1) || BUILD_RED_SAP==1
 							numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 							assert(numcharSap == SIZEBUFFER);
 							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -2510,6 +2536,11 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 					
 					#if BUILD_SAP==1
+						uchar eleSAP;
+						eleSAP=vectTriple[k].sap+48;
+						numcharWriteSap = fwrite (&eleSAP, sizeof(char), 1 , OutFileSap);
+						assert(numcharWriteSap == 1);
+					#elif BUILD_RED_SAP==1
 						numcharWriteSap = fwrite (&newSymbSAP[k], sizeof(char), 1 , OutFileSap);
 						assert(numcharWriteSap == 1);
 					#endif
@@ -2550,7 +2581,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					assert(numchar == numcharWrite); // we should always read/write the same number of characters
 				}
 			#endif
-			#if BUILD_SAP==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1
 				numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 				numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
 				assert(numcharSap == numcharWriteSap);
@@ -2578,7 +2609,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 			renameFilePartial(currentPile);
 		#endif
 
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			fclose(InFileSap);
 			fclose(OutFileSap);
 			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
@@ -2641,7 +2672,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 	delete [] buffer;
 
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		delete [] filenameInSap;
 		delete [] filenameOutSap;
 		delete [] filenameSap;
@@ -3134,7 +3165,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	char *filenameLCP = new char[120];
 	char *filenameIn = new char[100];
 
-	#if BUILD_SAP==1 
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		static FILE *OutFileSap, *InFileSap;                  // output and input file BWT SAP;
 		char *filenameInSap = new char[120];
 		char *filenameOutSap = new char[110];
@@ -3282,7 +3313,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			#endif
 		#endif
 		
-		#if BUILD_SAP==1 
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
 			numcharSap=sprintf (filenameInSap,"%s%s",filenameSap,ext);
 			//cerr << "TMP - storeBWTFilePartial: filenameInSap=" << filenameInSap << endl;
@@ -3355,7 +3386,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 							//std::cerr << "In LCP: numchar " << numchar << " numchar " << numcharWrite << " to Read " << toRead << "\n";
 						assert(numchar == numcharWrite); // we should always read/write the same number of characters 
 						
-						#if (BUILD_SAP==1)
+						#if (BUILD_SAP==1) || BUILD_RED_SAP==1
 							numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
 							assert(numcharSap == toRead);
 							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -3413,7 +3444,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 						numcharWrite = fwrite (bufferLCP,sizeof(dataTypelenSeq), numchar , OutFileLCP);
 						assert(numchar == numcharWrite); // we should always read/write the same number of characters.
 
-						#if (BUILD_SAP==1)
+						#if (BUILD_SAP==1) || BUILD_RED_SAP==1
 							numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 							assert(numcharSap == SIZEBUFFER);
 							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -3533,6 +3564,11 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					#endif
 					
 					#if BUILD_SAP==1
+						uchar eleSAP;
+						eleSAP=vectTriple[k].sap+48;
+						numcharWriteSap = fwrite (&eleSAP, sizeof(char), 1 , OutFileSap);
+						assert(numcharWriteSap == 1);
+					#elif BUILD_RED_SAP==1
 						numcharWriteSap = fwrite (&newSymbSAP[k], sizeof(char), 1 , OutFileSap);
 						assert(numcharWriteSap == 1);
 					#endif
@@ -3747,7 +3783,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 									vectBWTcurrentPile.push_back ( sucSymbol );  //vectVectBWT[currentPile][eleCurrentPile]			
 								#endif
 								
-								#if BUILD_SAP==1
+								#if BUILD_SAP==1 || BUILD_RED_SAP==1
 									numcharSap = fread(bufferSap,sizeof(uchar),1,InFileSap);
 									assert(numcharSap == 1);
 									numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -3928,7 +3964,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			//it means that posN[k]<>currentPile, so I have to change BWT-segment
 			//But before, I have to copy the remainder symbols from the old BWT to new BWT
 		while (numchar!=0) {	
-			#if BUILD_SAP==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1
 				numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 				numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
 				assert(numcharSap == numcharWriteSap);
@@ -4063,7 +4099,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 			if(rename(filenameOutLCP,filenameInLCP))
 				std::cerr << filenameOutLCP <<": Error renaming " << std::endl;
 		
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			fclose(InFileSap);
 			fclose(OutFileSap);
 			numcharSap=sprintf (filenameSap, "bwt.sap_%d", currentPile);
@@ -4154,7 +4190,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 	delete [] filenameLCP;
 	delete [] filenameOutLCP;
 
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		delete [] filenameInSap;
 		delete [] filenameOutSap;
 		delete [] filenameSap;
@@ -5579,7 +5615,7 @@ void BCRexternalBWT::printSegments()
 		delete [] bufferDA;
 	#endif
 	
-	#if BUILD_SAP==1 
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		std::cerr << "\nPartial SAP array: " << std::endl;
 		dataTypeNChar numcharSAP=0;
 		static FILE *InFileSAP;                  // output and input file SAP;
@@ -5740,7 +5776,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
                 exit (EXIT_FAILURE);
             }
         #endif
-    	#if BUILD_SAP==1  
+    	#if BUILD_SAP==1 || BUILD_RED_SAP==1
             char *fnSAP = new char[lung+100];
             sprintf (fnSAP,"%s%s",fileOutput,".bwt.sap");
             std::cerr << "printOutput: fnDA: "  << fnSAP <<  "." << std::endl;
@@ -5813,7 +5849,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             std::cerr << "DA\t";
             fprintf(OutFile, "DA\t");
         #endif
-	#if BUILD_SAP==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		dataTypeNChar numcharSAP;
 		uchar *bufferSAP = new uchar[SIZEBUFFER];            
 		fprintf(OutFile, "SAP\t");
@@ -5838,7 +5874,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             #if BUILD_LCP==1
                 numcharLCP = fread(bufferLCP,sizeof(dataTypelenSeq),SIZEBUFFER,InFileLCP);
             #endif
-	    #if BUILD_SAP==1
+	    #if BUILD_SAP==1 || BUILD_RED_SAP==1
 		numcharSAP = fread(bufferSAP,sizeof(uchar),SIZEBUFFER,InFileSAP);
 		assert(numcharSAP == numcharBWT);
 	    #endif
@@ -5866,7 +5902,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
                     std::cerr << (unsigned int)bufferDA[i]<< "\t";
                     fprintf(OutFile, "%d\t", bufferDA[i]);
                 #endif	
-		#if BUILD_SAP==1
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			std::cerr << (uchar)bufferSAP[i]<< "\t";
 			fprintf(OutFile, "%c\t", bufferSAP[i]);
 			#endif	
@@ -5903,7 +5939,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             delete[] bufferDA;
             fclose(InFileDA);
         #endif
-	#if BUILD_SAP==1 
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1
    	    delete[] fnSAP;
             delete[] bufferSAP;
             fclose(InFileSAP);
@@ -6397,7 +6433,7 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 	return numcharWrite;
 }
 
-#if BUILD_SAP
+#if BUILD_SAP==1 || BUILD_RED_SAP==1
 	
 	bool BCRexternalBWT::cmpSapSort (sortElement a,sortElement b) {
 		if (newSymb[a.seqN] == newSymb[b.seqN])
