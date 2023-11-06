@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
             exit (EXIT_FAILURE);
         }
         
-        if(BCR_SET_ALN_RH!=1 && BUILD_SAP )
+        if(BCR_SET_ALN_RH!=1 && (BUILD_SAP || BUILD_RED_SAP))
         {
-            std::cerr << "Error! BUILD_SAP works if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
+            std::cerr << "Error! SAP array is computed only if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
             exit (EXIT_FAILURE);
         }
          
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         }
 
         if (OUTPUT_FORMAT==3) {
-            if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (BUILD_SAP==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
+            if ( ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (BUILD_SAP==1) || (BUILD_RED_SAP==1) || KEEP_eBWT_IN_EXT_MEMORY==1) )
                 std::cout << "The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, SAP-array) at the same time.\n";
             else {
                 std::cerr << "Error! The output format of BCR is at most 4 files (ebwt, lcp, da, posSA) at the same time\n";
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
     #endif
 
     std::cout << "\tStrings order:\n";
-    #if BUILD_SAP == 0
+    #if BUILD_SAP == 0 || BUILD_RED_SAP == 0
         std::cout << "\t\tInput order" << endl;
     #else
         std::cout << "\t\tReverse lexicographic order" << endl;
@@ -274,6 +274,10 @@ int main(int argc, char *argv[])
     #if BUILD_SAP == 1
         std::cout << "\t\ttogether SAP array" << endl;	
     #endif
+	
+	#if BUILD_RED_SAP == 1
+		std::cout << "\t\ttogether reduced SAP array" << endl;
+	#endif
 	
     std::cout << "\tBWT partial:\n";
     #if  KEEP_eBWT_IN_EXT_MEMORY == 1    //BCR uses the internal memory for the BWT partial
