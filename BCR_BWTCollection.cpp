@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
             exit (EXIT_FAILURE);
         }
 		
-		if(BUILD_SAP && BUILD_RED_SAP))
+		if(BUILD_SAP && BUILD_RED_SAP)
         {
             std::cerr << "Warning! To compute the reduced SAP array BUILD_SAP must be set to 0 (see Parameters.h).\n";
         }
