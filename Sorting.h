@@ -48,7 +48,7 @@
 		#endif	
 		~sortElement() {};
 		dataTypedimAlpha pileN;
-		dataTypedimAlpha sap;
+		bool sap;
 		#if BUILD_LCP == 1
 			dataTypelenSeq lcpCurN;
 			dataTypelenSeq lcpSucN;
