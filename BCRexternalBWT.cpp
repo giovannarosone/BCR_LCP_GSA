@@ -1553,7 +1553,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			std::cerr << "S  ";
 			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << vectTriple[g].sap + 48  << " ";
+				std::cerr << (uchar)vectTriple[g].sap + 48  << " ";
 			}
 			std::cerr << std::endl;
 		#endif
@@ -2143,7 +2143,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 						std::cerr << std::endl;
 						std::cerr << "sap=";
 						for (dataTypeNSeq j=0; j<end-start; j++)
-							 std::cerr << vectTriple[start+j].sap + 48 <<" ";
+							 std::cerr << (uchar)vectTriple[start+j].sap + 48 <<" ";
 						std::cerr << std::endl;
 						std::cerr << "newSymbSAP=";
 						for (dataTypeNSeq j=0; j<end-start; j++)
@@ -2183,7 +2183,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		std::cerr << "S  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].sap + 48 << " ";
+			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
 		}
 		std::cerr << std::endl;
 		#endif
@@ -2250,7 +2250,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		std::cerr << "S  ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].sap + 48 << " ";
+			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
 		}
 		std::cerr << std::endl;
 		#endif
@@ -2537,7 +2537,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					
 					#if BUILD_SAP==1
 						uchar eleSAP;
-						eleSAP=vectTriple[k].sap+48;
+						eleSAP=(uchar)vectTriple[k].sap+48;
 						numcharWriteSap = fwrite (&eleSAP, sizeof(char), 1 , OutFileSap);
 						assert(numcharWriteSap == 1);
 					#elif BUILD_RED_SAP==1
@@ -3565,7 +3565,7 @@ void BCRexternalBWT::storeBWTandLCP(uchar const * newSymb, dataTypelenSeq posSym
 					
 					#if BUILD_SAP==1
 						uchar eleSAP;
-						eleSAP=vectTriple[k].sap+48;
+						eleSAP=(uchar)vectTriple[k].sap+48;
 						numcharWriteSap = fwrite (&eleSAP, sizeof(char), 1 , OutFileSap);
 						assert(numcharWriteSap == 1);
 					#elif BUILD_RED_SAP==1
