@@ -1914,10 +1914,9 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		#endif
 
 			dataTypedimAlpha currentPile = vectTriple[j].pileN;
-			
-			vectTriple[j].sap = 0;
 
 			#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
+			vectTriple[j].sap = 0;
 				#if RLO==1
 				dataTypedimAlpha prevSymbol = DUMMY_TERM;
 				#else
