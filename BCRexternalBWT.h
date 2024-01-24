@@ -80,7 +80,7 @@ public:
 	
 	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
 			
-	#if BUILD_SAP==1 || BUILD_RED_SAP==1
+	#if RLO==1
 		void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
 		static bool cmpSapSort (sortElement a,sortElement b);
 	#endif
