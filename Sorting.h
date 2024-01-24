@@ -37,7 +37,7 @@
 #include "Parameters.h" // Defines ulong and uchar.
 #include "Tools.h"
 
-#if BUILD_SAP==1 || BUILD_RED_SAP==1
+#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
 		//struct __attribute__((__packed__)) sortElement {
 		struct sortElement {	
 		sortElement() {};
