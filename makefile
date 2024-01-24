@@ -3,11 +3,12 @@ CC = g++
 
 FASTQ = 0
 SAP = 0
+RLO = 0
 
 LCP = 0
 DA = 0
 
-DEFINES = -DFASTQ=$(FASTQ) -DSAP=$(SAP) -DLCP=$(LCP) -DDA=$(DA) 
+DEFINES = -DFASTQ=$(FASTQ) -DSAP=$(SAP) -DRLO=$(RLO) -DLCP=$(LCP) -DDA=$(DA) 
 
 CPPFLAGS = -Wall -ansi -pedantic -g -O3 -std=c++11 $(DEFINES)
 
