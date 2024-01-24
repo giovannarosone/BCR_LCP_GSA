@@ -3,7 +3,7 @@ Main author: Giovanna Rosone (giovanna.rosone (at) unipi.it)
 # BCR_LCP_GSA
 
 Multi-string BWT (and related data structures) computation
-(Last Updated: November 15th 2022)
+(Last Updated: January 24th 2024)
 
     BCR is part of:
     BEETL: Burrows-Wheeler Extended Tool Library
@@ -25,7 +25,8 @@ BCR_LCP_GSA can compute at the same time:
     - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i]), set BUILD_DA to 1
     - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
 - the quality score permutation (see Install)
-- the SAP-array and BWT-RLO (see Install)
+- the SAP-array (see Install)
+- the BWT-RLO (see Install)
     
 of a very large collection of strings **having different or same length** and **any alphabet**. 
 
@@ -96,6 +97,11 @@ Open parameters.h file and, please, set the parameters (data structured that mus
 make
 ```
 
+Alternatively, if you want to build the LCP-array and/or the DA data structures, you could compile using
+```sh
+make LCP=1 DA=1
+```
+
 If the input is a multi-line fastQ file (or a gz file containing a fastQ file) and you also want to build the permutation of the QS values then you should compile like this
 ```sh
 make FASTQ=1
@@ -107,9 +113,14 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
 (https://github.com/lh3/seqtk.git)
 ```
 
-If you want to compute the SAP-array along with the multi-string BWT of a string collection implicitly sorted in reverse lexicographical order (BWT-RLO), please compile using
+To compute the SAP-array, please compile using
 ```sh
 make SAP=1
+```
+
+To compute the multi-string BWT of the string collection implicitly sorted in *reverse lexicographical order* (BWT-RLO), please compile using
+```sh
+make RLO=1
 ```
 
 ### Run
