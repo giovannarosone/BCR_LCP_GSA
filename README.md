@@ -97,7 +97,7 @@ Open parameters.h file and, please, set the parameters (data structured that mus
 make
 ```
 
-Alternatively, if you want to build the LCP-array and/or the DA data structures, you could compile using
+Alternatively, if you want to build the LCP and/or the DA data structures, you could compile using
 ```sh
 make LCP=1 DA=1
 ```
