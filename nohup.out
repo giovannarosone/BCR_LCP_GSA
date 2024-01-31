@@ -1,0 +1,1060 @@
+BWTCollection: The input is test/10seqsPlusExample.fa
+BWTCollection: The output is test/10seqsPlusExample.fa.out
+Compute the EBWT
+The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, SAP-array) at the same time.
+BCR uses the external memory for the BWT partial
+BCR of multi-sequences
+Lexicographic order
+dataTypedimAlpha: sizeof(type size of alpha): 1 bytes 
+dataTypelenSeq: sizeof(type of seq length): 1 bytes 
+dataTypeNSeq: sizeof(type of #sequences): 4 bytes
+dataTypeNChar: sizeof(type of #sequences): 8 bytes
+TIMER start buildBCR User: 2.8e-05s System: 0s Actual: 2.9e-05s Efficiency: 96.5517%
+
+Builds cyc. files and the builds the BCR 
+The (new and-or old) reads have the same length.
+Number of sequences reading/writing: 10
+Number of characters reading/writing: 50
+In the new collection, we have: 
+TrasposeFasta: init buf_ for bases of size 5 * 1048576
+TransposeFasta: The max length (Read) is: 5
+TransposeFasta: Number of reads: 10
+TransposeFasta: Total Number of chars (without end-markers): 50
+TransposeFasta: Size Alpha: 5 symbols
+TIMER after TRASP. User: 3e-06s System: 3e-06s Actual: 6e-06s Efficiency: 100%
+Symbols in the input file (ASCII, char, freq, code):
+36 $ 10 0
+65 A 18 1
+67 C 9 2
+71 G 12 3
+84 T 11 4
+
+Start Preprocessing 1686836810 seconds
+End   Preprocessing 1686836810 seconds
+Preprocessing tooks 0 seconds
+
+SizeAlpha: 5
+Length of the longest sequence: 5
+
+Number of sequences: 10
+Total symbols (without end-markers): 50
+Total symbols (with end-markers) in ebwt: 60
+
+For BCR approach (for each sequence): sizeof(type of sortElement): 16
+RAM for BCR approach (for all sequences): 0 MebiByte (MiB) 
+	- RAM for BCR for computing without considering I/O buffers and including the BWTs partial in internal memory (if set) is at most: 330 bytes.
+	- Size buffer in BCR 1024 bytes for each buffer.
+RAM Buffer for bufferBWT: 1024 bytes --> 0 MebiByte (MiB) 
+	- BCR needs at least 1 bytes * 1024 = 1024 bytes for the I/O buffers.
+
+Total (max) RAM for BCR for computing eBWT (int/ext) and/or LCP and/or DA and/or SA (including the buffers for reading files): 1354 bytes. So the size of the buffer is 1024 bytes. 
+
+First symbols: j= 0 - symbols in position 4
+
+j= 0 - symbols in position 4
+
+First step:
+U:  A A A A A T T T T T 
+Q  0 0 0 0 0 0 0 0 0 0 
+P  1 2 3 4 5 6 7 8 9 10 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 1 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	empty
+B[2]:	empty
+B[3]:	empty
+B[4]:	empty
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	empty
+SAP[2]:	empty
+SAP[3]:	empty
+SAP[4]:	empty
+
+Inserting symbols after the first position.
+
+j= 1 - symbols in position 3
+Starting iteration 1, time now: Thu Jun 15 15:46:50 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686836810 seconds
+End while 1686836810 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686836810 seconds
+End quickSort 1686836810 seconds
+quickSort tooks 0 seconds
+U  C C G G C C G G G C 
+After Sorting - Triples
+Q  1 1 1 1 1 4 4 4 4 4 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [0,5)
+symb=0 1 4 5 9 
+sap=48 49 49 49 49 
+newSymbSAP=0 0 0 0 0 
+frderico
+0 0 0 0 0 
+SAP-interval = [5,10)
+symb=2 3 6 7 8 
+sap=48 49 49 49 49 
+newSymbSAP=0 0 0 0 0 
+Start store partials 1686836810 seconds
+End store partials 1686836810 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 0 5 0 0 
+0 0 0 0 0 
+0 0 0 0 0 
+0 0 0 5 0 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 4 4 4 4 4 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC
+B[2]:	empty
+B[3]:	empty
+B[4]:	GGGGG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 
+SAP[2]:	empty
+SAP[3]:	empty
+SAP[4]:	0 1 1 1 1 
+Start insertN 1686836810 seconds
+End insertN 1686836810 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 2 - symbols in position 2
+Starting iteration 2, time now: Thu Jun 15 15:46:50 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686836810 seconds
+End while 1686836810 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686836810 seconds
+End quickSort 1686836810 seconds
+quickSort tooks 0 seconds
+U  A A A A A T T T T T 
+After Sorting - Triples
+Q  2 2 2 2 2 3 3 3 3 3 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [0,5)
+symb=0 1 4 5 9 
+sap=48 49 49 49 49 
+newSymbSAP=0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [5,10)
+symb=2 3 6 7 8 
+sap=48 49 49 49 49 
+newSymbSAP=0 1 1 1 1 
+Start store partials 1686836810 seconds
+End store partials 1686836810 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 0 5 0 0 
+0 3 0 0 2 
+0 2 0 0 3 
+0 0 0 5 0 
+Triples at the end of the current iteration:
+Q  2 2 2 2 2 3 3 3 3 3 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC
+B[2]:	AAATT
+B[3]:	AATTT
+B[4]:	GGGGG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 
+SAP[2]:	0 1 1 1 1 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 
+Start insertN 1686836810 seconds
+End insertN 1686836810 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 3 - symbols in position 1
+Starting iteration 3, time now: Thu Jun 15 15:46:50 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686836810 seconds
+End while 1686836810 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686836810 seconds
+End quickSort 1686836810 seconds
+quickSort tooks 0 seconds
+U  A A A A C C C A A T 
+After Sorting - Triples
+Q  1 1 1 1 1 4 4 4 4 4 
+P  6 7 8 9 10 6 7 8 9 10 
+N  0 1 4 2 3 5 9 6 7 8 
+S  0 1 1 0 1 0 1 0 1 1 
+frderico
+0 0 0 
+SAP-interval = [0,3)
+symb=4 0 1 
+sap=48 49 49 
+newSymbSAP=0 1 1 
+frderico
+0 0 
+SAP-interval = [3,5)
+symb=2 3 
+sap=48 49 
+newSymbSAP=0 0 
+frderico
+0 0 
+SAP-interval = [5,7)
+symb=9 5 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 0 
+SAP-interval = [7,10)
+symb=6 7 8 
+sap=48 49 49 
+newSymbSAP=0 1 1 
+Start store partials 1686836810 seconds
+End store partials 1686836810 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 4 6 0 0 
+0 3 0 0 2 
+0 2 0 0 3 
+0 2 2 5 1 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 4 4 4 4 4 
+P  6 7 8 9 10 6 7 8 9 10 
+N  4 0 1 2 3 9 5 6 7 8 
+S  0 1 1 0 1 0 1 0 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCCCAAAA
+B[2]:	AAATT
+B[3]:	AATTT
+B[4]:	GGGGGTCCAA
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 1 1 0 1 
+SAP[2]:	0 1 1 1 1 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 
+Start insertN 1686836810 seconds
+End insertN 1686836810 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 4 - symbols in position 0
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686836810 seconds
+End while 1686836810 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686836810 seconds
+End quickSort 1686836810 seconds
+quickSort tooks 0 seconds
+U  G C A G G G G G A G 
+After Sorting - Triples
+Q  1 1 1 1 1 1 2 2 2 4 
+P  6 7 8 9 15 16 6 7 8 11 
+N  0 1 2 3 7 8 4 5 6 9 
+S  0 1 0 1 0 1 0 0 0 0 
+frderico
+0 0 
+SAP-interval = [0,2)
+symb=1 0 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 
+SAP-interval = [2,4)
+symb=3 2 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 
+SAP-interval = [4,6)
+symb=8 7 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+Start store partials 1686836810 seconds
+End store partials 1686836810 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 6 7 3 0 
+0 3 0 3 2 
+0 2 0 0 3 
+0 2 2 6 1 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 1 2 2 2 4 
+P  6 7 8 9 15 16 6 7 8 11 
+N  1 0 3 2 8 7 4 5 6 9 
+S  0 1 0 1 0 1 0 0 0 0 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCCCGGACAAAAAG
+B[2]:	AAATTGGG
+B[3]:	AATTT
+B[4]:	GGGGGTCCAAG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 1 0 1 0 1 1 0 1 0 1 
+SAP[2]:	0 1 1 1 1 0 0 0 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 0 
+
+j= 5 - symbols in position 5. Inserting $=36=$ symbol
+
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686836810 seconds
+End while 1686836810 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686836810 seconds
+End quickSort 1686836810 seconds
+quickSort tooks 0 seconds
+U  $ $ $ $ $ $ $ $ $ $ 
+After Sorting - Triples
+Q  1 1 2 3 3 3 3 3 3 3 
+P  6 11 6 1 2 3 4 5 6 12 
+N  2 8 1 0 3 7 4 5 6 9 
+S  0 0 0 0 0 0 0 0 0 0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+Start store partials 1686836810 seconds
+End store partials 1686836810 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+2 6 7 3 0 
+1 3 0 3 2 
+7 2 0 0 3 
+0 2 2 6 1 
+Triples at the end of the current iteration:
+Q  255 255 255 255 255 255 255 255 255 255 
+P  6 11 6 1 2 3 4 5 6 12 
+N  2 8 1 0 3 7 4 5 6 9 
+S  0 0 0 0 0 0 0 0 0 0 
+
+All new characters have been inserted, usage: User: 0.015454s System: 0.016027s Actual: 0.031599s Efficiency: 99.6266%
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC$CGGA$CAAAAAG
+B[2]:	AAATT$GGG
+B[3]:	$$$$$$AATTT$
+B[4]:	GGGGGTCCAAG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 0 1 0 1 0 0 1 1 0 1 0 1 
+SAP[2]:	0 1 1 1 1 0 0 0 0 
+SAP[3]:	0 0 0 0 0 0 0 1 1 1 1 0 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 0 
+
+In tableOcc, there are 60 letters
+Start builBCR 1686836810 seconds
+End   builBCR 1686836810 seconds
+builBCR tooks 0 seconds
+
+Preprocessing + builBCR tooks 0 seconds
+Build the entire BWT/LCP/DA/SA file.
+Build the entire four files for BWT/LCP/DA/SA.
+
+Build entire SAP file
+Print the output: eBWT/LCP/DA/SA
+Reads files containing the BWT, LCP, DA and SA and writes a text file
+printOutput: fnBWT: test/10seqsPlusExample.fa.out.ebwt.
+printOutput: fnDA: test/10seqsPlusExample.fa.out.bwt.sap.
+printOutput: fileOutRes: test/10seqsPlusExample.fa.out.txt.
+SAP	
+A	0	
+A	1	
+A	1	
+A	1	
+A	1	
+T	1	
+T	1	
+T	1	
+T	1	
+T	1	
+C	0	
+C	1	
+C	1	
+C	1	
+C	1	
+$	0	
+C	0	
+G	1	
+G	0	
+A	1	
+$	0	
+C	0	
+A	1	
+A	1	
+A	0	
+A	1	
+A	0	
+G	1	
+A	0	
+A	1	
+A	1	
+T	1	
+T	1	
+$	0	
+G	0	
+G	0	
+G	0	
+$	0	
+$	0	
+$	0	
+$	0	
+$	0	
+$	0	
+A	0	
+A	1	
+T	1	
+T	1	
+T	1	
+$	0	
+G	0	
+G	1	
+G	1	
+G	1	
+G	1	
+T	0	
+C	1	
+C	0	
+A	1	
+A	1	
+G	0	
+Start builBCR (including the writing the cyc files) 1686836810 seconds
+End   builBCR (including the writing the cyc files) 1686836810 seconds
+builBCR (including the writing the cyc files) tooks 0 seconds
+total sap interval: 12
+total sap interval of type two: 9
+
+The BWT et al. is ready! 
+The End!
+	Command being timed: "./BCR_LCP_GSA test/10seqsPlusExample.fa test/10seqsPlusExample.fa.out"
+	User time (seconds): 0.02
+	System time (seconds): 0.01
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.03
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 8736
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1443
+	Voluntary context switches: 1
+	Involuntary context switches: 1
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 312
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+BWTCollection: The input is test/10seqsPlusExample.fa
+BWTCollection: The output is test/10seqsPlusExample.fa.out
+Compute the EBWT
+The output format of BCR is at most 5 files (ebwt, lcp, da, posSA, SAP-array) at the same time.
+BCR uses the external memory for the BWT partial
+BCR of multi-sequences
+Lexicographic order
+dataTypedimAlpha: sizeof(type size of alpha): 1 bytes 
+dataTypelenSeq: sizeof(type of seq length): 1 bytes 
+dataTypeNSeq: sizeof(type of #sequences): 4 bytes
+dataTypeNChar: sizeof(type of #sequences): 8 bytes
+TIMER start buildBCR User: 8.9e-05s System: 0s Actual: 0.00025s Efficiency: 35.6%
+
+Builds cyc. files and the builds the BCR 
+The (new and-or old) reads have the same length.
+Number of sequences reading/writing: 10
+Number of characters reading/writing: 50
+In the new collection, we have: 
+TrasposeFasta: init buf_ for bases of size 5 * 1048576
+TransposeFasta: The max length (Read) is: 5
+TransposeFasta: Number of reads: 10
+TransposeFasta: Total Number of chars (without end-markers): 50
+TransposeFasta: Size Alpha: 5 symbols
+TIMER after TRASP. User: 9e-06s System: 6e-06s Actual: 4.8e-05s Efficiency: 31.25%
+Symbols in the input file (ASCII, char, freq, code):
+36 $ 10 0
+65 A 18 1
+67 C 9 2
+71 G 12 3
+84 T 11 4
+
+Start Preprocessing 1686837177 seconds
+End   Preprocessing 1686837177 seconds
+Preprocessing tooks 0 seconds
+
+SizeAlpha: 5
+Length of the longest sequence: 5
+
+Number of sequences: 10
+Total symbols (without end-markers): 50
+Total symbols (with end-markers) in ebwt: 60
+
+For BCR approach (for each sequence): sizeof(type of sortElement): 16
+RAM for BCR approach (for all sequences): 0 MebiByte (MiB) 
+	- RAM for BCR for computing without considering I/O buffers and including the BWTs partial in internal memory (if set) is at most: 330 bytes.
+	- Size buffer in BCR 1024 bytes for each buffer.
+RAM Buffer for bufferBWT: 1024 bytes --> 0 MebiByte (MiB) 
+	- BCR needs at least 1 bytes * 1024 = 1024 bytes for the I/O buffers.
+
+Total (max) RAM for BCR for computing eBWT (int/ext) and/or LCP and/or DA and/or SA (including the buffers for reading files): 1354 bytes. So the size of the buffer is 1024 bytes. 
+
+First symbols: j= 0 - symbols in position 4
+
+j= 0 - symbols in position 4
+
+First step:
+U:  A A A A A T T T T T 
+Q  0 0 0 0 0 0 0 0 0 0 
+P  1 2 3 4 5 6 7 8 9 10 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 1 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	empty
+B[2]:	empty
+B[3]:	empty
+B[4]:	empty
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	empty
+SAP[2]:	empty
+SAP[3]:	empty
+SAP[4]:	empty
+
+Inserting symbols after the first position.
+
+j= 1 - symbols in position 3
+Starting iteration 1, time now: Thu Jun 15 15:52:57 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686837177 seconds
+End while 1686837177 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686837177 seconds
+End quickSort 1686837177 seconds
+quickSort tooks 0 seconds
+U  C C G G C C G G G C 
+After Sorting - Triples
+Q  1 1 1 1 1 4 4 4 4 4 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [0,5)
+symb=0 1 4 5 9 
+sap=48 49 49 49 49 
+newSymbSAP=0 0 0 0 0 
+frderico
+0 0 0 0 0 
+SAP-interval = [5,10)
+symb=2 3 6 7 8 
+sap=48 49 49 49 49 
+newSymbSAP=0 0 0 0 0 
+Start store partials 1686837177 seconds
+End store partials 1686837177 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 0 5 0 0 
+0 0 0 0 0 
+0 0 0 0 0 
+0 0 0 5 0 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 4 4 4 4 4 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC
+B[2]:	empty
+B[3]:	empty
+B[4]:	GGGGG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 
+SAP[2]:	empty
+SAP[3]:	empty
+SAP[4]:	0 1 1 1 1 
+Start insertN 1686837177 seconds
+End insertN 1686837177 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 2 - symbols in position 2
+Starting iteration 2, time now: Thu Jun 15 15:52:57 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686837177 seconds
+End while 1686837177 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686837177 seconds
+End quickSort 1686837177 seconds
+quickSort tooks 0 seconds
+U  A A A A A T T T T T 
+After Sorting - Triples
+Q  2 2 2 2 2 3 3 3 3 3 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [0,5)
+symb=0 1 4 5 9 
+sap=48 49 49 49 49 
+newSymbSAP=0 1 1 1 1 
+frderico
+0 0 0 0 0 
+SAP-interval = [5,10)
+symb=2 3 6 7 8 
+sap=48 49 49 49 49 
+newSymbSAP=0 1 1 1 1 
+Start store partials 1686837177 seconds
+End store partials 1686837177 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 0 5 0 0 
+0 3 0 0 2 
+0 2 0 0 3 
+0 0 0 5 0 
+Triples at the end of the current iteration:
+Q  2 2 2 2 2 3 3 3 3 3 
+P  1 2 3 4 5 1 2 3 4 5 
+N  0 1 4 5 9 2 3 6 7 8 
+S  0 1 1 1 1 0 1 1 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC
+B[2]:	AAATT
+B[3]:	AATTT
+B[4]:	GGGGG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 
+SAP[2]:	0 1 1 1 1 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 
+Start insertN 1686837177 seconds
+End insertN 1686837177 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 3 - symbols in position 1
+Starting iteration 3, time now: Thu Jun 15 15:52:57 2023
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686837177 seconds
+End while 1686837177 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686837177 seconds
+End quickSort 1686837177 seconds
+quickSort tooks 0 seconds
+U  A A A A C C C A A T 
+After Sorting - Triples
+Q  1 1 1 1 1 4 4 4 4 4 
+P  6 7 8 9 10 6 7 8 9 10 
+N  0 1 4 2 3 5 9 6 7 8 
+S  0 1 1 0 1 0 1 0 1 1 
+frderico
+0 0 0 
+SAP-interval = [0,3)
+symb=4 0 1 
+sap=48 49 49 
+newSymbSAP=0 1 1 
+frderico
+0 0 
+SAP-interval = [3,5)
+symb=2 3 
+sap=48 49 
+newSymbSAP=0 0 
+frderico
+0 0 
+SAP-interval = [5,7)
+symb=9 5 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 0 
+SAP-interval = [7,10)
+symb=6 7 8 
+sap=48 49 49 
+newSymbSAP=0 1 1 
+Start store partials 1686837177 seconds
+End store partials 1686837177 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 4 6 0 0 
+0 3 0 0 2 
+0 2 0 0 3 
+0 2 2 5 1 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 4 4 4 4 4 
+P  6 7 8 9 10 6 7 8 9 10 
+N  4 0 1 2 3 9 5 6 7 8 
+S  0 1 1 0 1 0 1 0 1 1 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCCCAAAA
+B[2]:	AAATT
+B[3]:	AATTT
+B[4]:	GGGGGTCCAA
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 1 1 0 1 
+SAP[2]:	0 1 1 1 1 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 
+Start insertN 1686837177 seconds
+End insertN 1686837177 seconds
+insertN tooks 0 seconds
+=====
+
+
+j= 4 - symbols in position 0
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686837177 seconds
+End while 1686837177 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686837177 seconds
+End quickSort 1686837177 seconds
+quickSort tooks 0 seconds
+U  G C A G G G G G A G 
+After Sorting - Triples
+Q  1 1 1 1 1 1 2 2 2 4 
+P  6 7 8 9 15 16 6 7 8 11 
+N  0 1 2 3 7 8 4 5 6 9 
+S  0 1 0 1 0 1 0 0 0 0 
+frderico
+0 0 
+SAP-interval = [0,2)
+symb=1 0 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 
+SAP-interval = [2,4)
+symb=3 2 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 0 
+SAP-interval = [4,6)
+symb=8 7 
+sap=48 49 
+newSymbSAP=0 1 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+Start store partials 1686837177 seconds
+End store partials 1686837177 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+0 6 7 3 0 
+0 3 0 3 2 
+0 2 0 0 3 
+0 2 2 6 1 
+Triples at the end of the current iteration:
+Q  1 1 1 1 1 1 2 2 2 4 
+P  6 7 8 9 15 16 6 7 8 11 
+N  1 0 3 2 8 7 4 5 6 9 
+S  0 1 0 1 0 1 0 0 0 0 
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCCCGGACAAAAAG
+B[2]:	AAATTGGG
+B[3]:	AATTT
+B[4]:	GGGGGTCCAAG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 1 0 1 0 1 1 0 1 0 1 
+SAP[2]:	0 1 1 1 1 0 0 0 
+SAP[3]:	0 1 1 1 1 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 0 
+
+j= 5 - symbols in position 5. Inserting $=36=$ symbol
+
+-----
+Start rankManySymbolsIntMem 0 seconds
+End   rankManySymbolsIntMem 0 seconds
+Total rankManySymbolsIntMem tooks 0 seconds
+Start while 1686837177 seconds
+End while 1686837177 seconds
+while (before sorting) tooks 0 seconds
+Start quickSort 1686837177 seconds
+End quickSort 1686837177 seconds
+quickSort tooks 0 seconds
+U  $ $ $ $ $ $ $ $ $ $ 
+After Sorting - Triples
+Q  1 1 2 3 3 3 3 3 3 3 
+P  6 11 6 1 2 3 4 5 6 12 
+N  2 8 1 0 3 7 4 5 6 9 
+S  0 0 0 0 0 0 0 0 0 0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+frderico
+0 
+Start store partials 1686837177 seconds
+End store partials 1686837177 seconds
+Total Store Partials tooks 0 seconds
+tableOcc: after storeBWT or storeBWTandLCP
+0 5 0 0 5 
+2 6 7 3 0 
+1 3 0 3 2 
+7 2 0 0 3 
+0 2 2 6 1 
+Triples at the end of the current iteration:
+Q  255 255 255 255 255 255 255 255 255 255 
+P  6 11 6 1 2 3 4 5 6 12 
+N  2 8 1 0 3 7 4 5 6 9 
+S  0 0 0 0 0 0 0 0 0 0 
+
+All new characters have been inserted, usage: User: 0.01138s System: 0.015385s Actual: 0.052758s Efficiency: 50.7316%
+
+Partial BWT segments:
+B[0]:	AAAAATTTTT
+B[1]:	CCCCC$CGGA$CAAAAAG
+B[2]:	AAATT$GGG
+B[3]:	$$$$$$AATTT$
+B[4]:	GGGGGTCCAAG
+
+Partial SAP array: 
+SAP[0]:	0 1 1 1 1 1 1 1 1 1 
+SAP[1]:	0 1 1 1 1 0 0 1 0 1 0 0 1 1 0 1 0 1 
+SAP[2]:	0 1 1 1 1 0 0 0 0 
+SAP[3]:	0 0 0 0 0 0 0 1 1 1 1 0 
+SAP[4]:	0 1 1 1 1 0 1 0 1 1 0 
+
+In tableOcc, there are 60 letters
+Start builBCR 1686837177 seconds
+End   builBCR 1686837177 seconds
+builBCR tooks 0 seconds
+
+Preprocessing + builBCR tooks 0 seconds
+Build the entire BWT/LCP/DA/SA file.
+Build the entire four files for BWT/LCP/DA/SA.
+
+Build entire SAP file
+Print the output: eBWT/LCP/DA/SA
+Reads files containing the BWT, LCP, DA and SA and writes a text file
+printOutput: fnBWT: test/10seqsPlusExample.fa.out.ebwt.
+printOutput: fnDA: test/10seqsPlusExample.fa.out.bwt.sap.
+printOutput: fileOutRes: test/10seqsPlusExample.fa.out.txt.
+SAP	
+A	0	
+A	1	
+A	1	
+A	1	
+A	1	
+T	1	
+T	1	
+T	1	
+T	1	
+T	1	
+C	0	
+C	1	
+C	1	
+C	1	
+C	1	
+$	0	
+C	0	
+G	1	
+G	0	
+A	1	
+$	0	
+C	0	
+A	1	
+A	1	
+A	0	
+A	1	
+A	0	
+G	1	
+A	0	
+A	1	
+A	1	
+T	1	
+T	1	
+$	0	
+G	0	
+G	0	
+G	0	
+$	0	
+$	0	
+$	0	
+$	0	
+$	0	
+$	0	
+A	0	
+A	1	
+T	1	
+T	1	
+T	1	
+$	0	
+G	0	
+G	1	
+G	1	
+G	1	
+G	1	
+T	0	
+C	1	
+C	0	
+A	1	
+A	1	
+G	0	
+Start builBCR (including the writing the cyc files) 1686837177 seconds
+End   builBCR (including the writing the cyc files) 1686837177 seconds
+builBCR (including the writing the cyc files) tooks 0 seconds
+total sap interval: 12
+total sap interval of type two: 9
+
+The BWT et al. is ready! 
+The End!
+	Command being timed: "./BCR_LCP_GSA test/10seqsPlusExample.fa test/10seqsPlusExample.fa.out"
+	User time (seconds): 0.01
+	System time (seconds): 0.01
+	Percent of CPU this job got: 48%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.07
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 8880
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1442
+	Voluntary context switches: 1
+	Involuntary context switches: 907
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 320
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
