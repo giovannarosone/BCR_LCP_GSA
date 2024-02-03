@@ -37,7 +37,7 @@
 #include "Parameters.h" // Defines ulong and uchar.
 #include "Tools.h"
 
-#if BUILD_SAP==1
+#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
 		//struct __attribute__((__packed__)) sortElement {
 		struct sortElement {	
 		sortElement() {};
@@ -48,7 +48,7 @@
 		#endif	
 		~sortElement() {};
 		dataTypedimAlpha pileN;
-		dataTypedimAlpha sap;
+		bool sap;
 		#if BUILD_LCP == 1
 			dataTypelenSeq lcpCurN;
 			dataTypelenSeq lcpSucN;
@@ -60,6 +60,7 @@
 		#endif
 		dataTypeNSeq seqN;
 		dataTypeNChar posN;
+
 		};
 #else
 	#if BUILD_LCP == 1
