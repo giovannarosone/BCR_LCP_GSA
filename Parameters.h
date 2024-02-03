@@ -113,7 +113,7 @@ typedef unsigned long ulong;
 #define printFinalOutput 0
 
 //Verbose
-#define verboseEncode 0
+#define verboseEncode 1
 #define verboseDecode 0
 
 //if you want to delete the partial files, please set it to 1
@@ -129,7 +129,7 @@ typedef unsigned long ulong;
 
 #define SAP_INVERSE 0
 
-#define SAP_PLUS 1
+#define SAP_PLUS 0
 
 #if FASTQ==1
     //Compute the quality score permutation associated to BWT   permutation
@@ -141,30 +141,51 @@ typedef unsigned long ulong;
     #define USE_QS 0             //if you want to build QS permutation from fasta and qs file, please set USE_QS to 1
 #endif
 
+#if RLO==1
+	#define BCR_SET_ALN_RH 1
+#endif
+
 #if SAP==1
     //Compute the SAP-array associated with BWT permutation
 	#define BUILD_SAP 1
-
-    #define BCR_SET_ALN_RH 1
+	//If you want to compute the reduced SAP-array instead of the SAP-array, please set BUILD_SAP 0 and BUILD_RED_SAP 1
+	#define BUILD_RED_SAP 0
+	
+	#ifndef BCR_SET_ALN_RH
+		#define BCR_SET_ALN_RH 1
+	#endif
 #else
-    #define BUILD_SAP 1 //if you want to build the SAP array, please set BUILD_SAP to 1
+    #define BUILD_SAP 0  //if you want to build the SAP array, please set BUILD_SAP to 1
+	#define BUILD_RED_SAP 0 //if you want to build the reduced SAP array, please set BUILD_RED_SAP to 1
 
 	//if BCR_SET_ALN_RH=0 then BCR computes the EBWT (the input is a set) aligning strings left 
 	//if BCR_SET_ALN_RH=1 then BCR computes the EBWT (the input is a set) aligning strings right 
-	#define BCR_SET_ALN_RH 1
+	#ifndef BCR_SET_ALN_RH
+		#define BCR_SET_ALN_RH 0
+	#endif
 #endif
 
 //Use kseq to read sequences
 #define KSEQ_PARSER 1
 
-//if you want to compute the LCP array, please set it to 1
-#define BUILD_LCP 0
+#if LCP==1
+	//Compute the LCP array
+	#define BUILD_LCP 1
+#else
+	#define BUILD_LCP 0
+#endif
+
+#if DA==1
+	//Compute the DA array \in [0..nSeq]
+	#define BUILD_DA 1
+#else
+	#define BUILD_DA 0
+#endif
 
 //The pair (da[i], sa[i]) is the gsa[i]
 //if you want to compute the SA array, please set it to 1
 #define BUILD_SA 0
-//if you want to compute the DA array \in [0..nSeq], please set it to 1
-#define BUILD_DA 0
+
 //if you want to compute the bit DA array, please set it to 1
 //it works in internal memory
 #define BUILD_DA_bit 0
