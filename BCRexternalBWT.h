@@ -80,10 +80,14 @@ public:
 	
 	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
 			
-	#if RLO==1
-		void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
-		static bool cmpSapSort (sortElement a,sortElement b);
-		void makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+		#if RLO==1 || SAP_PLUS || SAP_INVERSE
+			void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSort (sortElement a,sortElement b);
+		#endif
+
+		#if RLO
+			void makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+		#endif
 
 		#if SAP_PLUS
 			void makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
@@ -94,7 +98,12 @@ public:
 			void makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end, bool inverse);
 			static bool cmpSapSortInverse(sortElement a,sortElement b);
 		#endif
-	#endif
+
+		#if SAP_RANDOM
+			void makeSapRandom(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSortRandom(sortElement a,sortElement b);
+		#endif
+
 	
 private:
 	#if BCR_SET_ALN_RH ==1
