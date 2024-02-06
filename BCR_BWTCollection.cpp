@@ -247,11 +247,24 @@ int main(int argc, char *argv[])
         std::cout << "\t\tAlternate lexicographic order" << endl;
     #endif
 
+    #if BUILD_SAP == 1 || BUILD_RED_SAP == 1        
+	std::cout << "\t\tBuild SAP-array and use the folloging ";
+    #endif
     std::cout << "\tStrings order:\n";
-    #if BUILD_SAP == 0 || BUILD_RED_SAP == 0
-        std::cout << "\t\tInput order" << endl;
-    #else
-        std::cout << "\t\tReverse lexicographic order" << endl;
+    #if RLO==0 && SAP_PLUS==0 && SAP_INVERSE==0 && SAP_RANDOM==0
+	std::cout << "\t\tInput order" << endl;
+    #endif
+    #if RLO == 1
+	std::cout << "\t\tReverse lexicographic order" << endl;
+    #endif
+    #if SAP_PLUS == 1
+	std::cout << "\t\tSAP_PLUS" << endl;
+    #endif
+    #if SAP_INVERSE == 1
+	std::cout << "\t\tSAP_INVERSE order" << endl;
+    #endif
+    #if SAP_RANDOM == 1
+	std::cout << "\t\tSAP_RANDOM order" << endl;
     #endif
 	
     std::cout << "\tEBWT computation (.ebwt file)" << endl;
