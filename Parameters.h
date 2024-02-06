@@ -127,9 +127,9 @@ typedef unsigned long ulong;
 #define PI_PERM 0
 #define PI_POS 0
 
-#define SAP_INVERSE 0
-#define SAP_PLUS 0
-#define SAP_RANDOM 0
+//#define SAP_INVERSE 0
+//#define SAP_PLUS 0
+//#define SAP_RANDOM 0
 
 #if FASTQ==1
     //Compute the quality score permutation associated to BWT   permutation
