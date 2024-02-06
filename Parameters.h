@@ -128,8 +128,8 @@ typedef unsigned long ulong;
 #define PI_POS 0
 
 #define SAP_INVERSE 0
-
 #define SAP_PLUS 0
+#define SAP_RANDOM 0
 
 #if FASTQ==1
     //Compute the quality score permutation associated to BWT   permutation
@@ -141,7 +141,7 @@ typedef unsigned long ulong;
     #define USE_QS 0             //if you want to build QS permutation from fasta and qs file, please set USE_QS to 1
 #endif
 
-#if RLO==1
+#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 	#define BCR_SET_ALN_RH 1
 #endif
 
