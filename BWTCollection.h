@@ -142,7 +142,7 @@ namespace SXSI
 			virtual void storeEntireBWTIntMem(const char*) = 0;
 			virtual dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *, dataTypeNChar, dataTypeNChar , uchar *) =0;
 		#endif
-		#if RLO==1
+		#if RLO || SAP_PLUS || SAP_INVERSE
 			virtual void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)=0;
 		#endif
 	    
