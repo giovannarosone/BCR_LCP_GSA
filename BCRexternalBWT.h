@@ -29,151 +29,109 @@
  **
  **/
 
-#ifndef _SXSI_BWTCollection_h_
-#define _SXSI_BWTCollection_h_
+#ifndef _BCRexternalBWT_H_
+#define _BCRexternalBWT_H_
 
+#include <map>
+#include "BWTCollection.h"
 #include "Parameters.h" // Defines ulong and uchar.
-#include "Tools.h" 
-//#include "Sorting.cpp"
-#include "Sorting.h"
-//#include <utility> // Defines std::pair.
-//#include <fstream>
+#include <fstream>
 #include <iostream>
-using namespace std;
 
 //2022-10-28
 #include <algorithm>
+#include "Sorting.h"
 
-namespace SXSI
-{
+class BCRexternalBWT : public SXSI::BWTCollection {
+public:
     /**
-     * General interface for a bwt collection
-     *
-     * Class is virtual, make objects by calling
-     * the static method InitBWTCollection().
+     * Constructor
      */
-    class BWTCollection
-    {
-    public:
-	    #if BUILD_DA_bit == 1
-			dataTypeNSeq numberFirstSet;
-			dataTypeNSeq numberSecondSet;
-			std::vector< std::vector<bool> > vectVectBitDA;
-		#endif
-		
-		#if USE_QS==1
-			uchar *newSymbQS;
-		#endif 
-		
-	    #if BUILD_SAP==1 || BUILD_RED_SAP==1
-			uchar *newSymbSAP;
-		#endif 
-	    
-		std::vector <sortElement> vectTriple;  //Is is used both encoding, decoding, searching.
-		//ulong seqN;  //contains a number of a sequence
-		//ulong posN;  //contains the position of the last inserted symbol of the sequence seqN[i]
-		//uchar pileN; //contains the number of the pile of the last inserted symbol of the sequence seqN[i]
+        explicit BCRexternalBWT(char*, char*, string);
 
-		dataTypeNSeq nText;  //number total of texts in filename1
-		dataTypeNSeq nExamedTexts;  //number total of texts in filename1
-		//dataTypeNSeq middle; // number of sequence in filename1
-		//dataTypeNChar middleLength; //text[middleLength] = the first letter of the second database (filename2)
-		dataTypelenSeq lengthRead; //number of char in each text + $
-		dataTypeNChar lengthTot;   //length of the all texts without $
-		dataTypeNChar lengthTot_plus_eof; //length of the BWT
-		dataTypeNChar** tableOcc; //contains the number of occurrences of each symbol
-		dataTypedimAlpha alpha[SIZE_ALPHA]; //Corresponding between the alphabet, the piles and tableOcc
-		dataTypedimAlpha sizeAlpha;  //number of the different symbols in the input texts
-		dataTypedimAlpha *alphaInverse;  //Corresponding between alpha[i] and the symbol as char
+	~BCRexternalBWT();
 
-#if PI_PERM == 1
-			std::vector<dataTypeNSeq> piPerm; //permutation array
-		#endif
+	int buildBCR(char const *, char const *, char const *, string);
 
-		bool sapInterval;
-		#if BUILD_BCR_FROM_BCRpartials == 1
-			dataTypeNSeq nAddedTextEGSA;
-			//char c_aux[512] = "7seqsVar.fasta.7.gesa";
+  void storeBWTFilePartial(uchar const *, dataTypelenSeq);
+	#if BUILD_LCP == 1
+	    void storeBWTandLCP(uchar const *, dataTypelenSeq);
+		void storeEntireLCP(const char*);
+    #endif
+	void storeEntireBWTFilePartial(const char*);
+	
+	#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || KEEP_eBWT_IN_EXT_MEMORY==1)
+		virtual int storeEGSAcomplete( const char* );
+	#endif
+
+	#if OUTPUT_FORMAT == 1
+		virtual int storeEGSAoutputFromEntireFiles (string );
+	#endif
+	#if ( (BUILD_DA==1) || (BUILD_SA==1) )
+		void storeEntirePairSA(const char*);
+		//void storeEntireSAfromPairSA(const char*);
+	#endif
+	
+	#if KEEP_eBWT_IN_EXT_MEMORY==0
+		void storeEntireBWTIntMem(const char*);
+		void  storeBWTIntMem(uchar const *, dataTypelenSeq) ;
+		dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *,  dataTypeNChar, dataTypeNChar , uchar *);
+	#endif
+	
+	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
+			
+		#if RLO==1 || SAP_PLUS || SAP_INVERSE
+			void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSort (sortElement a,sortElement b);
 		#endif
 
-		#if KEEP_eBWT_IN_EXT_MEMORY==0
-			std::vector< std::vector<char> > vectVectBWT;
+		#if RLO
+			void makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
 		#endif
 
-		std::vector <bool> vectInsTexts;
-
-		vector< vector< vector<dataTypeNChar> > > vectorOcc;
-		vector <dataTypeNChar> numBlocksInPartialBWT;
-
-		vector<sortElement> FirstVector, LastVector;
-
-    static BWTCollection * InitBWTCollection(char*,char*, string);
-
-		/**
-         * Virtual destructor
-         */
-    virtual ~BWTCollection() { };
-
-    virtual int buildBCR(char const *, char const *, char const *, string) = 0;
-
-    virtual void storeBWTFilePartial(uchar const *, dataTypelenSeq) = 0;
-		#if BUILD_LCP == 1
-		    virtual void storeBWTandLCP(uchar const *, dataTypelenSeq) =0;
-			virtual void storeEntireLCP(const char*) = 0;
-        #endif
-		virtual void storeEntireBWTFilePartial(const char*) = 0;
-		#if ( (BUILD_DA==1) || (BUILD_SA==1) )
-			virtual void storeEntirePairSA(const char*) = 0;
-			//virtual void storeEntireSAfromPairSA(const char*) = 0;
+		#if SAP_PLUS
+			void makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSortPlus (sortElement a,sortElement b);
 		#endif
-		
-   		#if ((BUILD_LCP == 1) || (BUILD_DA==1) || (BUILD_SA==1) || (KEEP_eBWT_IN_EXT_MEMORY==1) )
-			virtual int storeEGSAcomplete( const char* )=0;
-		#endif
-	    
-		#if OUTPUT_FORMAT == 1
-			virtual int storeEGSAoutputFromEntireFiles (string input)= 0;
-		#endif
-		
-		virtual dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *)=0;
-	    
-		#if KEEP_eBWT_IN_EXT_MEMORY==0
-			virtual void  storeBWTIntMem(uchar const *, dataTypelenSeq) =0;
-			virtual void storeEntireBWTIntMem(const char*) = 0;
-			virtual dataTypeNChar rankManySymbolsIntMem(dataTypedimAlpha , dataTypeNChar *, dataTypeNChar, dataTypeNChar , uchar *) =0;
-		#endif
-		#if RLO || SAP_PLUS || SAP_INVERSE
-			virtual void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)=0;
-		#endif
-	    
-	private:
-		#if BUILD_BCR_FROM_BCRpartials == 1
-            		virtual dataTypeNChar readPreviousBCR(string)=0;
-		#endif
-		virtual void printSegments()=0;
-		virtual void printOutput(char *)=0;
-		virtual void InsertNsymbols(uchar const *, dataTypelenSeq) = 0;
-		virtual void InsertFirstsymbols(uchar *) = 0;   //Added/Modified/Removed 2016-02-23
 
+		#if SAP_INVERSE
+			void makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end, bool inverse);
+			static bool cmpSapSortInverse(sortElement a,sortElement b);
+		#endif
 
-		virtual int createFilePartialBWT() =0;
-		virtual FILE * openWriteFilePartialBWT_0() =0;
-		virtual dataTypeNChar writeFilePartial(uchar * , FILE *) =0;
-		virtual FILE * openFilePartialIn(dataTypedimAlpha) =0;
-		virtual FILE * openFilePartialOut(dataTypedimAlpha ) =0;
-		virtual int closeFilePartial(FILE * InFile)=0;
-		virtual int renameFilePartial(dataTypedimAlpha currentPile)=0;
-		virtual dataTypeNChar readOnFilePartial(uchar *, dataTypeNChar , FILE * )=0;
-		virtual dataTypeNChar writeOnFilePartial(uchar *, dataTypeNChar , FILE * )=0;
-		virtual dataTypeNChar writeSymbolOnFilePartial(uchar , dataTypeNChar , FILE * )=0;
+		#if SAP_RANDOM
+			void makeSapRandom(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSortRandom(sortElement a,sortElement b);
+		#endif
 
-    protected:
-        // Protected constructor; call the static function InitBWTCollection().
-        BWTCollection() { };
+	
+private:
+	#if BCR_SET_ALN_RH ==1
+		dataTypeNSeq numToRemove=0;
+		dataTypeNSeq contToRemove=0;
+	#endif
+	
+	#if BUILD_BCR_FROM_BCRpartials == 1
+		dataTypeNChar readPreviousBCR(string);
+	#endif
+	void printSegments();
+	void printOutput(char *);
+	void InsertNsymbols(uchar const *, dataTypelenSeq);
+	void InsertFirstsymbols(uchar *); //Added/Modified/Removed 2016-02-23
 
-        // No copy constructor or assignment
-        BWTCollection(BWTCollection const&);
-        BWTCollection& operator = (BWTCollection const&);
-    };
-}
+void printTriple(std::vector<sortElement> vectTriple, dataTypeNSeq nExamedTexts);
+
+	int createFilePartialBWT();
+	FILE * openWriteFilePartialBWT_0();
+	
+	dataTypeNChar writeFilePartial(uchar * , FILE * ) ;
+	FILE * openFilePartialIn( dataTypedimAlpha );
+	FILE * openFilePartialOut(dataTypedimAlpha );
+	int closeFilePartial(FILE * InFile);
+	int renameFilePartial(dataTypedimAlpha );
+	dataTypeNChar readOnFilePartial(uchar *, dataTypeNChar , FILE * );
+	dataTypeNChar writeOnFilePartial(uchar *, dataTypeNChar , FILE * );
+	dataTypeNChar writeSymbolOnFilePartial(uchar , dataTypeNChar , FILE * );
+};
+
 #endif
