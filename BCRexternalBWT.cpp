@@ -52,14 +52,16 @@
 
 uchar *newSymb;
 
+#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+	dataTypeNSeq sapCounter = 1;
+	dataTypeNSeq sapTypeTwoCounter = 0;
+#endif
+
 #if SAP_PLUS
 	static uchar prevSymbolSap;
 	static uchar nextSymbolSap;
 #endif
-#if BUILD_SAP 
-	dataTypeNSeq sapCounter = 1;
-	dataTypeNSeq sapTypeTwoCounter = 0;
-#endif
+
 //using std::vector;
 using namespace std;
 using SXSI::BWTCollection;
@@ -228,7 +230,7 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, string BCRprefPrev
         std::cerr << "Start builBCR (including the writing the cyc files) " << start << " seconds\n";
         std::cerr << "End   builBCR (including the writing the cyc files) " << end << " seconds\n";
         std::cerr << "builBCR (including the writing the cyc files) tooks " << dif << " seconds\n";
-#if BUILD_SAP
+		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 			std::cerr << "total sap interval: " << sapCounter << "\n";
 			std::cerr << "total sap interval of type two: " << sapTypeTwoCounter << "\n";
 		#endif
@@ -1142,14 +1144,12 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		#if verboseEncode==1 || KEEP_eBWT_IN_EXT_MEMORY == 0
 			std::cerr << "\n"<< "j= "<< (long) lengthRead - t - 1 <<" - symbols in position " << (long) t << "\n";
 		#endif
-		
 		#if verboseEncode==1
 			cout << "Starting iteration " << (long) lengthRead - t - 1  << ", time now: " << timer.timeNow();
 			time_t startWhile,endWhile;
 			double difWhile=0.0;
 			time (&startWhile);
 		#endif
-
 		//To insert the symbol from position m-3 to position 1
 		//The last inserted symbol is in position i+1 (or it is newSymb[j]),
 		//the next symbol (to insert) is in position i
@@ -1183,7 +1183,6 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 				if (remove(filename)!=0)
 					std::cerr << "Error deleting " << filename << " file" << std::endl;
 			#endif
-			
 			#if USE_QS==1
 				FILE *InFileInputTextQS;
 				sprintf (filename, "%sqs.%u.txt", fileOut , t);
@@ -1475,10 +1474,10 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			tripla.posN = nExamedTexts+1;  // position of the suffix (1-based)
 			tripla.seqN = j;	  // number of the sequence
 			tripla.pileN = 0;    //The first symbols are in $-pile
-			#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 				//Inizialize sap to 1
 				tripla.sap = 1;
-#if PI_POS == 1
+				#if PI_POS == 1
 					//inizialize piPos value in the triple
 					tripla.piPos = std::numeric_limits<dataTypeNSeq>::max();
 				#endif
@@ -1511,12 +1510,17 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
         #endif
 	}
 	
-	#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
-		#if RLO==1
-		//Sort by bwt and then by seqN
-		sapSort(vectTriple,0,nExamedTexts);
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+		#if RLO || SAP_PLUS || SAP_INVERSE
+			//Sort by bwt and then by seqN";
+			sapSort(vectTriple,0,nExamedTexts);
 		#endif
-#if PI_PERM == 1
+
+		#if SAP_RANDOM
+			
+		#endif
+
+		#if PI_PERM == 1
 			//initialize array permutation to N.
 			for(dataTypeNSeq j = 0; j< nExamedTexts; j++) {
 				piPerm.push_back(vectTriple[j].seqN);
@@ -1530,15 +1534,15 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		bool oneRunSAP=0, moreRunSAP=0;
 		#endif
 		
-		#if RLO==1
+		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 		//Rewrite newSymb and reset posN
 		dataTypeNSeq i_pile_fin, i_pile = 0;
 		#endif
 		
-		#if RLO==1 || BUILD_RED_SAP==1
+		#if RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM || BUILD_RED_SAP==1
 		for (dataTypedimAlpha h = 1 ; h < sizeAlpha; h++){
 			if(tableOcc[0][h]>0){
-				#if RLO==1
+				#if RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 				i_pile_fin = i_pile + tableOcc[0][h];
 				while(i_pile < i_pile_fin){
 					newSymb[i_pile]=alphaInverse[h];
@@ -1557,46 +1561,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	#endif
 	std::cerr << std::endl;
 	#if verboseEncode==1
-		std::cerr << "First step:" << std::endl;
-		std::cerr << "U:  ";
-		for (dataTypeNSeq j = 0 ; j < nExamedTexts; j++) {
-			std::cerr << newSymb[j] << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "Q  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << (unsigned int)vectTriple[g].pileN << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "P  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].posN  << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "N  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].seqN  << " ";
-		}
-		std::cerr << std::endl;
-		#if BUILD_SAP == 1 || BUILD_RED_SAP == 1 || RLO == 1
-			std::cerr << "S  ";
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (uchar)vectTriple[g].sap + 48  << " ";
-			}
-			std::cerr << std::endl;
-		#endif
-		#if BUILD_LCP == 1
-			std::cerr << "C  ";             //LCP current
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpCurN  << " ";
-			}
-			std::cerr << std::endl;
-			std::cerr << "S  ";                     //LCP successive
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpSucN  << " ";
-			}
-			std::cerr << std::endl;
-		#endif
+		printTriple(vectTriple, nExamedTexts);
 	#endif
 	//Store newSymb into $-pile BWT
 
@@ -1910,7 +1875,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		double difStore=0.0;
 	#endif 
 	
-	#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
+	#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 	bool sapInterval=false;
 	#endif
 	
@@ -1936,9 +1901,9 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 
 			dataTypedimAlpha currentPile = vectTriple[j].pileN;
 
-			#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
+			#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 ||SAP_PLUS ||SAP_INVERSE || SAP_RANDOM
 			vectTriple[j].sap = 0;
-				#if RLO==1
+				#if RLO==1 ||SAP_PLUS || SAP_INVERSE ||SAP_RANDOM
 				dataTypedimAlpha prevSymbol = DUMMY_TERM;
 				#else
 				dataTypedimAlpha *prevSymbol = new dataTypedimAlpha[sizeAlpha];
@@ -2013,8 +1978,8 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 					//I have to insert the new symbol in the symbol-pile
 					vectTriple[k].pileN=alpha[(unsigned int)foundSymbol];
 					
-					#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
-						#if RLO==1
+					#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 ||SAP_PLUS || SAP_INVERSE ||SAP_RANDOM
+						#if RLO==1 || SAP_PLUS || SAP_INVERSE ||SAP_RANDOM
 						//Set sap according to the previous symbol
 						if ( (prevSymbol != vectTriple[k].pileN) && vectTriple[k].sap == 1 )
 							vectTriple[k].sap=0;
@@ -2056,7 +2021,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			#endif
 
 			j=k;
-			#if (BUILD_SAP==1 || BUILD_RED_SAP==1) && RLO==0
+			#if (BUILD_SAP==1 || BUILD_RED_SAP==1) && (RLO==0 || SAP_PLUS == 0 || SAP_INVERSE == 0 || SAP_RANDOM == 0)
 			delete [] prevSymbol;
 			#endif
 
@@ -2116,8 +2081,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		time (&startSorting);
 	#endif
 	
-#if BUILD_SAP == 1
-		#if PI_POS == 1
+	#if (RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM) && PI_POS
 			//update the piPos value in the vector triple
 			dataTypeNSeq pos = 0;
 			for(j=0; j<nExamedTexts; j++) {
@@ -2132,8 +2096,6 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 					pos++;
 				}
 			}
-
-		#endif
 	#endif
 	quickSort(vectTriple);
 
@@ -2239,60 +2201,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				std::cerr << newSymb[g] << " ";
 		std::cerr << std::endl;
 		std::cerr << "After Sorting - Triples" << std::endl;
-		std::cerr << "Q  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << (unsigned int)vectTriple[g].pileN << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "P  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].posN  << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "N  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].seqN  << " ";
-		}
-		std::cerr << std::endl;
-		#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
-		std::cerr << "S  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
-		}
-		std::cerr << std::endl;
-		#endif
-		#if BUILD_LCP == 1
-			std::cerr << "C  ";             //LCP current
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpCurN  << " ";
-			}
-			std::cerr << std::endl;
-			std::cerr << "S  ";                     //LCP successive
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpSucN  << " ";
-			}
-			std::cerr << std::endl;
-		#endif
-		#if PI_PERM
-			#if PI_POS == 1
-			//Print piPos value
-				std::cerr << "I  ";
-				for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-					if(vectTriple[g].piPos != std::numeric_limits<dataTypeNSeq>::max()) {
-						std::cerr << vectTriple[g].piPos  << " ";
-					}
-					else {
-						std::cerr << "x" << " ";
-					}
-				}
-				std::cerr << std::endl;
-			#endif 
-			std::cerr << "G  ";
-			for (dataTypeNSeq g = 0 ; g < piPerm.size(); g++) {
-				std::cerr << piPerm[g] << " ";
-			}
-			std::cerr << std::endl;
-		#endif
+		printTriple(vectTriple, nExamedTexts);
 	#endif
 
 	#if verboseEncode==1
@@ -2326,39 +2235,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		}
 		std::cerr << "Triples at the end of the current iteration:" << std::endl;
 
-		std::cerr << "Q  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << (unsigned int)vectTriple[g].pileN << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "P  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].posN  << " ";
-		}
-		std::cerr << std::endl;
-		std::cerr << "N  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << vectTriple[g].seqN  << " ";
-		}
-		std::cerr << std::endl;
-		#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1
-		std::cerr << "S  ";
-		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
-		}
-		std::cerr << std::endl;
-		#endif
-		#if BUILD_LCP == 1
-			std::cerr << "C  ";
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpCurN  << " ";
-			}
-			std::cerr << std::endl;
-			std::cerr << "S  ";
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				std::cerr << (unsigned int)vectTriple[g].lcpSucN  << " ";
-			}
-		#endif
+		printTriple(vectTriple, nExamedTexts);
 	#endif
 	
 }
@@ -2417,7 +2294,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	#endif
 
 	dataTypeNChar numchar=0;
-#if SAP_PLUS
+	#if SAP_PLUS
 		dataTypeNChar numchar2 = 0;
 	#endif
 	uchar *buffer = new uchar[SIZEBUFFER];
@@ -2517,12 +2394,8 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		//For each new symbol in the same pile
 		dataTypeNSeq k=j;
 		dataTypeNChar cont = 0;
-#if BUILD_SAP
+		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 			bool sapPresence;
-		#endif
-		#if SAP_PLUS
-			uchar lastSymbolInserted;
-			//uchar nextSymbolToBeInserted;
 		#endif
 		#if SAP_INVERSE == 1
 			bool inverse = false;
@@ -2530,7 +2403,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		#endif
 
 		#if SAP_PLUS
-			lastSymbolInserted = TERMINATE_CHAR;
+			uchar lastSymbolInserted = TERMINATE_CHAR;
 			prevSymbolSap = TERMINATE_CHAR;
 			nextSymbolSap = (dataTypedimAlpha)84;
 			//nextSymbolToBeInserted = (dataTypedimAlpha)84;
@@ -2539,7 +2412,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 			//interations on the pile
-			#if BUILD_SAP
+			#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 				dataTypeNSeq start=k, end;
 				dataTypeNSeq h;		
 				dataTypeNSeq i = k+1;
@@ -2561,7 +2434,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				h = start;
 			#endif
 
-			#if BUILD_SAP
+			#if RLO || SAP_PLUS ||  SAP_INVERSE || SAP_RANDOM
 			while(h < end) {
 				//iteration of the SAP-interval
 			#else
@@ -2570,7 +2443,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 		   #if (BCR_SET==1)
 			//if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {    //Added check vectInsTexts
-if ((vectInsTexts[vectTriple[h].seqN]==1) && (newSymb[vectTriple[h].seqN] != TERMINATE_CHAR_LEN)) {
+				if ((vectInsTexts[vectTriple[h].seqN]==1) && (newSymb[vectTriple[h].seqN] != TERMINATE_CHAR_LEN)) {
     	   	   #endif
 				//if (verboseEncode==1)
 				 //   std::cerr << "k= " << k << " Q[k]= " << (unsigned int)vectTriple[k].pileN << " P[k]= " << vectTriple[k].posN << " cont = "<< cont << std::endl;
@@ -2579,7 +2452,7 @@ if ((vectInsTexts[vectTriple[h].seqN]==1) && (newSymb[vectTriple[h].seqN] != TER
 				//As PosN starts to the position 1 and I have to insert the new symbol in position posN[k]
 				// I have to read posN[k]-1 symbols
 				//cont is the number of symbols already read!
-toRead = (vectTriple[h].posN-1) - cont;
+				toRead = (vectTriple[h].posN-1) - cont;
 
 						#if SAP_INVERSE == 1
 							//reverse the RLO ordering in the SAP-interval
@@ -2588,7 +2461,7 @@ toRead = (vectTriple[h].posN-1) - cont;
 							}
 						#endif
 
-						#if SAP_PLUS == 1
+						#if SAP_PLUS
 							//obtain previous and next symbol through consecutive inserions
 							if(h==start && sapPresence) {
 								if(end == nExamedTexts) {
@@ -2703,7 +2576,7 @@ toRead = (vectTriple[h].posN-1) - cont;
 				//Now I have to insert the new symbol associated with the suffix of the sequence k
 				//And I have to update the number of occurrences of each symbol
 				if (toRead==0) {
-							#if BUILD_SAP == 1
+							#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 								if(sapPresence) {
 									if(h == start) {
 										
@@ -2731,12 +2604,17 @@ toRead = (vectTriple[h].posN-1) - cont;
 											#endif
 										#endif
 
-										#if SAP_INVERSE == 1
+										#if SAP_INVERSE
 											makeSapInverse(vectTriple, start, end, inverse);
-										#elif SAP_PLUS == 1
+										#endif
+										#if SAP_PLUS
 											makeSapPlus(vectTriple, start, end);
-										#else
+										#endif
+										#if RLO
 											makeSap(vectTriple, start, end);
+										#endif
+										#if SAP_RANDOM
+											makeSapRandom(vectTriple, start, end);
 										#endif
 
 										#if PI_PERM == 1
@@ -2841,7 +2719,7 @@ tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 			}   //end if (newSymb[vectTriple[k].seqN] != TERMINATE_CHAR_LEN) {
 		   #endif
 		  h++;   //  I changed the number of the sequence. New iteration.
-#if BUILD_SAP
+			#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 				//SAP-interval fully inserted
 			}
 			#endif
@@ -6712,7 +6590,7 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 	return numcharWrite;
 }
 
-#if RLO==1
+#if RLO || SAP_PLUS || SAP_INVERSE
 	
 	bool BCRexternalBWT::cmpSapSort (sortElement a,sortElement b) {
 		if (newSymb[a.seqN] == newSymb[b.seqN])
@@ -6720,39 +6598,45 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 		else
 			return (newSymb[a.seqN] < newSymb[b.seqN]); 
 	}
-
-
+	
 	void BCRexternalBWT::sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end)
 	{	
 		sort( v.begin()+start,v.begin()+end, cmpSapSort);  
 	}
+#endif
+
+#if RLO==1
 
  void BCRexternalBWT::makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end) {
 		//std::cerr << "simbolo precedente: " << buffer[toRead-1] << "\n";
 		//if(sapInterval) {
 
 		
-		dataTypeNChar init_posN = vectTriple[start].posN;
+		dataTypeNChar init_posN = v[start].posN;
 		//Reorder symbols in [start,end)
-		sapSort(vectTriple, start, end);
+		sapSort(v, start, end);
 										
-		//To check if the SAP-interval is type II
-		uchar currentCh=newSymb[vectTriple[start].seqN];
-		bool notOneRunSAP = true;
+		#if BUILD_RED_SAP
+			//To check if the SAP-interval is type II
+			uchar currentCh=newSymb[v[start].seqN];
+			bool notOneRunSAP = true;
+		#endif
 							
 		//Reset posN and sap in [start,end)
-		vectTriple[start].posN = init_posN;
-		vectTriple[start].sap = 0;
+		v[start].posN = init_posN;
+		v[start].sap = 0;
 		//newSymbSAP[start]=48;  by default
 		for (dataTypeNSeq j=start+1; j<end; j++){
-			vectTriple[j].posN = ++init_posN;
-			vectTriple[j].sap = 1;
-											
-			if ( (notOneRunSAP==true) && (currentCh != newSymb[vectTriple[j].seqN])) {
+			v[j].posN = ++init_posN;
+			v[j].sap = 1;
+			#if BUILD_RED_SAP	
+			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
 				notOneRunSAP=false;
 			}
+			#endif
 		}
-										
+				
+		#if BUILD_RED_SAP
 		//Modify newSymbSAP in case of SAP-interval of Type II
 		if (notOneRunSAP==false) {  //SAP-interval of type II
 			sapTypeTwoCounter++;
@@ -6760,21 +6644,24 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 				newSymbSAP[j]= 49; //==true
 				}	
 		}
+		#endif
 										
 		#if verboseEncode==1
 		std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
 		std::cerr << "symb=";
 		for (dataTypeNSeq j=0; j<end-start; j++)
-			std::cerr << vectTriple[start+j].seqN  <<" ";
+			std::cerr << v[start+j].seqN  <<" ";
 		std::cerr << std::endl;
 		std::cerr << "sap=";
 		for (dataTypeNSeq j=0; j<end-start; j++)
-			std::cerr << vectTriple[start+j].sap + 48 <<" ";
+			std::cerr << v[start+j].sap + 48 <<" ";
 		std::cerr << std::endl;
-		std::cerr << "newSymbSAP=";
-		for (dataTypeNSeq j=0; j<end-start; j++)
-			std::cerr << newSymbSAP[start+j] <<" ";
-		std::cerr << std::endl;
+			#if BUILD_RED_SAP
+			std::cerr << "newSymbSAP=";
+			for (dataTypeNSeq j=0; j<end-start; j++)
+				std::cerr << newSymbSAP[start+j] <<" ";
+			std::cerr << std::endl;
+			#endif
 		#endif
 	}
 #endif
@@ -6787,49 +6674,55 @@ void BCRexternalBWT::makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start
 			nextSymbolSap = (dataTypedimAlpha)84;
 		}
 		
-		dataTypeNChar init_posN = vectTriple[start].posN;
+		dataTypeNChar init_posN = v[start].posN;
 		//Reorder symbols in [start,end)
 		sort(v.begin()+start,v.begin()+end, cmpSapSortPlus);
 										
+		#if BUILD_RED_SAP
 		//To check if the SAP-interval is type II
-		uchar currentCh=newSymb[vectTriple[start].seqN];
+		uchar currentCh=newSymb[v[start].seqN];
 		bool notOneRunSAP = true;
+		#endif
 							
 		//Reset posN and sap in [start,end)
-		vectTriple[start].posN = init_posN;
-		vectTriple[start].sap = 0;
+		v[start].posN = init_posN;
+		v[start].sap = 0;
 		//newSymbSAP[start]=48;  by default
 		for (dataTypeNSeq j=start+1; j<end; j++){
-			vectTriple[j].posN = ++init_posN;
-			vectTriple[j].sap = 1;
-											
-			if ( (notOneRunSAP==true) && (currentCh != newSymb[vectTriple[j].seqN])) {
+			v[j].posN = ++init_posN;
+			v[j].sap = 1;
+			#if BUILD_RED_SAP							
+			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
 				notOneRunSAP=false;
 			}
+			#endif
 		}
-										
-			//Modify newSymbSAP in case of SAP-interval of Type II
+		#if BUILD_RED_SAP				
+		//Modify newSymbSAP in case of SAP-interval of Type II
 		if (notOneRunSAP==false) {  //SAP-interval of type II
 			sapTypeTwoCounter++;
 			for (dataTypeNSeq j = start+1; j<end; j++) {
 				newSymbSAP[j]= 49; //==true
 				}	
 		}
+		#endif
 										
 		#if verboseEncode==1
 			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
 			std::cerr << "symb=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
-				std::cerr << vectTriple[start+j].seqN  <<" ";
+				std::cerr << v[start+j].seqN  <<" ";
 			std::cerr << std::endl;
 			std::cerr << "sap=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
-				std::cerr << vectTriple[start+j].sap + 48 <<" ";
+				std::cerr << v[start+j].sap + 48 <<" ";
 			std::cerr << std::endl;
+			#if BUILD_RED_SAP
 			std::cerr << "newSymbSAP=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
 				std::cerr << newSymbSAP[start+j] <<" ";
 			std::cerr << std::endl;
+			#endif
 		#endif
 	}
 
@@ -6861,7 +6754,7 @@ void BCRexternalBWT::makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start
 void BCRexternalBWT::makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end, bool inverse) {
 	//if(sapInterval) {
 		
-			dataTypeNChar init_posN = vectTriple[start].posN;
+			dataTypeNChar init_posN = v[start].posN;
 			//Reorder symbols in [start,end)
 			if(inverse) {
 				sort(v.begin()+start,v.begin()+end, cmpSapSortInverse);
@@ -6869,24 +6762,28 @@ void BCRexternalBWT::makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq st
 			else {
 				sort(v.begin()+start,v.begin()+end, cmpSapSort);
 			}
-										
+			
+			#if BUILD_RED_SAP
 			//To check if the SAP-interval is type II
-			uchar currentCh=newSymb[vectTriple[start].seqN];
+			uchar currentCh=newSymb[v[start].seqN];
 			bool notOneRunSAP = true;
+			#endif
 							
 			//Reset posN and sap in [start,end)
-			vectTriple[start].posN = init_posN;
-			vectTriple[start].sap = 0;
+			v[start].posN = init_posN;
+			v[start].sap = 0;
 			//newSymbSAP[start]=48;  by default
 			for (dataTypeNSeq j=start+1; j<end; j++){
-				vectTriple[j].posN = ++init_posN;
-				vectTriple[j].sap = 1;
-											
-				if ( (notOneRunSAP==true) && (currentCh != newSymb[vectTriple[j].seqN])) {
+				v[j].posN = ++init_posN;
+				v[j].sap = 1;
+				#if BUILD_RED_SAP		
+				if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
 					notOneRunSAP=false;
 				}
+				#endif
 			}
-										
+
+			#if BUILD_RED_SAP					
 			//Modify newSymbSAP in case of SAP-interval of Type II
 			if (notOneRunSAP==false) {  //SAP-interval of type II
 				sapTypeTwoCounter++;
@@ -6894,21 +6791,24 @@ void BCRexternalBWT::makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq st
 					newSymbSAP[j]= 49; //==true
 					}	
 			}
+			#endif
 										
 			#if verboseEncode==1
 			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
 			std::cerr << "symb=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
-				std::cerr << vectTriple[start+j].seqN  <<" ";
+				std::cerr << v[start+j].seqN  <<" ";
 			std::cerr << std::endl;
 			std::cerr << "sap=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
-				std::cerr << vectTriple[start+j].sap + 48 <<" ";
+				std::cerr << v[start+j].sap + 48 <<" ";
 			std::cerr << std::endl;
+			#if BUILD_RED_SAP
 			std::cerr << "newSymbSAP=";
 			for (dataTypeNSeq j=0; j<end-start; j++)
 				std::cerr << newSymbSAP[start+j] <<" ";
 			std::cerr << std::endl;
+			#endif
 		#endif
 
 	//}
@@ -6919,6 +6819,79 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 			return (b.seqN < a.seqN);
 		else
 			return (newSymb[b.seqN] < newSymb[a.seqN]); 
+	}
+#endif
+
+#if SAP_RANDOM
+	void BCRexternalBWT::makeSapRandom(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end) {
+		dataTypeNChar init_posN = v[start].posN;
+		//Reorder symbols in [start,end)
+
+		sort(v.begin()+start,v.begin()+end, cmpSapSortRandom);
+										
+		#if BUILD_RED_SAP
+		//To check if the SAP-interval is type II
+		uchar currentCh=newSymb[v[start].seqN];
+		bool notOneRunSAP = true;
+		#endif
+							
+		//Reset posN and sap in [start,end)
+		v[start].posN = init_posN;
+		v[start].sap = 0;
+		//newSymbSAP[start]=48;  by default
+		for (dataTypeNSeq j=start+1; j<end; j++){
+			v[j].posN = ++init_posN;
+			v[j].sap = 1;
+			#if BUILD_RED_SAP							
+			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
+				notOneRunSAP=false;
+			}
+			#endif
+		}
+		#if BUILD_RED_SAP				
+		//Modify newSymbSAP in case of SAP-interval of Type II
+		if (notOneRunSAP==false) {  //SAP-interval of type II
+			sapTypeTwoCounter++;
+			for (dataTypeNSeq j = start+1; j<end; j++) {
+				newSymbSAP[j]= 49; //==true
+				}	
+		}
+		#endif
+										
+		#if verboseEncode==1
+			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
+			std::cerr << "symb=";
+			for (dataTypeNSeq j=0; j<end-start; j++)
+				std::cerr << v[start+j].seqN  <<" ";
+			std::cerr << std::endl;
+			std::cerr << "sap=";
+			for (dataTypeNSeq j=0; j<end-start; j++)
+				std::cerr << v[start+j].sap + 48 <<" ";
+			std::cerr << std::endl;
+			#if BUILD_RED_SAP
+			std::cerr << "newSymbSAP=";
+			for (dataTypeNSeq j=0; j<end-start; j++)
+				std::cerr << newSymbSAP[start+j] <<" ";
+			std::cerr << std::endl;
+			#endif
+		#endif
+	}
+
+	bool BCRexternalBWT::cmpSapSortRandom (sortElement a,sortElement b) {
+		/*srand(time(NULL));
+		bool val = rand()%2;
+		return val;*/
+		/*if(val) {
+			return (a.seqN < b.seqN);
+		}
+		else {
+			return (a.seqN > b.seqN);
+		}*/
+		if (newSymb[a.seqN] == newSymb[b.seqN])
+			return (b.seqN < a.seqN);
+		else
+			return (newSymb[b.seqN] < newSymb[a.seqN]); 
+
 	}
 #endif
 
@@ -6938,17 +6911,12 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 			std::cerr << vectTriple[g].seqN  << " ";
 		}
 		std::cerr << std::endl;
-		#if BUILD_SAP==1
-			std::cerr << "S  ";
-			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
-				if(vectTriple[g].sap == 1) {
-					std::cerr << "1 ";
-				}
-				else {
-					std::cerr << "0 ";
-				}
-			}
-			std::cerr << std::endl;
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+		std::cerr << "S  ";
+		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
+			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
+		}
+		std::cerr << std::endl;
 		#endif
 		#if BUILD_LCP == 1
 			std::cerr << "C  ";             //LCP current
