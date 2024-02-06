@@ -80,26 +80,35 @@ public:
 	
 	dataTypeNChar rankManySymbolsFilePartial(FILE &, dataTypeNChar *, dataTypeNChar, uchar *);
 			
-	#if BUILD_SAP
-		void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
-		static bool cmpSapSort (sortElement a,sortElement b);
+		#if RLO==1 || SAP_PLUS || SAP_INVERSE
+			void sapSort(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSort (sortElement a,sortElement b);
+		#endif
 
-		void makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+		#if RLO
+			void makeSap(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+		#endif
 
-		//#if SAP_PLUS
+		#if SAP_PLUS
 			void makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
 			static bool cmpSapSortPlus (sortElement a,sortElement b);
-		//#endif
+		#endif
 
-		//#if SAP_INVERSE
+		#if SAP_INVERSE
 			void makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end, bool inverse);
 			static bool cmpSapSortInverse(sortElement a,sortElement b);
-		//#endif
-	#endif
+		#endif
+
+		#if SAP_RANDOM
+			void makeSapRandom(std::vector<sortElement> &v, dataTypeNSeq start, dataTypeNSeq end);
+			static bool cmpSapSortRandom(sortElement a,sortElement b);
+		#endif
+
 	
 private:
 	#if BCR_SET_ALN_RH ==1
 		dataTypeNSeq numToRemove=0;
+		dataTypeNSeq contToRemove=0;
 	#endif
 	
 	#if BUILD_BCR_FROM_BCRpartials == 1
@@ -110,7 +119,7 @@ private:
 	void InsertNsymbols(uchar const *, dataTypelenSeq);
 	void InsertFirstsymbols(uchar *); //Added/Modified/Removed 2016-02-23
 
-	void printTriple(std::vector<sortElement> vectTriple, dataTypeNSeq nExamedTexts);
+void printTriple(std::vector<sortElement> vectTriple, dataTypeNSeq nExamedTexts);
 
 	int createFilePartialBWT();
 	FILE * openWriteFilePartialBWT_0();
@@ -123,7 +132,6 @@ private:
 	dataTypeNChar readOnFilePartial(uchar *, dataTypeNChar , FILE * );
 	dataTypeNChar writeOnFilePartial(uchar *, dataTypeNChar , FILE * );
 	dataTypeNChar writeSymbolOnFilePartial(uchar , dataTypeNChar , FILE * );
-
 };
 
 #endif
