@@ -2,8 +2,8 @@ CC = g++
 
 
 FASTQ = 0
-SAP = 1
-RLO = 1
+SAP = 0
+RLO = 0
 
 LCP = 0
 DA = 0
