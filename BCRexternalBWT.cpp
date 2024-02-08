@@ -2021,7 +2021,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			#endif
 
 			j=k;
-			#if (BUILD_SAP==1 || BUILD_RED_SAP==1) && (RLO==0 || SAP_PLUS == 0 || SAP_INVERSE == 0 || SAP_RANDOM == 0)
+			#if (BUILD_SAP==1 || BUILD_RED_SAP==1) && (RLO==0 && SAP_PLUS == 0 && SAP_INVERSE == 0 && SAP_RANDOM == 0)
 			delete [] prevSymbol;
 			#endif
 
