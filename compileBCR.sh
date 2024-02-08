@@ -16,3 +16,7 @@ make clean
 make SAP_PLUS=1
 mv BCR_LCP_GSA BCR_LCP_GSA_plus
 make clean
+
+make RLO=1 SAP=1
+mv BCR_LCP_GSA BCR_LCP_GSA_sap
+make clean
