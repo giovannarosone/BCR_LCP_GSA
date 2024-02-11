@@ -2306,6 +2306,14 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	//std::cerr << "storeBWTFilePartial: posSymb= " << posSymb << std::endl;
 
 	//uchar symbol='\0';
+
+	#if SAP_INVERSE == 1
+		bool inverse = false;
+		bool wroteSap = false;
+		dataTypedimAlpha wrotePile = -1;
+		bool continuousPile = -1;
+	#endif
+	
 	j=0;
 	while (j < nExamedTexts) {
 
@@ -2397,10 +2405,6 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 			bool sapPresence;
 		#endif
-		#if SAP_INVERSE == 1
-			bool inverse = false;
-			bool wroteSap = false;
-		#endif
 
 		#if SAP_PLUS
 			uchar lastSymbolInserted = TERMINATE_CHAR;
@@ -2456,7 +2460,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 						#if SAP_INVERSE == 1
 							//reverse the RLO ordering in the SAP-interval
-							if(toRead == 0 && h==start && sapPresence && wroteSap) {
+							if(toRead == 0 && h==start && sapPresence && wroteSap && (continuousPile==true || wrotePile==currentPile)) {
 								inverse = !inverse;
 							}
 						#endif
@@ -2650,6 +2654,10 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 									#if SAP_INVERSE
 									if(h == end-1) {
 										wroteSap = true;
+										wrotePile=currentPile;
+										if(vectTriple[end].posN==1 && vectTriple[end].pileN == currentPile+1) {
+											continuousPile=true;
+										}
 									}
 									#endif
 
@@ -2657,6 +2665,8 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 								#if SAP_INVERSE
 								else {
 									wroteSap = false;
+									continuousPile = false;
+									wrotePile = -1;
 								}
 								#endif
 
