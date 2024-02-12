@@ -53,8 +53,8 @@
 uchar *newSymb;
 
 #if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
-	dataTypeNSeq sapCounter = 1;
-	dataTypeNSeq sapTypeTwoCounter = 0;
+	dataTypeNChar sapCounter = 1;
+	dataTypeNChar sapTypeTwoCounter = 0;
 #endif
 
 #if SAP_PLUS
@@ -1449,7 +1449,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		}
 	#endif
 	
-    sortElement tripla;
+        sortElement tripla;
 	nExamedTexts=0;
 	for (dataTypeNSeq j = 0 ; j < nText; j++) {
 
@@ -1493,9 +1493,9 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
             tableOcc[0][alpha[(unsigned int)newSymb[j]]]++;       //counting the number of occurrences in BWT of the $-pile
             newSymb[nExamedTexts] = newSymb[j];
 
-			#if USE_QS==1
-				newSymbQS[nExamedTexts] = newSymbQS[j];
-			#endif
+            #if USE_QS==1
+		newSymbQS[nExamedTexts] = newSymbQS[j];
+            #endif
 
             tripla.posN = nExamedTexts+1;  // position of the suffix (1-based)
             tripla.seqN = j;	  // number of the sequence
@@ -1535,8 +1535,9 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		#endif
 		
 		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
-		//Rewrite newSymb and reset posN
-		dataTypeNSeq i_pile_fin, i_pile = 0;
+			//Rewrite newSymb and reset posN
+			dataTypeNChar i_pile_fin=0;
+			dataTypeNSeq i_pile = 0;
 		#endif
 		
 		#if RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM || BUILD_RED_SAP==1
@@ -1565,8 +1566,8 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 	#endif
 	//Store newSymb into $-pile BWT
 
-    char *filenameOut = new char[110];
-    char *filename = new char[100];
+	char *filenameOut = new char[110];
+	char *filename = new char[100];
     
     
 	//dataTypeNChar num = fwrite (newSymb, sizeof(uchar), nText , OutFileBWT);
@@ -2240,18 +2241,18 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 	
 }
 
+#if KEEP_eBWT_IN_EXT_MEMORY==1
 void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq posSymb) {
 
 	//I have found the position where I have to insert the chars in the position t of the each text
 	//Now I have to update the BWT in each file.
 	
-	#if KEEP_eBWT_IN_EXT_MEMORY==1
-		static FILE *OutFileBWT, *InFileBWT;                  // output and input file BWT;
-		char *filenameOut = new char[120];
-		char *filenameIn = new char[110];
-		char *filename = new char[100];
-		dataTypeNChar numcharWrite=0;
-	#endif
+	
+	static FILE *OutFileBWT, *InFileBWT;                  // output and input file BWT;
+	char *filenameOut = new char[120];
+	char *filenameIn = new char[110];
+	char *filename = new char[100];
+	dataTypeNChar numcharWrite=0;
 	
 	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		static FILE *OutFileSap, *InFileSap;                  // output and input file BWT SAP;
@@ -2319,17 +2320,14 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 
 		currentPile = vectTriple[j].pileN;
 
-		#if KEEP_eBWT_IN_EXT_MEMORY==1
-			numchar=sprintf (filename, "bwt_%d", currentPile);
-
-			InFileBWT = openFilePartialIn (currentPile);
-			numchar=sprintf (filenameOut,"new_%s%s",filename,ext);
-			OutFileBWT = fopen(filenameOut, "wb");
-			if (OutFileBWT==NULL) {
-					std::cerr << "storeBWTFilePartial: Out BWT file, j= " << (unsigned int)j <<": Error opening " << std::endl;
-					exit (EXIT_FAILURE);
-			}
-		#endif
+		numchar=sprintf (filename, "bwt_%d", currentPile);
+		InFileBWT = openFilePartialIn (currentPile);
+		numchar=sprintf (filenameOut,"new_%s%s",filename,ext);
+		OutFileBWT = fopen(filenameOut, "wb");
+		if (OutFileBWT==NULL) {
+			std::cerr << "storeBWTFilePartial: Out BWT file, j= " << (unsigned int)j <<": Error opening " << std::endl;
+			exit (EXIT_FAILURE);
+		}		
 		
 		#if USE_QS==1
 			numcharQS=sprintf (filenameQS, "bwt.qs_%d", currentPile);
@@ -2458,36 +2456,36 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				//cont is the number of symbols already read!
 				toRead = (vectTriple[h].posN-1) - cont;
 
-						#if SAP_INVERSE == 1
-							//reverse the RLO ordering in the SAP-interval
-							if(toRead == 0 && h==start && sapPresence && wroteSap && (continuousPile==true || wrotePile==currentPile)) {
-								inverse = !inverse;
-							}
-						#endif
+				#if SAP_INVERSE == 1
+					//reverse the RLO ordering in the SAP-interval
+					if(toRead == 0 && h==start && sapPresence && wroteSap && (continuousPile==true || wrotePile==currentPile)) {
+						inverse = !inverse;
+					}
+				#endif
 
-						#if SAP_PLUS
-							//obtain previous and next symbol through consecutive inserions
-							if(h==start && sapPresence) {
-								if(end == nExamedTexts) {
-									nextSymbolSap = (dataTypedimAlpha)84;
-									continuousSap = false;
-								}
-								else {
-									if(vectTriple[end].posN == vectTriple[start].posN+(end-start) && vectTriple[start].pileN == vectTriple[end].pileN) {
-										continuousSap = true;
-										nextSymbolSap =  newSymb[vectTriple[end].seqN];
-									}
-									else {
-										nextSymbolSap = (dataTypedimAlpha)84;
-										continuousSap = false;
-									}
-								}
-
-								if(toRead == 0  && vectTriple[h].posN-1 != 0) {
-									prevSymbolSap = lastSymbolInserted;
-								}
+				#if SAP_PLUS
+					//obtain previous and next symbol through consecutive inserions
+					if(h==start && sapPresence) {
+						if(end == nExamedTexts) {
+							nextSymbolSap = (dataTypedimAlpha)84;
+							continuousSap = false;
+						}
+						else {
+							if(vectTriple[end].posN == vectTriple[start].posN+(end-start) && vectTriple[start].pileN == vectTriple[end].pileN) {
+								continuousSap = true;
+								nextSymbolSap =  newSymb[vectTriple[end].seqN];
 							}
-						#endif
+							else {
+								nextSymbolSap = (dataTypedimAlpha)84;
+								continuousSap = false;
+							}
+						}
+
+						if(toRead == 0  && vectTriple[h].posN-1 != 0) {
+							prevSymbolSap = lastSymbolInserted;
+						}
+					}
+				#endif
 				
 				///2019-10-08
 				////if (toRead > 0)
@@ -2496,26 +2494,25 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				while (toRead > 0) {            //((numchar!=0) && (toRead > 0)) {
 					if (toRead < SIZEBUFFER) { //The last reading for this sequence
 						//numchar = fread(buffer,sizeof(uchar),toRead,InFileBWT);
-						#if KEEP_eBWT_IN_EXT_MEMORY==1
-							numchar =  readOnFilePartial(buffer, toRead, InFileBWT) ;
-							assert(numchar == toRead); // we should always read/write the same number of characters
+						
+						numchar =  readOnFilePartial(buffer, toRead, InFileBWT) ;
+						assert(numchar == toRead); // we should always read/write the same number of characters
 
-									#if SAP_PLUS
-									if(sapPresence) {
-										//obtain the previous symbol in the BWT
-										prevSymbolSap = buffer[toRead-1];
-									}
-									#endif
+						#if SAP_PLUS
+							if(sapPresence) {
+								//obtain the previous symbol in the BWT
+								prevSymbolSap = buffer[toRead-1];
+							}
+						#endif
 
-
-									numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
-									assert(numchar == numcharWrite); // we should always read/write the same number of characters
-								#endif						
-								#if (BUILD_SAP==1)
-								numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
-								assert(numcharSap == toRead);
-								numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
-								assert(numcharSap == numcharWriteSap);
+						numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
+						assert(numchar == numcharWrite); // we should always read/write the same number of characters
+								
+						#if (BUILD_SAP==1)
+							numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
+							assert(numcharSap == toRead);
+							numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
+							assert(numcharSap == numcharWriteSap);
 						#endif
 						#if USE_QS==1
 								numcharQS = fread(bufferQS,sizeof(char),toRead,InFileQS);
@@ -2537,12 +2534,12 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 						#endif
 					}
 					else {
-						#if KEEP_eBWT_IN_EXT_MEMORY==1
-							numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
-							assert(numchar == SIZEBUFFER); // we should always read/write the same number of characters
-							numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
-							assert(numchar == numcharWrite); // we should always read/write the same number of characters
-						#endif
+						
+						numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
+						assert(numchar == SIZEBUFFER); // we should always read/write the same number of characters
+						numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
+						assert(numchar == numcharWrite); // we should always read/write the same number of characters
+						
 						#if (BUILD_SAP==1) || BUILD_RED_SAP==1
 							numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 							assert(numcharSap == SIZEBUFFER);
@@ -2580,111 +2577,109 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 				//Now I have to insert the new symbol associated with the suffix of the sequence k
 				//And I have to update the number of occurrences of each symbol
 				if (toRead==0) {
-							#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
-								if(sapPresence) {
-									if(h == start) {
-										
-										#if SAP_PLUS
-										//obtain the next symbol in the BWT
-										if(!continuousSap) {
-											dataTypeNSeq filePos = ftell(InFileBWT);
-											numchar2 = readOnFilePartial(&nextSymbolSap, 1, InFileBWT);
-											fseek(InFileBWT, filePos, SEEK_SET);
-											if(numchar2 == 0)  {
-												nextSymbolSap = (dataTypedimAlpha)84;
-											}
-											continuousSap = false;
+					#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+						if(sapPresence) {
+							if(h == start) {
+								
+								#if SAP_PLUS
+									//obtain the next symbol in the BWT
+									if(!continuousSap) {
+										dataTypeNChar filePos = ftell(InFileBWT);
+										numchar2 = readOnFilePartial(&nextSymbolSap, 1, InFileBWT);
+										fseek(InFileBWT, filePos, SEEK_SET);
+										if(numchar2 == 0)  {
+											nextSymbolSap = (dataTypedimAlpha)84;
 										}
-										#endif
-
-										#if PI_PERM == 1
-											#if PI_POS == 0
-											//memorize value of N where the SAP-interval begins
-											dataTypeNSeq pos = 0;
-											dataTypeNSeq val = vectTriple[start].seqN;
-											while(piPerm[pos] != val) {
-												pos++;
-											}
-											#endif
-										#endif
-
-										#if SAP_INVERSE
-											makeSapInverse(vectTriple, start, end, inverse);
-										#endif
-										#if SAP_PLUS
-											makeSapPlus(vectTriple, start, end);
-										#endif
-										#if RLO
-											makeSap(vectTriple, start, end);
-										#endif
-										#if SAP_RANDOM
-											makeSapRandom(vectTriple, start, end);
-										#endif
-
-										#if PI_PERM == 1
-											#if PI_POS == 1
-												//repositioning of the valu of piPos on the start of the SAP-interval
-												for(dataTypeNSeq j=start; j<end; j++) {
-													if(vectTriple[j].sap == 0 && vectTriple[j].piPos == std::numeric_limits<dataTypeNSeq>::max()) {
-														dataTypeNSeq g = j;
-														while(vectTriple[g].piPos == std::numeric_limits<dataTypeNSeq>::max()) {
-															g++;
-														}
-														vectTriple[j].piPos = vectTriple[g].piPos;
-														vectTriple[g].piPos = std::numeric_limits<dataTypeNSeq>::max();
-														j=g;
-													}
-												}
-												//update of permutaion array through piPos
-												dataTypeNSeq pos = vectTriple[start].piPos;
-												piPerm[pos-1] = vectTriple[start].seqN;
-												for(dataTypeNSeq j=start+1; j<end; j++) {
-													pos++;
-													piPerm[pos-1] = vectTriple[j].seqN;
-												}
-											#else
-											//apdate of permutation array through pos
-											for(dataTypeNSeq j=start; j<end; j++) {
-												piPerm[pos] = vectTriple[j].seqN;
-												pos++;
-											}
-											#endif
-										#endif
+										continuousSap = false;
 									}
-									#if SAP_INVERSE
-									if(h == end-1) {
-										wroteSap = true;
-										wrotePile=currentPile;
-										if(vectTriple[end].posN==1 && vectTriple[end].pileN == currentPile+1) {
-											continuousPile=true;
+								#endif
+
+								#if PI_PERM == 1
+									#if PI_POS == 0
+										//memorize value of N where the SAP-interval begins
+										dataTypeNSeq pos = 0;
+										dataTypeNSeq val = vectTriple[start].seqN;
+										while(piPerm[pos] != val) {
+											pos++;
 										}
-									}
 									#endif
+								#endif
 
-								}
 								#if SAP_INVERSE
-								else {
-									wroteSap = false;
-									continuousPile = false;
-									wrotePile = -1;
-								}
+									makeSapInverse(vectTriple, start, end, inverse);
+								#endif
+								#if SAP_PLUS
+									makeSapPlus(vectTriple, start, end);
+								#endif
+								#if RLO
+									makeSap(vectTriple, start, end);
+								#endif
+								#if SAP_RANDOM
+									makeSapRandom(vectTriple, start, end);
 								#endif
 
-								#if SAP_PLUS == 1
-									if(h == end -1) {
-										lastSymbolInserted = newSymb[vectTriple[h].seqN];
-										//std::cerr << "mi salvo come simbolo precedente " << lastSymbolInserted << "\n"; 
+								#if PI_PERM == 1
+									#if PI_POS == 1
+										//repositioning of the valu of piPos on the start of the SAP-interval
+										for(dataTypeNSeq j=start; j<end; j++) {
+											if(vectTriple[j].sap == 0 && vectTriple[j].piPos == std::numeric_limits<dataTypeNSeq>::max()) {
+												dataTypeNSeq g = j;
+												while(vectTriple[g].piPos == std::numeric_limits<dataTypeNSeq>::max()) {
+													g++;
+												}
+												vectTriple[j].piPos = vectTriple[g].piPos;
+												vectTriple[g].piPos = std::numeric_limits<dataTypeNSeq>::max();
+												j=g;
+											}
+										}
+										//update of permutaion array through piPos
+										dataTypeNSeq pos = vectTriple[start].piPos;
+										piPerm[pos-1] = vectTriple[start].seqN;
+										for(dataTypeNSeq j=start+1; j<end; j++) {
+											pos++;
+											piPerm[pos-1] = vectTriple[j].seqN;
+										}
+									#else
+										//apdate of permutation array through pos
+										for(dataTypeNSeq j=start; j<end; j++) {
+											piPerm[pos] = vectTriple[j].seqN;
+											pos++;
+										}
+									#endif
+								#endif
+							}
+							#if SAP_INVERSE
+								if(h == end-1) {
+									wroteSap = true;
+									wrotePile=currentPile;
+									if(vectTriple[end].posN==1 && vectTriple[end].pileN == currentPile+1) {
+										continuousPile=true;
 									}
-								#endif
-
+								}
 							#endif
-#if KEEP_eBWT_IN_EXT_MEMORY==1
-								numchar =  writeSymbolOnFilePartial(newSymb[vectTriple[h].seqN], 1, OutFileBWT) ;
-						assert(numchar == 1); // we should always read/write the same number of characters
+						}
+						#if SAP_INVERSE
+						else {
+							wroteSap = false;
+							continuousPile = false;
+							wrotePile = -1;
+						}
+						#endif
+
+						#if SAP_PLUS == 1
+							if(h == end -1) {
+								lastSymbolInserted = newSymb[vectTriple[h].seqN];
+								//std::cerr << "mi salvo come simbolo precedente " << lastSymbolInserted << "\n"; 
+							}
+						#endif
+
 					#endif
 
+					numchar =  writeSymbolOnFilePartial(newSymb[vectTriple[h].seqN], 1, OutFileBWT) ;
+					assert(numchar == 1); // we should always read/write the same number of characters
+
 					//update the number of occurrences in BWT of the pileN[k]
-tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
+					tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 
 					#if BCR_SET_ALN_RH ==1
 						if (newSymb[vectTriple[h].seqN] == TERMINATE_CHAR) {   
@@ -2739,15 +2734,15 @@ tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 		//it means that posN[k]<>currentPile, so I have to change BWT-file
 		//But before, I have to copy the remainder symbols from the old BWT to new BWT
 		while (numchar!=0) {
-			#if KEEP_eBWT_IN_EXT_MEMORY==1
-				numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
-				//numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
-				if (numchar > 0) {
-					numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
-					//numcharWrite = fwrite (buffer, sizeof(uchar), numchar , OutFileBWT);
-					assert(numchar == numcharWrite); // we should always read/write the same number of characters
-				}
-			#endif
+			
+			numchar =  readOnFilePartial(buffer, SIZEBUFFER, InFileBWT) ;
+			//numchar = fread(buffer,sizeof(uchar),SIZEBUFFER,InFileBWT);
+			if (numchar > 0) {
+				numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
+				//numcharWrite = fwrite (buffer, sizeof(uchar), numchar , OutFileBWT);
+				assert(numchar == numcharWrite); // we should always read/write the same number of characters
+			}
+			
 			#if BUILD_SAP==1 || BUILD_RED_SAP==1
 				numcharSap = fread(bufferSap,sizeof(uchar),SIZEBUFFER,InFileSap);
 				numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -2770,11 +2765,10 @@ tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 			#endif
 		}  //end-while for current pile
 
-		#if KEEP_eBWT_IN_EXT_MEMORY==1
-			closeFilePartial(InFileBWT);
-			closeFilePartial(OutFileBWT);
-			renameFilePartial(currentPile);
-		#endif
+		
+		closeFilePartial(InFileBWT);
+		closeFilePartial(OutFileBWT);
+		renameFilePartial(currentPile);
 
 		#if BUILD_SAP==1 || BUILD_RED_SAP==1
 			fclose(InFileSap);
@@ -2831,12 +2825,11 @@ tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 		j=k;
 	}
 
-	#if KEEP_eBWT_IN_EXT_MEMORY==1
-		delete [] filenameIn;
-		delete [] filename;
-		delete [] filenameOut;
-	#endif
-
+	
+	delete [] filenameIn;
+	delete [] filename;
+	delete [] filenameOut;
+	
 	delete [] buffer;
 
 	#if BUILD_SAP==1 || BUILD_RED_SAP==1
@@ -2863,8 +2856,8 @@ tableOcc[currentPile][alpha[(unsigned int)newSymb[vectTriple[h].seqN]]]++;
 		delete [] filenameOutSA;
 		delete [] bufferSA;
 	#endif
-
 }
+#endif
 
 #if KEEP_eBWT_IN_EXT_MEMORY == 0
 void BCRexternalBWT::storeBWTIntMem(uchar const * newSymb, dataTypelenSeq posSymb) {
