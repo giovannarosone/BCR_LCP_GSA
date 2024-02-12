@@ -258,10 +258,10 @@ int main(int argc, char *argv[])
 	std::cout << "\t\tReverse lexicographic order" << endl;
     #endif
     #if SAP_PLUS == 1
-	std::cout << "\t\tSAP_PLUS" << endl;
+	std::cout << "\t\tSAP-PLUS" << endl;
     #endif
     #if SAP_INVERSE == 1
-	std::cout << "\t\tSAP_INVERSE order" << endl;
+	std::cout << "\t\tAlternating sap (SAP-ALT) order" << endl;
     #endif
     #if SAP_RANDOM == 1
 	std::cout << "\t\tSAP_RANDOM order" << endl;
