@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./scriptDatasets ../dataset/ ../Tools ./output_dataset ../Tools ./out_data
+#./scriptDatasets ../dataset ../Tools ./output_dataset ../Tools ./out_data
 
 dataset_directory=$1;
 tools_directory=$2;
