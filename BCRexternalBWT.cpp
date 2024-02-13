@@ -2295,9 +2295,6 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 	#endif
 
 	dataTypeNChar numchar=0;
-	#if SAP_PLUS
-		dataTypeNChar numchar2 = 0;
-	#endif
 	uchar *buffer = new uchar[SIZEBUFFER];
 	dataTypeNChar toRead = 0;
 
@@ -2314,11 +2311,80 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		dataTypedimAlpha wrotePile = -1;
 		bool continuousPile = -1;
 	#endif
+
+	#if SAP_PLUS
+		dataTypeNChar numchar2 = 0;
+		uchar lastSymbolInserted = TERMINATE_CHAR;
+
+		uchar lastSymbolPrevPile = TERMINATE_CHAR;
+		uchar firstSymbolNextPile = (dataTypedimAlpha)84;
+		dataTypedimAlpha prevPile;
+		dataTypedimAlpha nextPile;
+		static FILE* prevPileFile;
+		static FILE* nextPileFile;
+		dataTypeNChar filePos;
+		dataTypeNChar filePosEnd;
+
+
+		prevSymbolSap = TERMINATE_CHAR;
+		nextSymbolSap = (dataTypedimAlpha)84;
+		bool continuousSap = false;
+	#endif
 	
 	j=0;
 	while (j < nExamedTexts) {
 
 		currentPile = vectTriple[j].pileN;
+
+		#if SAP_PLUS
+			prevPile = currentPile-1;
+			nextPile = currentPile+1;
+			if(prevPile == -1) {
+				lastSymbolPrevPile = TERMINATE_CHAR;
+				nextPileFile = openFilePartialIn (nextPile);
+				filePos = ftell(nextPileFile);
+				fseek(nextPileFile, 0, SEEK_SET);
+				numchar2 = readOnFilePartial(&firstSymbolNextPile, 1, nextPileFile);
+				fseek(nextPileFile, filePos, SEEK_SET);
+				closeFilePartial(nextPileFile);
+				if (numchar2==0) {
+					firstSymbolNextPile = (dataTypedimAlpha)84;;
+				}
+			}
+			else if(nextPile == 6) {
+				firstSymbolNextPile = (dataTypedimAlpha)84;
+				prevPileFile = openFilePartialIn (prevPile);
+				filePos = ftell(prevPileFile);
+				fseek(prevPileFile, -1, SEEK_END);
+				numchar2 = readOnFilePartial(&lastSymbolPrevPile, 1, prevPileFile);
+				fseek(prevPileFile, filePos, SEEK_SET);
+				closeFilePartial(prevPileFile);
+				if(numchar2==0) {
+					lastSymbolPrevPile=TERMINATE_CHAR;
+				}
+			}
+			else {
+				nextPileFile = openFilePartialIn (nextPile);
+				filePos = ftell(nextPileFile);
+				fseek(nextPileFile, 0, SEEK_SET);
+				numchar2 = readOnFilePartial(&firstSymbolNextPile, 1, nextPileFile);
+				fseek(nextPileFile, filePos, SEEK_SET);
+				closeFilePartial(nextPileFile);
+				if(numchar2==0) {
+					firstSymbolNextPile = (dataTypedimAlpha)84;;
+				}
+
+				prevPileFile = openFilePartialIn (prevPile);
+				fseek(prevPileFile, -1, SEEK_END);
+				numchar2 = readOnFilePartial(&lastSymbolPrevPile, 1, prevPileFile);
+				fseek(prevPileFile, filePos, SEEK_SET);
+				closeFilePartial(prevPileFile);
+				if(numchar2==0) {
+					lastSymbolPrevPile=TERMINATE_CHAR;
+				}
+			}
+		#endif
+
 
 		numchar=sprintf (filename, "bwt_%d", currentPile);
 		InFileBWT = openFilePartialIn (currentPile);
@@ -2404,14 +2470,6 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 			bool sapPresence;
 		#endif
 
-		#if SAP_PLUS
-			uchar lastSymbolInserted = TERMINATE_CHAR;
-			prevSymbolSap = TERMINATE_CHAR;
-			nextSymbolSap = (dataTypedimAlpha)84;
-			//nextSymbolToBeInserted = (dataTypedimAlpha)84;
-			bool continuousSap = false;
-		#endif
-
 		while ((k< nExamedTexts) && (vectTriple[k].pileN == currentPile)) {
 			//interations on the pile
 			#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
@@ -2471,9 +2529,20 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 							continuousSap = false;
 						}
 						else {
+
+							filePos = ftell(InFileBWT);
+							fseek(InFileBWT, 0, SEEK_END);
+							filePosEnd = ftell(InFileBWT);
+							fseek(InFileBWT, filePos, SEEK_SET);
+
+							
 							if(vectTriple[end].posN == vectTriple[start].posN+(end-start) && vectTriple[start].pileN == vectTriple[end].pileN) {
 								continuousSap = true;
 								nextSymbolSap =  newSymb[vectTriple[end].seqN];
+							}
+	-						else if(vectTriple[end].posN-1==0 && vectTriple[end].pileN==vectTriple[start].pileN+1 && filePosEnd<vectTriple[end-1].posN) {
+								continuousSap=true;
+								nextSymbolSap=newSymb[vectTriple[end].seqN];
 							}
 							else {
 								nextSymbolSap = (dataTypedimAlpha)84;
@@ -2484,6 +2553,10 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 						if(toRead == 0  && vectTriple[h].posN-1 != 0) {
 							prevSymbolSap = lastSymbolInserted;
 						}
+						else if (toRead==0 && vectTriple[h].posN-1 == 0) {
+							prevSymbolSap = lastSymbolPrevPile;
+						}
+
 					}
 				#endif
 				
@@ -2584,11 +2657,11 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 								#if SAP_PLUS
 									//obtain the next symbol in the BWT
 									if(!continuousSap) {
-										dataTypeNChar filePos = ftell(InFileBWT);
+										filePos = ftell(InFileBWT);
 										numchar2 = readOnFilePartial(&nextSymbolSap, 1, InFileBWT);
 										fseek(InFileBWT, filePos, SEEK_SET);
 										if(numchar2 == 0)  {
-											nextSymbolSap = (dataTypedimAlpha)84;
+											nextSymbolSap=firstSymbolNextPile;
 										}
 										continuousSap = false;
 									}
