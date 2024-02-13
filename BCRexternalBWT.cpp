@@ -2369,7 +2369,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					firstSymbolNextPile = (dataTypedimAlpha)84;;
 				}
 			}
-			else if(nextPile == 6) {
+			else if(nextPile == sizeAlpha) {
 				firstSymbolNextPile = (dataTypedimAlpha)84;
 				prevPileFile = openFilePartialIn (prevPile);
 				filePos = ftell(prevPileFile);
