@@ -146,10 +146,10 @@ typedef unsigned long ulong;
 #endif
 
 #if SAP==1
-    //Compute the SAP-array associated with BWT permutation
-	#define BUILD_SAP 1
-	//If you want to compute the reduced SAP-array instead of the SAP-array, please set BUILD_SAP 0 and BUILD_RED_SAP 1
-	#define BUILD_RED_SAP 0
+    //Compute the reduced SAP-array associated with BWT permutation
+	#define BUILD_RED_SAP 1
+	//If you want to compute the SAP-array instead of the reduced SAP-array, please set BUILD_SAP 1 and BUILD_RED_SAP 0
+	#define BUILD_SAP 0
 	
 	#ifndef BCR_SET_ALN_RH
 		#define BCR_SET_ALN_RH 1
