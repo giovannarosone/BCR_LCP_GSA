@@ -1574,7 +1574,10 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 				#endif
 			}
 		}
-		assert(i_pile == nExamedTexts);
+		
+			#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+			assert(i_pile == nExamedTexts);
+			#endif
 		#endif
 	#endif
 	std::cerr << std::endl;
