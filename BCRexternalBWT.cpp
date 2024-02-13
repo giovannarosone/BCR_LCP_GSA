@@ -1531,7 +1531,9 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 				#endif
 			}
 		}
+		#if RLO==1
 		assert(i_pile == nExamedTexts);
+		#endif
 		#endif
 	#endif
 	std::cerr << std::endl;
