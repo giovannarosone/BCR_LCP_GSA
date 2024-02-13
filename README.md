@@ -113,7 +113,7 @@ Fold long FASTA/Q lines and remove FASTA/Q comments:
 (https://github.com/lh3/seqtk.git)
 ```
 
-To compute the SAP-array, please compile using
+To compute the reduced SAP-array, please compile using
 ```sh
 make SAP=1
 ```
@@ -169,7 +169,7 @@ make RLO=1
     Ira M. Gessel, Antonio Restivo, Christophe Reutenauer,
     A bijection between words and multisets of necklaces, 
     European Journal of Combinatorics, Volume 33, Issue 7, 2012, Pages 1537-1546,
-    https://doi.org/10.1016/j.ejc.2012.03.016.
+    doi:10.1016/j.ejc.2012.03.016.
     
     *** QS permutation
     
@@ -184,6 +184,11 @@ make RLO=1
     Large-scale compression of genomic sequence databases with the Burrows–Wheeler transform, 
     Bioinformatics (2012) 28 (11): 1415–1419, 
     doi: 10.1093/bioinformatics/bts173.
+
+    Davide Cenzato, Veronica Guerrini, Zsuzsanna Lipták, Giovanna Rosone,
+    Computing the optimal BWT of very large string collections, 
+    DCC 2023, Volume 2023-March, Pages 71-80,
+    doi: 10.1109/DCC55655.2023.00015
 
 ---
 <small> Supported by the project Italian MIUR-SIR [CMACBioSeq][240fb5f5] ("_Combinatorial methods for analysis and compression of biological sequences_") grant n.~RBSI146R5L. P.I. Giovanna Rosone</small>
