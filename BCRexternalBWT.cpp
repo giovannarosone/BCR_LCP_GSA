@@ -58,7 +58,10 @@ uchar *newSymb;
 #endif
 
 #if SAP_RANDOM
-	char order[5] = {'$', 'A', 'C', 'G','T'};
+	int aIndex=-1;
+	int bIndex=-1;
+	char* order;
+	dataTypedimAlpha dimAlpha;
 #endif
 
 #if SAP_PLUS
@@ -520,6 +523,14 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			std::cerr << (unsigned int)i << " " << i << " " << freq[i] << " " << (unsigned int)alpha[i] << "\n";
         }
     }
+
+	#if SAP_RANDOM
+		dimAlpha = sizeAlpha;
+		order = (char*)malloc(sizeAlpha*sizeof(char));
+		for(dataTypeNSeq i = 0; i< sizeAlpha; i++) {
+			order[i] = alphaInverse[i];
+ 		}
+	#endif
 	
     if (freq[SIZE_ALPHA-1] > 0) {
             alpha[SIZE_ALPHA-1] = sizeAlpha;
@@ -1525,15 +1536,14 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		#endif
 
 		#if SAP_RANDOM
-
-		printf("\n");
-			random_shuffle(order, order+5);
-
-			printf("uso ordinamento:\n");
-			for(int i = 0; i<5; i++) {
-				printf("%c", order[i]);
-			}
-			printf("\n");
+			random_shuffle(order, order+sizeAlpha);
+			#if verboseEncode
+				printf("random order used:\n");
+				for(int i = 0; i<sizeAlpha; i++) {
+					printf("%c", order[i]);
+				}
+				printf("\n");
+			#endif
 			sort(vectTriple.begin(),vectTriple.end(), cmpSapSortRandom);
 		#endif
 
@@ -1557,10 +1567,10 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			dataTypeNSeq i_pile = 0;
 		#endif
 		
-		#if RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM || BUILD_RED_SAP==1
+		#if RLO==1 || SAP_PLUS || SAP_INVERSE || BUILD_RED_SAP==1
 		for (dataTypedimAlpha h = 1 ; h < sizeAlpha; h++){
 			if(tableOcc[0][h]>0){
-				#if RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+				#if RLO==1 || SAP_PLUS || SAP_INVERSE
 				i_pile_fin = i_pile + tableOcc[0][h];
 				while(i_pile < i_pile_fin){
 					newSymb[i_pile]=alphaInverse[h];
@@ -1575,9 +1585,31 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			}
 		}
 		
-			#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+			#if RLO || SAP_PLUS || SAP_INVERSE
 			assert(i_pile == nExamedTexts);
 			#endif
+		#endif
+
+		#if SAP_RANDOM
+		int index;
+		for (dataTypedimAlpha h = 0 ; h < sizeAlpha; h++){
+			index=0;
+			while(order[h] != alphaInverse[index]) {
+				index++;
+			}
+			if(index == 0) {
+				continue;
+			}
+			if(tableOcc[0][index]>0){
+				i_pile_fin = i_pile + tableOcc[0][index];
+				while(i_pile < i_pile_fin){
+					newSymb[i_pile]=alphaInverse[index];
+					vectTriple[i_pile].posN = i_pile+1;
+					i_pile++;
+				}
+			}
+		}
+		assert(i_pile == nExamedTexts);
 		#endif
 	#endif
 	std::cerr << std::endl;
@@ -6932,12 +6964,13 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		dataTypeNChar init_posN = v[start].posN;
 		//Reorder symbols in [start,end)
 
+		random_shuffle(order, order+sizeAlpha);
 		printf("uso ordinamento:\n");
 		for(int i = 0; i<5; i++) {
 			printf("%c", order[i]);
 		}
 		printf("\n");
-		random_shuffle(order, order+5);
+		
 		sort(v.begin()+start,v.begin()+end, cmpSapSortRandom);
 										
 		#if BUILD_RED_SAP
@@ -6989,28 +7022,19 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 	}
 
 	bool BCRexternalBWT::cmpSapSortRandom (sortElement a,sortElement b) {
-		dataTypeNSeq first=-1;
-		dataTypeNSeq second=-1;
-
 		if(newSymb[a.seqN] == newSymb[b.seqN]) {
 			return a.seqN<b.seqN;
 		}
 		else {
-			for(dataTypeNSeq i = 0; i<4; i++) {
+			for(dataTypeNSeq i = 0; i<dimAlpha; i++) {
 				if(order[i] == newSymb[a.seqN]) {
-					first = order[i];
+					aIndex= i;
 				}
 				if(order[i] == newSymb[b.seqN]) {
-					second=order[i];
+					bIndex = i;
 				}
 			}
-			printf("ordino con %c prima di %c\n", first, second);
-			if(first<second) {
-				return newSymb[a.seqN]<newSymb[b.seqN];
-			}
-			else {
-				return newSymb[b.seqN]<newSymb[a.seqN];
-			}
+			return aIndex<bIndex;
 		}
 	}
 #endif
