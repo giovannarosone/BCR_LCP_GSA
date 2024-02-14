@@ -1564,7 +1564,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 		//Rewrite newSymb and reset posN
                         dataTypeNChar i_pile_fin=0;
-			dataTypeNSeq i_pile = 0;
+			dataTypeNChar i_pile = 0;
 		#endif
 		
 		#if RLO==1 || SAP_PLUS || SAP_INVERSE || BUILD_RED_SAP==1
