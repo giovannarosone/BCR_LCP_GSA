@@ -67,6 +67,7 @@ uchar *newSymb;
 #if SAP_PLUS
 	static uchar prevSymbolSap;
 	static uchar nextSymbolSap;
+	dataTypeNChar** symbolsPiles;
 #endif
 
 //using std::vector;
@@ -530,6 +531,21 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 		for(dataTypeNSeq i = 0; i< sizeAlpha; i++) {
 			order[i] = alphaInverse[i];
  		}
+	#endif
+
+	#if SAP_PLUS
+		symbolsPiles = (dataTypeNChar**)malloc(sizeof(dataTypeNChar*)*sizeAlpha);
+		for(dataTypeNSeq i = 0; i<sizeAlpha; i++) {
+			symbolsPiles[i] = (dataTypeNChar*)malloc(sizeof(dataTypeNChar)*4);
+		}
+		for(dataTypeNSeq i = 0; i<sizeAlpha; i++) {
+			symbolsPiles[i][0] = i;
+		}
+		for(dataTypeNSeq i = 0; i<sizeAlpha; i++) {
+			symbolsPiles[i][1] = sizeAlpha-1;
+			symbolsPiles[i][2] = 0;
+			symbolsPiles[i][3] = 0;
+		}
 	#endif
 	
     if (freq[SIZE_ALPHA-1] > 0) {
@@ -1440,6 +1456,18 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	time (&endBuildBCR);
     difBuildBCR = difftime (endBuildBCR,startBuildBCR);
 
+	#if SAP_PLUS
+		delete [] alphaInverse;
+		for(dataTypeNSeq i = 0; i<sizeAlpha; i++) {
+			free(symbolsPiles[i]);
+		}
+		free(symbolsPiles);
+	#endif
+
+	#if SAP_RANDOM
+		free(order);
+	#endif
+
 	std::cerr << "Start builBCR " << startBuildBCR << " seconds\n";
     std::cerr << "End   builBCR " << endBuildBCR << " seconds\n";
     std::cerr << "builBCR tooks " << difBuildBCR << " seconds\n\n";
@@ -1617,6 +1645,12 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		printTriple(vectTriple, nExamedTexts);
 	#endif
 	//Store newSymb into $-pile BWT
+
+	#if SAP_PLUS
+		symbolsPiles[0][1] = alpha[newSymb[0]];
+		symbolsPiles[0][2] = alpha[newSymb[nExamedTexts-1]];
+		symbolsPiles[0][3] = vectTriple[nExamedTexts-1].posN;
+	#endif
 
     char *filenameOut = new char[110];
     char *filename = new char[100];
@@ -1847,7 +1881,9 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 
 	delete [] filenameOut;
 	delete [] filename;
-	delete [] alphaInverse;
+	#if SAP_PLUS == 0
+		delete [] alphaInverse;
+	#endif
 	
 	#if BUILD_SAP==1
 		newSymbSAP = new uchar[nExamedTexts];
@@ -2373,11 +2409,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		uchar firstSymbolNextPile = (dataTypedimAlpha)84;
 		dataTypedimAlpha prevPile;
 		dataTypedimAlpha nextPile;
-		static FILE* prevPileFile;
-		static FILE* nextPileFile;
 		dataTypeNChar filePos;
-		dataTypeNChar filePosEnd;
-
 
 		prevSymbolSap = TERMINATE_CHAR;
 		nextSymbolSap = (dataTypedimAlpha)84;
@@ -2392,49 +2424,17 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 		#if SAP_PLUS
 			prevPile = currentPile-1;
 			nextPile = currentPile+1;
-			if(prevPile == -1) {
+			/*if(prevPile == -1) {
 				lastSymbolPrevPile = TERMINATE_CHAR;
-				nextPileFile = openFilePartialIn (nextPile);
-				filePos = ftell(nextPileFile);
-				fseek(nextPileFile, 0, SEEK_SET);
-				numchar2 = readOnFilePartial(&firstSymbolNextPile, 1, nextPileFile);
-				fseek(nextPileFile, filePos, SEEK_SET);
-				closeFilePartial(nextPileFile);
-				if (numchar2==0) {
-					firstSymbolNextPile = (dataTypedimAlpha)84;;
-				}
-			}
-			else if(nextPile == sizeAlpha) {
+				firstSymbolNextPile = alphaInverse[symbolsPiles[nextPile][1]];
+			}*/
+			if(nextPile == sizeAlpha) {
 				firstSymbolNextPile = (dataTypedimAlpha)84;
-				prevPileFile = openFilePartialIn (prevPile);
-				filePos = ftell(prevPileFile);
-				fseek(prevPileFile, -1, SEEK_END);
-				numchar2 = readOnFilePartial(&lastSymbolPrevPile, 1, prevPileFile);
-				fseek(prevPileFile, filePos, SEEK_SET);
-				closeFilePartial(prevPileFile);
-				if(numchar2==0) {
-					lastSymbolPrevPile=TERMINATE_CHAR;
-				}
+				lastSymbolPrevPile = alphaInverse[symbolsPiles[prevPile][2]];
 			}
 			else {
-				nextPileFile = openFilePartialIn (nextPile);
-				filePos = ftell(nextPileFile);
-				fseek(nextPileFile, 0, SEEK_SET);
-				numchar2 = readOnFilePartial(&firstSymbolNextPile, 1, nextPileFile);
-				fseek(nextPileFile, filePos, SEEK_SET);
-				closeFilePartial(nextPileFile);
-				if(numchar2==0) {
-					firstSymbolNextPile = (dataTypedimAlpha)84;;
-				}
-
-				prevPileFile = openFilePartialIn (prevPile);
-				fseek(prevPileFile, -1, SEEK_END);
-				numchar2 = readOnFilePartial(&lastSymbolPrevPile, 1, prevPileFile);
-				fseek(prevPileFile, filePos, SEEK_SET);
-				closeFilePartial(prevPileFile);
-				if(numchar2==0) {
-					lastSymbolPrevPile=TERMINATE_CHAR;
-				}
+				firstSymbolNextPile = alphaInverse[symbolsPiles[nextPile][1]];
+				lastSymbolPrevPile = alphaInverse[symbolsPiles[prevPile][2]];
 			}
 		#endif
 
@@ -2577,7 +2577,6 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 						#endif
 
 						#if SAP_PLUS
-							
 							//obtain previous and next symbol through consecutive inserions
 							if(h==start && sapPresence) {
 
@@ -2587,16 +2586,11 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 								}
 								else {
 
-									filePos = ftell(InFileBWT);
-									fseek(InFileBWT, 0, SEEK_END);
-									filePosEnd = ftell(InFileBWT);
-									fseek(InFileBWT, filePos, SEEK_SET);
-
 									if(vectTriple[end].posN == vectTriple[start].posN+(end-start) && vectTriple[start].pileN == vectTriple[end].pileN) {
 										continuousSap = true;
 										nextSymbolSap =  newSymb[vectTriple[end].seqN];
 									}
-									else if(vectTriple[end].posN-1==0 && vectTriple[end].pileN==vectTriple[start].pileN+1 && filePosEnd<vectTriple[end-1].posN) {
+									else if(vectTriple[end].posN-1==0 && vectTriple[end].pileN==vectTriple[start].pileN+1 && vectTriple[end-1].posN>symbolsPiles[currentPile][3]) {
 										continuousSap=true;
 										nextSymbolSap=newSymb[vectTriple[end].seqN];
 									}
@@ -2800,7 +2794,13 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 								#if SAP_PLUS == 1
 									if(h == end -1) {
 										lastSymbolInserted = newSymb[vectTriple[h].seqN];
-										//std::cerr << "mi salvo come simbolo precedente " << lastSymbolInserted << "\n"; 
+										if(vectTriple[start].posN-1==0) {
+											symbolsPiles[currentPile][1]=alpha[newSymb[vectTriple[start].seqN]];
+										}
+										if(vectTriple[end-1].posN>symbolsPiles[currentPile][3]) {
+											symbolsPiles[currentPile][2] = alpha[newSymb[vectTriple[end-1].seqN]];
+										}
+										symbolsPiles[currentPile][3] = symbolsPiles[currentPile][3]+(end-start);
 									}
 								#endif
 
