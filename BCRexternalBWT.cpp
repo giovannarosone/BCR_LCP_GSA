@@ -52,8 +52,8 @@
 
 uchar *newSymb;
 
-#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
-        dataTypeNChar sapCounter = 1;
+#if BUILD_RED_SAP
+    dataTypeNChar sapCounter = 1;
 	dataTypeNChar sapTypeTwoCounter = 0;
 #endif
 
@@ -242,7 +242,7 @@ BCRexternalBWT::BCRexternalBWT(char *file1, char *fileOutput, string BCRprefPrev
         std::cerr << "Start builBCR (including the writing the cyc files) " << start << " seconds\n";
         std::cerr << "End   builBCR (including the writing the cyc files) " << end << " seconds\n";
         std::cerr << "builBCR (including the writing the cyc files) tooks " << dif << " seconds\n";
-		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
+		#if BUILD_RED_SAP
 			std::cerr << "total sap interval: " << sapCounter << "\n";
 			std::cerr << "total sap interval of type two: " << sapTypeTwoCounter << "\n";
 		#endif
@@ -1607,7 +1607,10 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 				#endif
 				#if BUILD_RED_SAP==1
 					if (not oneRunSAP) oneRunSAP=1;
-					else if(not moreRunSAP) moreRunSAP=1;
+					else if(not moreRunSAP) {
+						moreRunSAP=1;
+						sapTypeTwoCounter++;
+					}
 				#endif
 			}
 		}
@@ -2216,7 +2219,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				start=i-1;
 				while (i<nExamedTexts && vectTriple[i].sap==1) i++;
 				end=i;
-				
+				sapCounter++;
 				//To check if the SAP-interval is type II
 				uchar currentCh=newSymb[vectTriple[start].seqN];
 				bool notOneRunSAP = true;
@@ -2232,6 +2235,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				//Modify newSymbSAP in case of SAP-interval of Type II
 				//newSymbSAP[start]=48;  by default
 				if (notOneRunSAP==false) {  //SAP-interval of type II
+					sapTypeTwoCounter++;
 					for (dataTypeNSeq j = start+1; j<end; j++) {
 						newSymbSAP[j]= 49; //==true
 					}	
@@ -2517,7 +2521,6 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 					}
 					end=i;
 					sapPresence = true;
-					sapCounter++;
 
 				}
 				else {
