@@ -1511,7 +1511,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		
 		#if RLO==1
 		//Rewrite newSymb and reset posN
-		dataTypeNChar i_pile_fin, i_pile = 0;
+		dataTypeNSeq i_pile_fin, i_pile = 0;
 		#endif
 		
 		#if RLO==1 || BUILD_RED_SAP==1
