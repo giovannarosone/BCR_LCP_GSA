@@ -1591,8 +1591,7 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		
 		#if RLO || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
 		//Rewrite newSymb and reset posN
-                        dataTypeNChar i_pile_fin=0;
-			dataTypeNChar i_pile = 0;
+            dataTypeNSeq i_pile_fin=0, i_pile = 0;
 		#endif
 		
 		#if RLO==1 || SAP_PLUS || SAP_INVERSE || BUILD_RED_SAP==1
@@ -2208,8 +2207,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 		difSorting = 0.0;
 	#endif 
 		
-//QUI QUI QUI
-/*	#if RLO==1 || BUILD_RED_SAP==1
+	#if BUILD_RED_SAP==1
 	if( sapInterval ){ //There exists at least one SAP-interval (Type I or Type II)
 		//Find SAP-interval [start,end)
 		dataTypeNSeq i = 1, start, end;
@@ -2218,38 +2216,19 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 				start=i-1;
 				while (i<nExamedTexts && vectTriple[i].sap==1) i++;
 				end=i;
-					
-				#if RLO==1
-				//Initial posN
-				dataTypeNChar init_posN = vectTriple[start].posN;
-					
-				//Reorder symbols in [start,end)
-				sapSort(vectTriple,start,end);
 				
-				//Reset posN and sap in [start,end)
-				vectTriple[start].posN = init_posN;
-				vectTriple[start].sap = 0;
-				#endif
-				
-				#if BUILD_RED_SAP==1
 				//To check if the SAP-interval is type II
 				uchar currentCh=newSymb[vectTriple[start].seqN];
 				bool notOneRunSAP = true;
-				#endif
-					
-				for (dataTypeNSeq j=start+1; j<end; j++){
-					#if RLO==1
-						vectTriple[j].posN = ++init_posN;
-						vectTriple[j].sap = 1;
-					#endif
-					#if BUILD_RED_SAP==1
-						if ( (notOneRunSAP==true) && (currentCh != newSymb[vectTriple[j].seqN])) {
-							notOneRunSAP=false;
-						}
-					#endif
+				dataTypeNSeq j=start+1;
+				
+				while ( notOneRunSAP && j<end){
+					if (currentCh != newSymb[vectTriple[j].seqN])
+						notOneRunSAP=false;
+					else
+						j++;
 				}
 					
-				#if BUILD_RED_SAP==1
 				//Modify newSymbSAP in case of SAP-interval of Type II
 				//newSymbSAP[start]=48;  by default
 				if (notOneRunSAP==false) {  //SAP-interval of type II
@@ -2257,7 +2236,6 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 						newSymbSAP[j]= 49; //==true
 					}	
 				}
-				#endif
 					
 				#if verboseEncode==1
 					std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
@@ -2281,7 +2259,7 @@ void BCRexternalBWT::InsertNsymbols(uchar const * newSymb, dataTypelenSeq posSym
 			else i++;;
 		}//end-while
 	}
-	#endif*/
+	#endif
 	
 	#if verboseEncode==1
 		std::cerr << "U  ";
@@ -2631,7 +2609,7 @@ void BCRexternalBWT::storeBWTFilePartial(uchar const * newSymb, dataTypelenSeq p
 									numcharWrite =  writeOnFilePartial(buffer, numchar, OutFileBWT) ;
 									assert(numchar == numcharWrite); // we should always read/write the same number of characters
 					
-								#if (BUILD_SAP==1)
+								#if BUILD_SAP==1 || BUILD_RED_SAP==1
 								numcharSap = fread(bufferSap,sizeof(uchar),toRead,InFileSap);
 								assert(numcharSap == toRead);
 								numcharWriteSap = fwrite (bufferSap, sizeof(uchar), numcharSap , OutFileSap);
@@ -6752,12 +6730,6 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 		dataTypeNChar init_posN = v[start].posN;
 		//Reorder symbols in [start,end)
 		sapSort(v, start, end);
-										
-		#if BUILD_RED_SAP
-			//To check if the SAP-interval is type II
-			uchar currentCh=newSymb[v[start].seqN];
-			bool notOneRunSAP = true;
-		#endif
 							
 		//Reset posN and sap in [start,end)
 		v[start].posN = init_posN;
@@ -6766,22 +6738,7 @@ dataTypeNChar BCRexternalBWT::writeSymbolOnFilePartial(uchar symbol, dataTypeNCh
 		for (dataTypeNSeq j=start+1; j<end; j++){
 			v[j].posN = ++init_posN;
 			v[j].sap = 1;
-			#if BUILD_RED_SAP	
-			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
-				notOneRunSAP=false;
-			}
-			#endif
 		}
-				
-		#if BUILD_RED_SAP
-		//Modify newSymbSAP in case of SAP-interval of Type II
-		if (notOneRunSAP==false) {  //SAP-interval of type II
-			sapTypeTwoCounter++;
-			for (dataTypeNSeq j = start+1; j<end; j++) {
-				newSymbSAP[j]= 49; //==true
-				}	
-		}
-		#endif
 										
 		#if verboseEncode==1
 		std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
@@ -6814,12 +6771,6 @@ void BCRexternalBWT::makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start
 		dataTypeNChar init_posN = v[start].posN;
 		//Reorder symbols in [start,end)
 		sort(v.begin()+start,v.begin()+end, cmpSapSortPlus);
-										
-		#if BUILD_RED_SAP
-		//To check if the SAP-interval is type II
-		uchar currentCh=newSymb[v[start].seqN];
-		bool notOneRunSAP = true;
-		#endif
 							
 		//Reset posN and sap in [start,end)
 		v[start].posN = init_posN;
@@ -6828,21 +6779,8 @@ void BCRexternalBWT::makeSapPlus(std::vector<sortElement> &v, dataTypeNSeq start
 		for (dataTypeNSeq j=start+1; j<end; j++){
 			v[j].posN = ++init_posN;
 			v[j].sap = 1;
-			#if BUILD_RED_SAP							
-			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
-				notOneRunSAP=false;
-			}
-			#endif
 		}
-		#if BUILD_RED_SAP				
-		//Modify newSymbSAP in case of SAP-interval of Type II
-		if (notOneRunSAP==false) {  //SAP-interval of type II
-			sapTypeTwoCounter++;
-			for (dataTypeNSeq j = start+1; j<end; j++) {
-				newSymbSAP[j]= 49; //==true
-				}	
-		}
-		#endif
+
 										
 		#if verboseEncode==1
 			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
@@ -6899,12 +6837,6 @@ void BCRexternalBWT::makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq st
 			else {
 				sort(v.begin()+start,v.begin()+end, cmpSapSort);
 			}
-			
-			#if BUILD_RED_SAP
-			//To check if the SAP-interval is type II
-			uchar currentCh=newSymb[v[start].seqN];
-			bool notOneRunSAP = true;
-			#endif
 							
 			//Reset posN and sap in [start,end)
 			v[start].posN = init_posN;
@@ -6913,22 +6845,7 @@ void BCRexternalBWT::makeSapInverse(std::vector<sortElement> &v, dataTypeNSeq st
 			for (dataTypeNSeq j=start+1; j<end; j++){
 				v[j].posN = ++init_posN;
 				v[j].sap = 1;
-				#if BUILD_RED_SAP		
-				if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
-					notOneRunSAP=false;
-				}
-				#endif
 			}
-
-			#if BUILD_RED_SAP					
-			//Modify newSymbSAP in case of SAP-interval of Type II
-			if (notOneRunSAP==false) {  //SAP-interval of type II
-				sapTypeTwoCounter++;
-				for (dataTypeNSeq j = start+1; j<end; j++) {
-					newSymbSAP[j]= 49; //==true
-					}	
-			}
-			#endif
 										
 			#if verboseEncode==1
 			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
@@ -6972,12 +6889,6 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		printf("\n");
 		
 		sort(v.begin()+start,v.begin()+end, cmpSapSortRandom);
-										
-		#if BUILD_RED_SAP
-		//To check if the SAP-interval is type II
-		uchar currentCh=newSymb[v[start].seqN];
-		bool notOneRunSAP = true;
-		#endif
 							
 		//Reset posN and sap in [start,end)
 		v[start].posN = init_posN;
@@ -6986,21 +6897,7 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		for (dataTypeNSeq j=start+1; j<end; j++){
 			v[j].posN = ++init_posN;
 			v[j].sap = 1;
-			#if BUILD_RED_SAP							
-			if ( (notOneRunSAP==true) && (currentCh != newSymb[v[j].seqN])) {
-				notOneRunSAP=false;
-			}
-			#endif
 		}
-		#if BUILD_RED_SAP				
-		//Modify newSymbSAP in case of SAP-interval of Type II
-		if (notOneRunSAP==false) {  //SAP-interval of type II
-			sapTypeTwoCounter++;
-			for (dataTypeNSeq j = start+1; j<end; j++) {
-				newSymbSAP[j]= 49; //==true
-				}	
-		}
-		#endif
 										
 		#if verboseEncode==1
 			std::cerr << "SAP-interval = [" << start <<"," << end << ")" << std::endl;
