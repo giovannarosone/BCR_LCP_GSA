@@ -6885,11 +6885,15 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		//Reorder symbols in [start,end)
 
 		random_shuffle(order, order+sizeAlpha);
-		printf("uso ordinamento:\n");
+		
+	/*	#if verboseEncode==1
+		printf("random order:\n");
 		for(int i = 0; i<5; i++) {
 			printf("%c", order[i]);
 		}
 		printf("\n");
+		#endif
+	*/
 		
 		sort(v.begin()+start,v.begin()+end, cmpSapSortRandom);
 							
