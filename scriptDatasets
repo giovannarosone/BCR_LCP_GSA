@@ -21,6 +21,7 @@ echo -e "RLO\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_RLO
 echo -e "BEETL\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_BEETL.txt
 echo -e "INVERSE\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_inverse.txt
 echo -e "PLUS\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_plus.txt
+echo -e "RANDOM\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_random.txt
 echo -e "SAP-ARRAY\ndataset,%CPU,WALL_CLOCK,RAM" &> ${output_directory}/table_SAP-ARRAY.txt
 echo -e "OPTIMAL\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_optimal.txt
 echo -e "SAP_INTERVAL\ndataset,sap_interval,sap_interval_type_two" &> ${output_directory}/table_temp.txt
@@ -135,6 +136,33 @@ fi
   cp ${output_directory}/data_${dataset}.txt ${output_dirStdERROUT}/data_PLUS_${dataset}.txt
   rm ${output_directory}/data_*
 
+
+echo "  SAP RANDOM"
+
+  (/usr/bin/time -v ./BCR_LCP_GSA_random ${dataset_directory}/${dataset} $output_directory/${dataset}.out) &>  $output_directory/data_${dataset}.txt
+  ${tools_directory}/number-runs ${output_directory}/${dataset}.out.ebwt >> ${output_directory}/data_${dataset}.txt
+
+ #CHECK EXECUTION
+grep -q "Command terminated by signal" ${output_directory}/data_${dataset}.txt
+if [ $? -eq 0 ]; then
+echo "    Command terminated by signal"
+  CPU=0
+  CLOCK=0
+  RAM=0 
+  RUNS=0
+else
+  echo "    Done"
+  CPU=$(grep "CPU" ${output_directory}/data_${dataset}.txt | cut -f 7 -d " ")
+  CLOCK=$(grep "Elapsed" ${output_directory}/data_${dataset}.txt | cut -f 8 -d " ")
+  RAM=$(grep "Maximum" ${output_directory}/data_${dataset}.txt | cut -f 6 -d " ") 
+  RUNS=$(grep "runs" ${output_directory}/data_${dataset}.txt | cut -f 4 -d " ") 
+fi
+  #STORE INFORMATION
+  echo "${dataset},${CPU},${CLOCK},${RAM},${RUNS}" >> ${output_directory}/table_random.txt
+  cp ${output_directory}/data_${dataset}.txt ${output_dirStdERROUT}/data_RANDOM_${dataset}.txt
+  rm ${output_directory}/data_*
+
+
  echo "  SAP-BEETL"
   
   (/usr/bin/time -v ${tools_directory}/BEETL/install/bin/beetl bwt --algorithm=ext --sap-ordering --output-format ASCII --intermediate-format ASCII --input ${dataset_directory}/${dataset} --output ${output_directory}/${dataset}.out) &> ${output_directory}/data_${dataset}.txt
@@ -227,10 +255,11 @@ echo -e "\n" >> ${output_directory}/table_original.txt
 echo -e "\n" >> ${output_directory}/table_RLO.txt
 echo -e "\n" >> ${output_directory}/table_inverse.txt
 echo -e "\n" >> ${output_directory}/table_plus.txt
+echo -e "\n" >> ${output_directory}/table_random.txt
 echo -e "\n" >> ${output_directory}/table_SAP-ARRAY.txt
 echo -e "\n" >> ${output_directory}/table_optimal.txt
 echo -e "\n" >> ${output_directory}/table_BEETL.txt
 
 
-cat ${output_directory}/table_original.txt ${output_directory}/table_RLO.txt ${output_directory}/table_inverse.txt ${output_directory}/table_plus.txt ${output_directory}/table_SAP-ARRAY.txt ${output_directory}/table_optimal.txt ${output_directory}/table_BEETL.txt ${output_directory}/table_temp.txt > ${output_directory}/table.txt
+cat ${output_directory}/table_original.txt ${output_directory}/table_RLO.txt ${output_directory}/table_inverse.txt ${output_directory}/table_plus.txt ${output_directory}/table_random.txt ${output_directory}/table_SAP-ARRAY.txt ${output_directory}/table_optimal.txt ${output_directory}/table_BEETL.txt ${output_directory}/table_temp.txt > ${output_directory}/table.txt
 rm ${output_directory}/table_*
