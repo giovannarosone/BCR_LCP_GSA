@@ -215,7 +215,7 @@ cp ${output_directory}/data_${dataset}.txt ${output_dirStdERROUT}/data_SAP-ARRAY
   fi
 
   echo "  SAP_TYPE_TWO"
-  (/usr/bin/time -v ./dataSapIntervalTwo ${dataset_directory}/${dataset}.out) &> ${output_directory}/sapTypeTwo_${dataset}.txt
+  (/usr/bin/time -v ./dataSapIntervalTwo ${output_director}/${dataset}.out) &> ${output_directory}/sapTypeTwo_${dataset}.txt
   #CHECK EXECUTION
   grep -q -E "Command exited|Command terminated by signal"  ${output_directory}/sapTypeTwo_${dataset}.txt
   if [ $? -eq 0 ]; then
