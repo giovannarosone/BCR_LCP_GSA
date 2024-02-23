@@ -24,7 +24,7 @@ echo -e "PLUS\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_pl
 echo -e "RANDOM\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_random.txt
 echo -e "SAP-ARRAY\ndataset,%CPU,WALL_CLOCK,RAM" &> ${output_directory}/table_SAP-ARRAY.txt
 echo -e "OPTIMAL\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_optimal.txt
-echo -e "SAP_INTERVAL\ndataset,sap_interval,sap_interval_type_two" &> ${output_directory}/table_temp.txt
+echo -e "SAP_INTERVAL\ndataset,sap_interval,sap_interval_type_two,sum_length_saps.sum_diff_char" &> ${output_directory}/table_temp.txt
 
 for dataset in ${dataset_array[@]}; do
 
