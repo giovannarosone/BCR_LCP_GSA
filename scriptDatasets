@@ -11,7 +11,9 @@ output_dirStdERROUT=$5;
 
 dataset_array=("10seqsVar.fa" "7seqsVar.fa" "8seq.fasta")
 
-#dataset_array=("ERR7320.fasta" "SRR12038588.fasta" "ERR022075_1.fasta" "Saccharomyces_SRR327342.fasta" "SRR065390_1.fasta" "SRR065390_2.fasta" "SRR1784310_1.fasta")
+#dataset_array=("SRR12038588.fasta")
+
+#dataset_array=("SRR065390_1.fasta" "SRR12038588.fasta")
 
 #dataset_array=("ERR7320.fasta" "SRR12038540.fasta"  "SRR059298.fasta" "ERR022075_1.fasta" "C_elegans_200x.fasta" "SRR2990914_1.fasta" "ERR1019034.fasta")
 
@@ -24,7 +26,7 @@ echo -e "PLUS\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_pl
 echo -e "RANDOM\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_random.txt
 echo -e "SAP-ARRAY\ndataset,%CPU,WALL_CLOCK,RAM" &> ${output_directory}/table_SAP-ARRAY.txt
 echo -e "OPTIMAL\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_optimal.txt
-echo -e "SAP_INTERVAL\ndataset,sap_interval,sap_interval_type_two,sum_length_saps.sum_diff_char" &> ${output_directory}/table_temp.txt
+echo -e "SAP_INTERVAL\ndataset,sap_interval,sap_interval_type_two,sum_length_saps,sum_diff_char,number_run_sap" &> ${output_directory}/table_temp.txt
 
 for dataset in ${dataset_array[@]}; do
 
@@ -216,7 +218,7 @@ cp ${output_directory}/data_${dataset}.txt ${output_dirStdERROUT}/data_SAP-ARRAY
   fi
 
   echo "  SAP_TYPE_TWO"
-  (/usr/bin/time -v ./dataSapIntervalTwo ${output_directory}/${dataset}.out) &> ${output_directory}/sapTypeTwo_${dataset}.txt
+  (/usr/bin/time -v ./dataSapIntervalTypeTwo ${output_directory}/${dataset}.out) &> ${output_directory}/sapTypeTwo_${dataset}.txt
   #CHECK EXECUTION
   grep -q -E "Command exited|Command terminated by signal"  ${output_directory}/sapTypeTwo_${dataset}.txt
   if [ $? -eq 0 ]; then
@@ -224,16 +226,18 @@ cp ${output_directory}/data_${dataset}.txt ${output_dirStdERROUT}/data_SAP-ARRAY
     #sap_counter_two=0
     TotalSapLength=0
     totalDiffChar=0
+    totalSapRuns=0
   else
     echo "    Done"
     #sap_counter_two=$(grep "total sap interval of type two" ${output_directory}/sapTypeTwo_${dataset}.txt | cut -f 7 -d " ")
     totalSapLength=$(grep "length" ${output_directory}/sapTypeTwo_${dataset}.txt | cut -f 9 -d " ")
     totalDiffChar=$(grep "distinctive" ${output_directory}/sapTypeTwo_${dataset}.txt | cut -f 10 -d " ")
+    totalSapRuns=$(grep "runs" ${output_directory}/sapTypeTwo_${dataset}.txt | cut -f 9 -d " ")
   fi
 
   #STORE INFORMATION
-  echo "${dataset},${CPU},${CLOCK},${RAM},${RUNS}" >> ${output_directory}/table_SAP-ARRAY.txt
-  echo "${dataset},${sap_counter},${sap_counter_two},${totalSapLength},${totalDiffChar}" >> ${output_directory}/table_temp.txt
+  echo "${dataset},${CPU},${CLOCK},${RAM}" >> ${output_directory}/table_SAP-ARRAY.txt
+  echo "${dataset},${sap_counter},${sap_counter_two},${totalSapLength},${totalDiffChar},${totalSapRuns}" >> ${output_directory}/table_temp.txt
 
   echo "  OPT"
 
