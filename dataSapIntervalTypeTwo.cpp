@@ -86,7 +86,7 @@ int main (int argn, char** argv) {
     fclose(InFileSAP);
 
 	std::cerr << "total sap interval of type two: " << number_sap << "\n";
-	std::cerr << "total length of sap intervals of type_two: " << total_sap_length << "\n";
-	std::cerr << "total distintive chracters in sap intervals of type two: " << total_diff_char << "\n";
+	std::cerr << "total length of sap intervals of type two: " << total_sap_length << "\n";
+	std::cerr << "total distinctive chracters in sap intervals of type two: " << total_diff_char << "\n";
     return 0;
 }
