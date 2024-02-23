@@ -24,3 +24,5 @@ make clean
 make SAP=1
 mv BCR_LCP_GSA BCR_LCP_GSA_sap
 make clean
+
+g++ dataSapIntervalTypeTwo.cpp -o dataSapIntervalTypeTwo
