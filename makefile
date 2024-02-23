@@ -26,6 +26,7 @@ DATA_SAP_TWO: dataSapIntervalTwo.o
 
 clean:
 	rm -f core *.o *~ BCR_LCP_GSA
+	rm -f core *.o *~ dataSapIntervalTwo
 
 depend:
 	$(CC) -MM *.cpp *.c > dependencies.mk
