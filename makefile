@@ -20,9 +20,6 @@ BCR_BWTCollection_obs = BCR_BWTCollection.o BWTCollection.o BCRexternalBWT.o Too
 BCR_BWTCollection: $(BCR_BWTCollection_obs)
 	$(CC) -o BCR_LCP_GSA $(BCR_BWTCollection_obs)
 
-DATA_SAP_TWO: dataSapIntervalTwo.o
-	$(CC) -o dataSapIntervalTwo dataSapIntervalTwo.o
-
 
 clean:
 	rm -f core *.o *~ BCR_LCP_GSA
