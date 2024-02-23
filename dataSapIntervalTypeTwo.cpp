@@ -23,6 +23,8 @@ int main (int argn, char** argv) {
     ulong total_sap_length=0;
     ulong total_diff_char=0;
 	char symbol;
+    char lastSymbol;
+    ulong total_run_sap=0;
 
     ulong lung = strlen(fileOutput);
 	char *fileOutRes = new char[lung+100];
@@ -57,9 +59,16 @@ int main (int argn, char** argv) {
                     number_sap++;
                     found_sap=1;
                     inserted_symbols+=symbol;
+                    lastSymbol=symbol;
+                    total_run_sap++;
                 }
                 sap_length++;
-    
+
+                if(bufferBWT[i]!=lastSymbol) {
+                    total_run_sap++;
+                    lastSymbol=bufferBWT[i];
+                }
+
                 if(inserted_symbols.find(bufferBWT[i]) == std::string::npos) {
                     inserted_symbols+=bufferBWT[i];
                 }
@@ -73,6 +82,7 @@ int main (int argn, char** argv) {
                     inserted_symbols="";
                 }
                 symbol=bufferBWT[i];
+                lastSymbol=bufferBWT[i];
             }
         }
     }
@@ -88,5 +98,6 @@ int main (int argn, char** argv) {
 	std::cerr << "total sap interval of type two: " << number_sap << "\n";
 	std::cerr << "total length of sap intervals of type two: " << total_sap_length << "\n";
 	std::cerr << "total distinctive chracters in sap intervals of type two: " << total_diff_char << "\n";
+    std::cerr << "total runs in sap intervals of type two: " << total_run_sap << "\n";
     return 0;
 }
