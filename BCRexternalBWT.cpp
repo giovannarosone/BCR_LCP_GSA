@@ -1496,8 +1496,12 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 			exit (EXIT_FAILURE);
 		}
 	#endif
+
+	#if BCR_SET_ALN_RH == 1
+		vectTriple.resize(nText);
+	#endif
 	
-    sortElement tripla;
+        sortElement tripla;
 	nExamedTexts=0;
 	for (dataTypeNSeq j = 0 ; j < nText; j++) {
 
@@ -1508,10 +1512,10 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 		{ 
 			tableOcc[0][alpha[(unsigned int)newSymb[j]]]++;       //counting the number of occurrences in BWT of the $-pile
 			#if BCR_SET_ALN_RH == 0
-			newSymb[nExamedTexts] = newSymb[j];
-			if (j != nExamedTexts)
+			   newSymb[nExamedTexts] = newSymb[j];
+			   if (j != nExamedTexts)
 				newSymb[j] = TERMINATE_CHAR_LEN;
-			vectInsTexts[j]=1;
+			   vectInsTexts[j]=1;
 			#endif
 			#if USE_QS==1
 				newSymbQS[nExamedTexts] = newSymbQS[j];
@@ -1534,7 +1538,11 @@ void BCRexternalBWT::InsertFirstsymbols(uchar * newSymb)
 				tripla.lcpCurN = 0;   //it could be -1
 				tripla.lcpSucN = 0;   //it could be -1
 			#endif
-			vectTriple.push_back(tripla);
+			#if BCR_SET_ALN_RH == 0
+				vectTriple.push_back(tripla);
+			#else
+				vectTriple[j]=tripla;
+			#endif
 			nExamedTexts++;
 		}
         #else
