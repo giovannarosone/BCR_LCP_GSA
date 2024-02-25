@@ -145,6 +145,8 @@ typedef unsigned long ulong;
 	#define BCR_SET_ALN_RH 1
 #endif
 
+#define BCR_SET_ALN_RH 1   //Added
+
 #if SAP==1
     //Compute the reduced SAP-array associated with BWT permutation
 	#define BUILD_RED_SAP 1
