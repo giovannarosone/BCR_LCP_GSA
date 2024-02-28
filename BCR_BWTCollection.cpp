@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
     std::cout << "\t\tdataTypeNSeq: sizeof(type of #sequences): " << sizeof(dataTypeNSeq) << " bytes\n";
     std::cout << "\t\tdataTypeNChar: sizeof(type of #sequences): " << sizeof(dataTypeNChar) << " bytes\n";
     std::cout << "\t\sortElement: sizeof(type of sortElement): " << sizeof(sortElement) << " bytes\n";
-    std::cout << "\t\vectTriple: sizeof(type of vectTriple): " << sizeof(vectTriple) << "bytes\n";
+    
     #if OUTPUT_FORMAT == 1
         std::cerr << "EGSA: sizeof(type of t_GSA): " << sizeof(t_GSA) << "\n";
         std::cerr << "file EGSA: " << lengthTot_plus_eof * sizeof(t_GSA) << "\n";
