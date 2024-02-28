@@ -23,7 +23,7 @@ BCR_BWTCollection: $(BCR_BWTCollection_obs)
 
 clean:
 	rm -f core *.o *~ BCR_LCP_GSA
-	rm -f core *.o *~ dataSapIntervalTwo
+	rm -f core *.o *~ stastisticsSAPintervals
 
 depend:
 	$(CC) -MM *.cpp *.c > dependencies.mk
