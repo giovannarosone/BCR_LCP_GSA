@@ -1,6 +1,9 @@
 
 #!/bin/bash
 
+mkdir out_BCRdata
+mkdir out_table
+
 make 
 mv BCR_LCP_GSA BCR_inputBWT
 make clean
