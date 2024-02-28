@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./scriptDatasets ../dataset ../Tools ./output_dataset ../Tools ./out_data
+#./scriptTestDatasets ../dataset ../Tools ./out_table ../Tools ./out_BCRdata
 
 dataset_directory=$1;
 tools_directory=$2;
@@ -9,14 +9,14 @@ optimal_directory=$4;
 output_dirStdERROUT=$5;
 
 
-dataset_array=("10seqsVar.fa" "7seqsVar.fa" "8seq.fasta")
+dataset_array=("7stringsSAP.fasta")
 
-#dataset_array=("SRR12038588.fasta")
+#dataset_array=("SRR7494928_30.fasta" "ERR7320.fasta" "SRR12038540.fasta"  "SRR059298.fasta" "ERR022075_1.fasta" "C_elegans_200x.fasta" "SRR2990914_1.fasta" "ERR1019034.fasta")
 
-#dataset_array=("SRR065390_1.fasta" "SRR12038588.fasta")
-
-#dataset_array=("ERR7320.fasta" "SRR12038540.fasta"  "SRR059298.fasta" "ERR022075_1.fasta" "C_elegans_200x.fasta" "SRR2990914_1.fasta" "ERR1019034.fasta")
-
+##########
+#needs to change the input data types (len seqs, BWT len, ...) in Parameters.h
+#dataset_array=("pdb_seqres.fa"); 
+##########
 
 echo -e "inputBWT\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_original.txt
 echo -e "rloBWT\ndataset,%CPU,WALL_CLOCK,RAM,runs" &> ${output_directory}/table_RLO.txt
