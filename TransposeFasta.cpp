@@ -215,9 +215,9 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 
 
 	if (lenSeq == true)
-		cerr << "The  (new and-or old) reads have a different length. The max len is " << lengthRead << endl;
+		cerr << "The  (new and-or old) reads have a different length. The max len is " << (unsigned int) lengthRead << endl;
 	else
-        cerr << "The (new and-or old) reads have the same length. The len is " << lengthRead << endl;
+        cerr << "The (new and-or old) reads have the same length. The len is " << (unsigned int) lengthRead << endl;
 
 	static FILE *OutFileLen;                  // output file of the end positions;
 	OutFileLen = fopen(fileLen, "wb");
