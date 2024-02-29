@@ -6062,8 +6062,13 @@ void BCRexternalBWT::printOutput(char *fileOutput)
         #endif
     	#if BUILD_SAP==1 || BUILD_RED_SAP==1
             char *fnSAP = new char[lung+100];
-            sprintf (fnSAP,"%s%s",fileOutput,".bwt.sap");
-            std::cerr << "printOutput: fnDA: "  << fnSAP <<  "." << std::endl;
+            #if BUILD_SAP==1 
+		sprintf (fnSAP,"%s%s",fileOutput,".bwt.sap");
+	    #else 
+		//if BUILD_RED_SAP==1
+	        sprintf (fnSAP,"%s%s",fileOutput,".bwt.red_sap");
+	    #endif
+            std::cerr << "printOutput: fnSAP: "  << fnSAP <<  "." << std::endl;
             FILE *InFileSAP = fopen(fnSAP, "rb");
             if (InFileSAP==NULL) {
                 std::cerr << "printOutput: Entire SAP file: Error opening " << fnSAP <<  "." << std::endl;
