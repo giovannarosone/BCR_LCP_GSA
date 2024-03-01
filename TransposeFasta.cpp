@@ -217,7 +217,18 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 	if (lenSeq == true)
 		cerr << "The  (new and-or old) reads have a different length. The max len is " << (unsigned int) lengthRead << endl;
 	else
-        cerr << "The (new and-or old) reads have the same length. The len is " << (unsigned int) lengthRead << endl;
+        	cerr << "The (new and-or old) reads have the same length. The len is " << (unsigned int) lengthRead << endl;
+
+	if (lenSeq == true) {
+		if ((STORE_ENDMARKER_POS == 1) && (BCR_SET_ALN_RH == 1)) {
+			std::cerr << "Store the position of the end-markers. TO DO. STORE_ENDMARKER_POS must be set to 1 (see Parameters.h)\n";	
+			exit (EXIT_FAILURE);			
+		}
+		else if ((STORE_ENDMARKER_POS == 1) && (BCR_SET_ALN_RH == 1)) {
+			std::cerr << "Store the position of the end-markers.\n";	
+			exit (EXIT_FAILURE);			
+		}
+	}
 
 	static FILE *OutFileLen;                  // output file of the end positions;
 	OutFileLen = fopen(fileLen, "wb");
