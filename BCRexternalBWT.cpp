@@ -6958,35 +6958,47 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 #endif
 
 	void BCRexternalBWT::printTriple(std::vector<sortElement> vectTriple, dataTypeNSeq nExamedTexts) {
-		std::cerr << "Q  ";
+		std::cerr << "Pos in BWT:   ";		
+		dataTypeNChar posGlobal = 0;
+		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {			
+			posGlobal = vectTriple[g].posN;
+			for (dataTypedimAlpha r = 0; r < vectTriple[g].pileN; r++) {
+					for (dataTypedimAlpha t = 0; t < sizeAlpha; t++) {
+						posGlobal += tableOcc[r][t];
+					}
+				}
+			std::cerr << posGlobal  << " "; 
+		}
+		std::cerr << std::endl;
+		std::cerr << "Seg  (Q):     ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << (unsigned int)vectTriple[g].pileN << " ";
 		}
 		std::cerr << std::endl;
-		std::cerr << "P  ";
+		std::cerr << "Pos (P) in Q: ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << vectTriple[g].posN  << " ";
 		}
 		std::cerr << std::endl;
-		std::cerr << "N  ";
+		std::cerr << "Nseq (N):     ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << vectTriple[g].seqN  << " ";
 		}
 		std::cerr << std::endl;
 		#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_PLUS || SAP_INVERSE || SAP_RANDOM
-		std::cerr << "S  ";
+		std::cerr << "SAP-ARRAY:    ";
 		for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 			std::cerr << (uchar)vectTriple[g].sap + 48 << " ";
 		}
 		std::cerr << std::endl;
 		#endif
 		#if BUILD_LCP == 1
-			std::cerr << "C  ";             //LCP current
+			std::cerr << "LCPcur:       ";             //LCP current
 			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 				std::cerr << (unsigned int)vectTriple[g].lcpCurN  << " ";
 			}
 			std::cerr << std::endl;
-			std::cerr << "S  ";                     //LCP successive
+			std::cerr << "LCPsuc:       ";                     //LCP successive
 			for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 				std::cerr << (unsigned int)vectTriple[g].lcpSucN  << " ";
 			}
@@ -6997,7 +7009,7 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		#if PI_PERM
 			#if PI_POS == 1
 			//Print piPos value
-				std::cerr << "I  ";
+				std::cerr << "Index:        ";
 				for (dataTypeNSeq g = 0 ; g < nExamedTexts; g++) {
 					if(vectTriple[g].piPos != std::numeric_limits<dataTypeNSeq>::max()) {
 						std::cerr << vectTriple[g].piPos  << " ";
@@ -7008,7 +7020,7 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 				}
 				std::cerr << std::endl;
 			#endif 
-			std::cerr << "G  ";
+			std::cerr << "piPerm:       ";
 			for (dataTypeNSeq g = 0 ; g < piPerm.size(); g++) {
 				std::cerr << piPerm[g] << " ";
 			}
