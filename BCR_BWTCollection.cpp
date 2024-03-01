@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 		
 	
 	if (PI_PERM == 1 || PI_POS == 1) {
-		if (RLO==1 && SAP_INVERSE==1 && SAP_PLUS==1 && SAP_RANDOM==1) {
+		if (RLO==0 && SAP_INVERSE==0 && SAP_PLUS==0 && SAP_RANDOM==0) {
 			std::cerr << "Error! To compute the permutation, a SAP-heuristic must be set to 1 (see Parameters.h).\n";
 			exit (EXIT_FAILURE);
 		}
