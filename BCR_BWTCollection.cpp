@@ -159,9 +159,18 @@ int main(int argc, char *argv[])
             exit (EXIT_FAILURE);
         }
 		
-		if(BUILD_SAP && BUILD_RED_SAP)
+	
+	if (PI_PERM == 1 || PI_POS == 1) {
+		if (RLO==1 && SAP_INVERSE==1 && SAP_PLUS==1 && SAP_RANDOM==1) {
+			std::cerr << "Error! To compute the permutation, a SAP-heuristic must be set to 1 (see Parameters.h).\n";
+			exit (EXIT_FAILURE);
+		}
+        }
+	
+	if(BUILD_SAP==1 && BUILD_RED_SAP==1)
         {
-            std::cerr << "Warning! To compute the reduced SAP array BUILD_SAP must be set to 0 (see Parameters.h).\n";
+            std::cerr << "Error! only one of the two parameters (BUILD_SAP or BUILD_RED_SAP) for computing the (reduced) SAP array must be set to 1 (see Parameters.h).\n";
+	    exit (EXIT_FAILURE);
         }
          
         if (OUTPUT_FORMAT==0) {
