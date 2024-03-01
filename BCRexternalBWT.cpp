@@ -7006,7 +7006,8 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 		#endif
 
 		//print permutation array value
-		#if PI_PERM
+		#if BUILD_SAP==1 || BUILD_RED_SAP==1 || RLO==1 || SAP_INVERSE || SAP_PLUS || SAP_RANDOM
+		   #if PI_PERM
 			#if PI_POS == 1
 			//Print piPos value
 				std::cerr << "Index:        ";
@@ -7025,6 +7026,7 @@ bool BCRexternalBWT::cmpSapSortInverse (sortElement a,sortElement b) {
 				std::cerr << piPerm[g] << " ";
 			}
 			std::cerr << std::endl;
+		   #endif
 		#endif
 	}
 	
