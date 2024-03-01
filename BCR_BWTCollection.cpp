@@ -152,7 +152,12 @@ int main(int argc, char *argv[])
             std::cerr << "Error! The input is a set. BCR_SET must be set to 1, BUILD_BCR_FROM_BCRpartials must be set to 0, BUILD_BCR_ALTERNATE must be set to 1  (see Parameters.h).\n";
             exit (EXIT_FAILURE);
         }
-        
+
+	if (STORE_ENDMARKER_POS == 1) {
+		if (BCR_SET_ALN_RH == 0)  //Alignment to left
+			std::cout << "Store the position of the end-markers.\n";			
+	}
+	
         if(BCR_SET_ALN_RH!=1 && (BUILD_SAP || BUILD_RED_SAP))
         {
             std::cerr << "Error! SAP array is computed only if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
@@ -161,7 +166,7 @@ int main(int argc, char *argv[])
 		
 	
 	if (PI_PERM == 1 || PI_POS == 1) {
-		if (RLO==0 && SAP_INVERSE==0 && SAP_PLUS==0 && SAP_RANDOM==0) {
+		if (BUILD_SAP==0 && BUILD_RED_SAP==0 && RLO==0 && SAP_INVERSE==0 && SAP_PLUS==0 && SAP_RANDOM==0) {
 			std::cerr << "Error! To compute the permutation, a SAP-heuristic must be set to 1 (see Parameters.h).\n";
 			exit (EXIT_FAILURE);
 		}
