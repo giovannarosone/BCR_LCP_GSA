@@ -221,7 +221,7 @@ bool TransposeFasta::findLengthNseq( const string& input, const string& fileOutp
 
 	if (lenSeq == true) {
 		if ((STORE_ENDMARKER_POS == 1) && (BCR_SET_ALN_RH == 1)) {
-			std::cerr << "Store the position of the end-markers. TO DO. STORE_ENDMARKER_POS must be set to 1 (see Parameters.h)\n";	
+			std::cerr << "Store the position of the end-markers with alignment to right in cyc files: TO DO! Please, set either STORE_ENDMARKER_POS or BCR_SET_ALN_RH to 0 (see Parameters.h)\n";	
 			exit (EXIT_FAILURE);			
 		}
 		else if ((STORE_ENDMARKER_POS == 1) && (BCR_SET_ALN_RH == 1)) {
