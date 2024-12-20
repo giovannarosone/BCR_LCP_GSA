@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     #endif
 
     std::cout << "\tStrings order:\n";
-    #if BUILD_SAP == 0 || BUILD_RED_SAP == 0
+    #if RLO == 0
         std::cout << "\t\tInput order" << endl;
     #else
         std::cout << "\t\tReverse lexicographic order" << endl;
