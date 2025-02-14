@@ -186,7 +186,9 @@ typedef unsigned long ulong;
 
 
 //if you want to Store the 'end positions' of the end-markers (one for each sequence), please set it to 1
-#define STORE_ENDMARKER_POS 0
+#ifndef STORE_ENDMARKER_POS
+	#define STORE_ENDMARKER_POS 0
+#endif
 
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
 //if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
