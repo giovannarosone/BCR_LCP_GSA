@@ -153,7 +153,13 @@ int main(int argc, char *argv[])
             exit (EXIT_FAILURE);
         }
         
-        if(BCR_SET_ALN_RH!=1 && (BUILD_SAP || BUILD_RED_SAP))
+        if(BCR_SET_ALN_RH==1 && STORE_ENDMARKER_POS==1)
+        {
+            std::cerr << "Error! EOFpos file is computed only if BCR_SET_ALN_RH is set to 0 (see Parameters.h).\n";
+            exit (EXIT_FAILURE);
+        }
+	
+	if(BCR_SET_ALN_RH!=1 && (BUILD_SAP || BUILD_RED_SAP))
         {
             std::cerr << "Error! SAP array is computed only if BCR_SET_ALN_RH is set to 1 (see Parameters.h).\n";
             exit (EXIT_FAILURE);
