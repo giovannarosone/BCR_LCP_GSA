@@ -14,71 +14,46 @@ Multi-string BWT (and related data structures) computation
     covered by the "BSD 2-Clause License" (see accompanying LICENSE file)
        
     By Giovanna Rosone
-   
-   
 
-BCR_LCP_GSA can compute at the same time:
+###  Idea
 
+BCR (both the strategy described in the paper and the implementation) uses each string in circular way. 
+
+A distinct end marker symbol is added (implicitly) to each string, and this allows the eBWT to be built by (implicitly) sorting the string suffixes, rather than cyclic rotations.
+
+Note that BCR does not require linearizing the strings in the collection S by concatenating the strings and does not require explicitly computing the GSA.
+
+BCR builds the BWT incrementally in m steps, where m is the length of the longest string in S (including the end-markers) by exploiting the basic properties of BWT and LF mapping.
+The strings in S can be align either left or right and BCR scans all the strings in S from right to left at the same time, to incrementally construct the partial BWTs of  suffixes of S with length at most h \leq m (for more details see the paper).
+
+Note that the BCR implementation prints in the output file (eBWT string) the same end-marker symbol, $\$$, for all strings (\ie, $\$_i=\$$ for all $i=0,\ldots,m-1$) so as not to increase the size of the alphabet, but one can decide whether to output also the list of end-marker indices in order of appearance in the BWT (please compile by setting STORE_INDICES_DOLLARS=1) or not (please compile by setting STORE_INDICES_DOLLARS=0).
+
+
+###  The main features:
+
+Given a very large collection of strings **having different or same length** and **any alphabet**, BCR_LCP_GSA can compute at the same time:
 - the (extended) Burrows-Wheeler transform (multi-string BWT)
-- the longest common prefix array (optional, set BUILD_LCP to 1)
+- the longest common prefix array (optional)
 - the generalized suffix array (optional):
-    - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i]), set BUILD_DA to 1
-    - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated to the symbol ebwt[i]), set BUILD_SA to 1. You could not compute the DA array.
+    - document array (DA[i] corresponds to the ID of the sequence of the symbol ebwt[i])
+    - suffix array (SA[i] corresponds to the position of the suffixes of the sequence with id=DA[i] associated with the symbol ebwt[i]).
 - the quality score permutation (see Install)
 - the SAP-array (see Install)
 - the BWT-RLO (see Install)
-    
-of a very large collection of strings **having different or same length** and **any alphabet**. 
-
-The output format for eBWT/LCP/GSA(DA/SA) can be:
-- EGSA (OUTPUT_FORMAT must be 1). The end-marker in .bwt file is the symbol '\0' [https://github.com/felipelouza/egsa]
-- at most four files: .ebwt, .lcp, .da, posSA (OUTPUT_FORMAT != 1). The end-marker in .bwt file is the symbol '#'
-    - if OUTPUT_FORMAT == 0, the output format of BCR is at most 4 files - built one after the other
-    - if OUTPUT_FORMAT == 1, the output format of BCR is as the output of EGSA (.gesa file). BUILD_LCP, BUILD_DA and BUILD_SA must be set to 1. Please, set the types as in eGSA
-    - if OUTPUT_FORMAT == 2, the output format of BCR is a unique file .egsa. BUILD_LCP must be set to 1 (we do not use a struct), BUILD_DA and BUILD_SA could be set to either 0 or 1.  Order: ebwt, lcp, da, sa
-    - if OUTPUT_FORMAT == 3, the output format of BCR is at most 4 files at the same time
-    - if OUTPUT_FORMAT == 4, the output format of BCR is at most 3 files (ebwt, da), lcp, sa
-    - if OUTPUT_FORMAT == 5, the output format of BCR is at most 3 files ebwt, (lcp, da), sa
-    - if OUTPUT_FORMAT == 6, the output format of BCR is at most 3 files ebwt, lcp, (sa, da)
-
-
-One should set the following size of the buffers. 
-The two steps are consecutive, so you must check that their maximum does not exceed the total available memory.
-
-Please check BUFFERSIZE in TransposeFasta.h. It should be set based on the total available memory.
-
-It means that BCR needs (max length of the reads) * BUFFERSIZE bytes in order to build the cyc files.
-
-Please check SIZEBUFFER in parameters.h. It should be set based on the total available memory:
-
-It means that BCR could need to (sizeof(bwt[i]) + sizeof(lcp[i]) + sizeof(da[i]) + sizeof(sa[i])) * SIZEBUFFER bytes in order to keep the I/O buffers.
-
-You also keep in mind that it could use (sizeof(bwt[i]) + 2*sizeof(lcp[i]) + sizeof(da[i]) + sizeof(x)) bytes per text, where x is the type necessary to index the characters of the (complete) ebwt.
-
+ 
+Other features not described here can be set directly in the Parameters.h file.
 
 Default:
-- Build eBWT permutation
-- Types: uchar (you have to reserve two characters) for eBWT, uchar (max length of sequences 256-1) for LCP (BUILD_LCP==1)  
-- Store distinct partial files at the same time: OUTPUT_FORMAT == 3
+- Build only eBWT string
+- Types: **uchar** for symbol in eBWT, **uint** for the length of the strings, *ulong* for the number of symbols in the input strings (length of the BWT) (see [Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki/Type-setting) for a description of how to change data types for your collection)
+- Store distinct partial files at the same time: OUTPUT_FORMAT == 3 (see [Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki/Output-format))
+  
+For details on the output format, please, see [Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki/Output-format). 
 
-For instance, the data structures LCP and SA depend on the setting of dataTypeLengthSequences/dataTypelenSeq.
-If your dataset contains sequences having a length greater than 256-1, you should set dataTypeLengthSequences to 2, so that dataTypelenSeq is set to uint. 
+One should set the following size of the buffers. This is important when reading the input file, please see Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki/Buffer-size), especially if you get errors.
 
 BCR supports the inserting and deleting of new elements belonging to a sequence in the computed data structures. 
-Now, BCR can add the elements of a new string collection in input by starting with the previously computed data structures. 
-In this case, BCR takes in input the collection (.fasta) that to be inserted and the BCR partial files.
-In order to do this, BUILD_BCR_FROM_BCRpartials must to be set to 1.
-For instance:
-```sh
-./BCR_LCP_GSA test/2seqsVar.fa test/2seqsVar.fa.out test/part_7seqsVar
-```
-where part_7seqsVar is the prefix of the filenames of BCR partial files.
-
-In order to get BCR partial files from eGSA [https://github.com/felipelouza/egsa], one can use the script eGSA_2_BCR_partials.
-```sh
-./eGSA_2_BCR_partials 7seqsVar.gesa part_7seqsVar
-```
-
+For details on the dynamic eBWT, please, see [Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki/Dynamic-EBWT). 
 
 If BCR suddenly stops working, you could use the script to remove the cyc files.
 ```sh
@@ -123,6 +98,16 @@ To compute the multi-string BWT of the string collection implicitly sorted in *r
 make RLO=1
 ```
 
+To output the indexes of the distinct end-marker symbols, , please compile using
+```sh
+make STORE_INDICES_DOLLARS=1
+```
+
+To print the output of BCR in the terminal, please compile using
+```sh
+make PRINT=1
+```
+
 ### Run
 ```sh
 ./BCR_LCP_GSA inputFile outputFile
@@ -140,6 +125,59 @@ make RLO=1
 ```sh
 ./BCR_LCP_GSA test/test.fq.gz test/test.fq.out
 ```
+
+### Some computed data structures
+Let S={CG, CGAT, GGGAT, CGCT, AGCT, AGAT, AGGAT, GGCT}.
+Note that in #seq appears the index (in [0,7]) of each end-markers in position order in the eBWT string. 
+
+```sh
+i	#seq	eBWT	LCP	DA	SAP-array	Sorted suffixes (only for clarity)
+1	 	G	0	0	0		$_0
+2	 	T	0	1	1		$_1
+3	 	T	0	2	1		$_2
+4	 	T	0	3	1		$_3
+5	 	T	0	4	1		$_4
+6	 	T	0	5	1		$_5
+7	 	T	0	6	1		$_6
+8	 	T	0	7	1		$_7
+9	5	$	0	5	0		AGAT$_5
+10	4	$	2	4	0		AGCT$_4
+11	6	$	2	6	0		AGGAT$_6
+12	 	G	1	1	0		AT$_1
+13	 	G	2	2	1		AT$_2
+14	 	G	2	5	1		AT$_5
+15	 	G	2	6	1		AT$_6
+16	0	$	0	0	0		CG$_0
+17	1	$	2	1	0		CGAT$_1
+18	3	$	2	3	0		CGCT$_3
+19	 	G	1	3	0		CT$_3
+20	 	G	2	4	1		CT$_4
+21	 	G	2	7	1		CT$_7
+22	 	C	0	0	0		G$_0
+23	 	C	1	1	0		GAT$_1
+24	 	G	3	2	1		GAT$_2
+25	 	A	3	5	1		GAT$_5
+26	 	G	3	6	1		GAT$_6
+27	 	C	1	3	0		GCT$_3
+28	 	A	3	4	1		GCT$_4
+29	 	G	3	7	1		GCT$_7
+30	 	G	1	2	0		GGAT$_2
+31	 	A	4	6	1		GGAT$_6
+32	7	$	2	7	0		GGCT$_7
+33	2	$	2	2	0		GGGAT$_2
+34	 	A	0	1	0		T$_1
+35	 	A	1	2	1		T$_2
+36	 	C	1	3	1		T$_3
+37	 	C	1	4	1		T$_4
+38	 	A	1	5	1		T$_5
+39	 	A	1	6	1		T$_6
+40	 	C	1	7	1		T$_7
+```
+
+
+### Wiki
+
+See more details and additional features in [Wiki](https://github.com/giovannarosone/BCR_LCP_GSA/wiki). 
 
 
 #### References:
