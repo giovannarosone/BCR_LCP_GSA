@@ -5879,10 +5879,9 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 	#if (STORE_ENDMARKER_POS == 1)
 		std::cerr << "#seq\t";
 	#endif
-        std::cerr << "eBWT\t";
 	
+        std::cerr << "eBWT\t";
 	uchar *bufferBWT = new uchar[SIZEBUFFER];
-        std::cerr << "bwt\t";
         fprintf(OutFile, "bwt\t");
         #if BUILD_LCP==1
 	    dataTypeNChar numcharLCP;	
@@ -5976,8 +5975,8 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 			fprintf(OutFile, "%c\t", bufferSAP[i]);
 			#endif	
                 #if BUILD_DA_bit==1				
-					char c;
-					InFileDAbit.read((char*)&c,sizeof(c));
+                    char c;
+                    InFileDAbit.read((char*)&c,sizeof(c));
                     std::cerr << c<< "\t";
                     fprintf(OutFile, "%c\t", c);
                 #endif
