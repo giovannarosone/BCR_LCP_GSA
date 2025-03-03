@@ -1338,6 +1338,9 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 	#if STORE_ENDMARKER_POS == 1
 		 //We are storing the last simbols of sequences: $
 			std::cerr << "Stores the 'end positions' of the $!"<< std::endl;
+			std::cerr << "The binary file EOFpos contains for each end-marker the following information:"<< std::endl;
+			std::cerr << "sequence index in the range [0,m-1], position in ebwt [1,N], symbol with which the associated suffix begins"<< std::endl;
+			
 			char *fileEndPos = new char[strlen(fileOutput)+100];
 			sprintf (fileEndPos,"%s%s",fileOutput,".EOFpos");
 			static FILE *OutFileEndPos;                  // output file of the end positions;
@@ -1366,6 +1369,12 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 			#if (verboseEncode == 1) 
 				std::cerr << nText << " positions of the EOF into BWT: " << std::endl;
 			#endif
+
+			#if (printFinalOutput == 1)
+				std::cerr << "Print the indexes of the distinct "<< nText << "end-marker symbols as pairs: "  << std::endl;
+				std::cerr << "The symbol $_i, for i=0,...,m-1, is in the j in ebwt string for j=1,...N:\n";
+				std::cerr << "Index Sequence\tPosition in EBWT\n";   
+			#endif
 			for (dataTypeNSeq i = 0; i < nText; i++) {
 				#if (verboseEncode == 1) 				
 					std::cerr << "#seq: " << vectTriple[i].seqN << " pos in ebwt: " << vectTriple[i].posN << " suffix starting with " << (unsigned int)vectTriple[i].pileN << std::endl;
@@ -1377,9 +1386,11 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 				numchar = fwrite (&vectTriple[i].pileN, sizeof(dataTypedimAlpha), 1 , OutFileEndPos);
 				assert( numchar == 1); 
 			}
-			
 			#if (verboseEncode == 1) 
 				std::cerr << std::endl;
+			#endif
+			#if (printFinalOutput == 1) || (printFinalOutput == 1)
+				std::cerr << vectTriple[i].seqN << " \t " << vectTriple[i].posN << std::endl;
 			#endif
 			
 			fclose(OutFileEndPos);
@@ -5770,9 +5781,9 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 	//if ((BUILD_LCP==1) && (BUILD_DA==1) && (BUILD_SA==1) && (OUTPUT_FORMAT)==0) {
 		std::cerr << "Reads files containing the BWT, LCP, DA and SA and writes a text file\n";
 
-		ulong lung = strlen(fileOutput);
-		char *fileOutRes = new char[lung+100];
-		char *fnBWT = new char[lung+100];
+	ulong lung = strlen(fileOutput);
+	char *fileOutRes = new char[lung+100];
+	char *fnBWT = new char[lung+100];
         sprintf (fileOutRes,"%s%s",fileOutput,".txt");
         sprintf (fnBWT,"%s%s",fileOutput,".ebwt");
         FILE *InFileBWT = fopen(fnBWT, "rb");
@@ -5793,7 +5804,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
         #endif
         #if BUILD_SA==1
             char *fnPairSA = new char[lung+100];
-            sprintf (fnPairSA,"%s%s",fileOutput,".posSA");
+            sprintf (fnPairSA,"%s%s",fileOutput,".gsa");
             std::cerr << "printOutput: fnPairSA: "  << fnPairSA <<  "." << std::endl;
             FILE *InFilePairSA = fopen(fnPairSA, "rb");
             if (InFilePairSA==NULL) {
@@ -5822,7 +5833,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             }
         #endif
 	
-	     #if BUILD_DA_bit==1
+	#if BUILD_DA_bit==1
             dataTypeNChar numcharDAbit;
             char *fnDAbit = new char[lung+100];
             sprintf (fnDAbit,"%s%s",fileOutput,".DAbit");
@@ -5839,9 +5850,9 @@ void BCRexternalBWT::printOutput(char *fileOutput)
         #endif
 
 	
-		std::cerr << "printOutput: fileOutRes: "  << fileOutRes <<  "." << std::endl;
+	std::cerr << "printOutput: fileOutRes: "  << fileOutRes <<  "." << std::endl;
 
-		#if OUTPUT_linear_SuffixArray ==  1
+	#if OUTPUT_linear_SuffixArray ==  1
 			char *fnSA = new char[lung+100];
 			sprintf (fnSA,"%s%s",fileOutput,".posSA");
 			FILE* InFileSA = fopen(fnSA, "rb");
@@ -5849,40 +5860,47 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 				std::cerr << "printOutput: Entire SA file: Error opening " << fnSA << std::endl;
 				exit (EXIT_FAILURE);
 			}
-		#endif
+	#endif
 
-		FILE *OutFile = fopen(fileOutRes, "w");
-		if (OutFile==NULL) {
-			std::cerr << "printOutput: Error opening output \"" << fileOutRes << "\" file"<< std::endl;
-			exit (EXIT_FAILURE);
-		}
+	FILE *OutFile = fopen(fileOutRes, "w");
+	if (OutFile==NULL) {
+		std::cerr << "printOutput: Error opening output \"" << fileOutRes << "\" file"<< std::endl;
+		exit (EXIT_FAILURE);
+	}
 
-		dataTypeNChar numcharBWT; //, numcharDA, numcharPairSA, numcharLCP;
+	dataTypeNChar numcharBWT; //, numcharDA, numcharPairSA, numcharLCP;
 
-		#if OUTPUT_linear_SuffixArray ==  1
-			numcharSA;
-		#endif
+	#if OUTPUT_linear_SuffixArray ==  1
+		numcharSA;
+	#endif
 
-		uchar *bufferBWT = new uchar[SIZEBUFFER];
+
+	std::cerr << "i\t";
+	#if (STORE_ENDMARKER_POS == 1)
+		std::cerr << "#seq\t";
+	#endif
+        std::cerr << "eBWT\t";
+	
+	uchar *bufferBWT = new uchar[SIZEBUFFER];
         std::cerr << "bwt\t";
         fprintf(OutFile, "bwt\t");
         #if BUILD_LCP==1
-			dataTypeNChar numcharLCP;	
+	    dataTypeNChar numcharLCP;	
             dataTypelenSeq *bufferLCP = new dataTypelenSeq[SIZEBUFFER];
             std::cerr << "lcp\t";
             fprintf(OutFile, "lcp\t");
         #endif
         #if BUILD_SA==1
-			dataTypeNChar numcharPairSA;
-             dataTypelenSeq *bufferSA = new dataTypelenSeq[SIZEBUFFER];
-            std::cerr << "posSA\t";
-            fprintf(OutFile, "posSA");
+		dataTypeNChar numcharPairSA;
+             	dataTypelenSeq *bufferSA = new dataTypelenSeq[SIZEBUFFER];
+            	std::cerr << "posSA\t";
+            	fprintf(OutFile, "posSA");
         #endif
         #if BUILD_DA==1
-			dataTypeNChar numcharDA;
-             dataTypeNSeq *bufferDA = new dataTypeNSeq[SIZEBUFFER];
-            std::cerr << "DA\t";
-            fprintf(OutFile, "DA\t");
+		dataTypeNChar numcharDA;
+             	dataTypeNSeq *bufferDA = new dataTypeNSeq[SIZEBUFFER];
+            	std::cerr << "DA\t";
+            	fprintf(OutFile, "DA\t");
         #endif
 	#if BUILD_SAP==1 || BUILD_RED_SAP==1
 		dataTypeNChar numcharSAP;
@@ -5890,18 +5908,23 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 		fprintf(OutFile, "SAP\t");
 		std::cerr << "SAP\t";
         #endif
-		#if BUILD_DA_bit==1
+	#if BUILD_DA_bit==1
             dataTypeNSeq *bufferDAbit = new uint[SIZEBUFFER];
             std::cerr << "DAbit\t";
             fprintf(OutFile, "DAbit\t");
         #endif
-		#if OUTPUT_linear_SuffixArray ==  1
-			dataTypeNChar *bufferNChar = new dataTypeNChar[SIZEBUFFER];
-            std::cerr << "SA";
-            fprintf(OutFile, "SA");
-		#endif
+	#if OUTPUT_linear_SuffixArray ==  1
+		dataTypeNChar *bufferNChar = new dataTypeNChar[SIZEBUFFER];
+            	std::cerr << "SA";
+            	fprintf(OutFile, "SA");
+	#endif
         std::cerr << "\r\n";
         fprintf(OutFile, "\r\n");
+
+	dataTypeNChar pos=1;
+        #if (STORE_ENDMARKER_POS == 1)
+	        dataTypeNSeq ind =1;
+	#endif
         
 		//while (!feof(InFileBWT))  {  //&& (!feof(InFileSA)) && (!feof(InFilePairSA)) && (!feof(InFileLCP))
         while ( (numcharBWT = fread(bufferBWT,sizeof(uchar),SIZEBUFFER,InFileBWT)) && (numcharBWT>0) ) {
@@ -5919,10 +5942,21 @@ void BCRexternalBWT::printOutput(char *fileOutput)
             #if BUILD_DA==1
                 numcharDA = fread(bufferDA,sizeof(dataTypeNSeq),SIZEBUFFER,InFileDA);
             #endif
-			#if OUTPUT_linear_SuffixArray ==  1
+           #if OUTPUT_linear_SuffixArray ==  1
 				numcharSA = fread(bufferNChar,sizeof(dataTypeNChar),SIZEBUFFER,InFileSA);
-			#endif
-			for (dataTypeNChar i=0; i < numcharBWT; i++) {
+           #endif
+           for (dataTypeNChar i=0; i < numcharBWT; i++) {
+		std::cerr << pos << "\t";
+
+		#if (STORE_ENDMARKER_POS == 1)
+			if (pos == vectTriple[ind].posN) {
+				std::cerr << vectTriple[ind].seqN << "\t";
+				ind++;
+			}
+			else 
+				std::cerr << " " << "\t";
+		#endif
+		pos++;
                 std::cerr << bufferBWT[i] << "\t";
                 fprintf(OutFile, "%c\t", bufferBWT[i]);
                 #if BUILD_LCP==1
@@ -5954,8 +5988,8 @@ void BCRexternalBWT::printOutput(char *fileOutput)
                 std::cerr << "\r\n";
                 fprintf(OutFile, "\r\n");
                 
-			}  //end-for
-		}  //end-while
+           }  //end-for
+	}  //end-while
 		
         delete[] bufferBWT;
         fclose(InFileBWT);
