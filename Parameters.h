@@ -190,7 +190,7 @@ typedef unsigned long ulong;
 
 
 //if you want to store the indexes of each end-marker (one for each sequence) in EBWT string, please set it to 1
-#ifndef STORE_ENDMARKER_POS==1
+#if STORE_ENDMARKER_POS==1
 	//Store (#seq, pos, symbol), where symbol is the first symbol of the string
 	#define STORE_ENDMARKER_POS 1
 #else
