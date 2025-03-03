@@ -5884,12 +5884,11 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 	
         std::cerr << "eBWT\t";
 	uchar *bufferBWT = new uchar[SIZEBUFFER];
-        fprintf(OutFile, "bwt\t");
         #if BUILD_LCP==1
 	    dataTypeNChar numcharLCP;	
             dataTypelenSeq *bufferLCP = new dataTypelenSeq[SIZEBUFFER];
-            std::cerr << "lcp\t";
-            fprintf(OutFile, "lcp\t");
+            std::cerr << "LCP\t";
+            fprintf(OutFile, "LCP\t");
         #endif
         #if BUILD_SA==1
 		dataTypeNChar numcharPairSA;
@@ -5924,7 +5923,7 @@ void BCRexternalBWT::printOutput(char *fileOutput)
 
 	dataTypeNChar pos=1;
         #if (STORE_ENDMARKER_POS == 1)
-	        dataTypeNSeq ind =1;
+	        dataTypeNSeq ind =0;
 	#endif
         
 		//while (!feof(InFileBWT))  {  //&& (!feof(InFileSA)) && (!feof(InFilePairSA)) && (!feof(InFileLCP))
