@@ -109,8 +109,12 @@ typedef unsigned long ulong;
 ////////////
 
 //Print of the output (BWT/DA/SA/LCP)
-//Store a txt file containing (BWT/DA/SA/LCP)
-#define printFinalOutput 0
+//Store a txt file containing (BWT/DA/SA/LCP
+#if printFinalOutput==1
+	#define printFinalOutput 1
+#else
+	#define printFinalOutput 0
+#endif
 
 //Verbose
 #define verboseEncode 0
@@ -185,8 +189,11 @@ typedef unsigned long ulong;
 
 
 
-//if you want to Store the 'end positions' of the end-markers (one for each sequence), please set it to 1
-#ifndef STORE_ENDMARKER_POS
+//if you want to store the indexes of each end-marker (one for each sequence) in EBWT string, please set it to 1
+#ifndef STORE_ENDMARKER_POS==1
+	//Store (#seq, pos, symbol), where symbol is the first symbol of the string
+	#define STORE_ENDMARKER_POS 1
+#else
 	#define STORE_ENDMARKER_POS 0
 #endif
 
