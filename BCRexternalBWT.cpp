@@ -1385,13 +1385,15 @@ int BCRexternalBWT::buildBCR(char const * file1, char const * fileOutput, char c
 				assert( numchar == 1); 
 				numchar = fwrite (&vectTriple[i].pileN, sizeof(dataTypedimAlpha), 1 , OutFileEndPos);
 				assert( numchar == 1); 
+
+				#if (printFinalOutput == 1)
+					std::cerr << vectTriple[i].seqN << " \t " << vectTriple[i].posN << std::endl;
+				#endif
 			}
-			#if (verboseEncode == 1) 
+			#if (verboseEncode == 1) || (printFinalOutput == 1)
 				std::cerr << std::endl;
 			#endif
-			#if (printFinalOutput == 1) || (printFinalOutput == 1)
-				std::cerr << vectTriple[i].seqN << " \t " << vectTriple[i].posN << std::endl;
-			#endif
+		
 			
 			fclose(OutFileEndPos);
 					
