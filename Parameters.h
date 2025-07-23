@@ -188,14 +188,21 @@ typedef unsigned long ulong;
 #define BUILD_DA_bit 0
 
 
+#if BCR_SET_ALN_RH==1
+	#define STORE_ENDMARKER_POS 0
+#endif
 
 //if you want to store the indexes of each end-marker (one for each sequence) in EBWT string, please set it to 1
 #if STORE_ENDMARKER_POS==1
 	//Store (#seq, pos, symbol), where symbol is the first symbol of the string
 	#define STORE_ENDMARKER_POS 1
+	#define BCR_SET_ALN_RH 0
+	#define BUILD_SAP 0  
+	#define BUILD_RED_SAP 0
 #else
 	#define STORE_ENDMARKER_POS 0
 #endif
+
 
 //if BUILD_BCR_ALTERNATE=0 then BCR computes the eBWT/SA/DA/LCP in straightforward order of the sequences (lexicographical order)
 //if BUILD_BCR_ALTERNATE=1 then BCR computes the eBWT/SA/DA/LCP in alternating order of the sequences (alternating lexicographical order) See paper...
