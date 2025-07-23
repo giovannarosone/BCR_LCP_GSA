@@ -310,6 +310,12 @@ int main(int argc, char *argv[])
         std::cout << "\t\tin internal memory (no cyc files)" << endl;
     #endif
 
+    std::cout << "Store the indeces of the dollars in EBWT in a separate file: ";
+    if(STORE_ENDMARKER_POS==1)
+	std::cout << "YES.\n";            
+    else
+	std::cout << "NO.\n"; 
+	
     std::cout << "End Setting" << endl;
     std::cout << "********************" << endl;
 
