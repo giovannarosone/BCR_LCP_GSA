@@ -8,7 +8,7 @@ RLO = 0    #compute the RLO-BWT
 LCP = 0    #compute the LCP array
 DA = 0     #compute the DA array
 
-STORE_INDICES_DOLLARS = 1 #Store the indexes of each distint end-marker in eBWT string 
+STORE_INDICES_DOLLARS = 0 #Store the indexes of each distint end-marker in eBWT string 
 #For each end-marker, the binary file contains
 #- indexes of the sequences
 #- position in the eBWT string
